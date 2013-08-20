@@ -42,6 +42,7 @@ TARGET_CC_ARCH += "${LDFLAGS}"
 do_compile_prepend_class-native() {
     export NSPR_INCLUDE_DIR=${STAGING_INCDIR_NATIVE}
     export NSPR_LIB_DIR=${STAGING_LIBDIR_NATIVE}
+    export PATH=/usr/libexec/binutils220:${PATH}
 }
 
 do_compile_prepend_class-nativesdk() {
