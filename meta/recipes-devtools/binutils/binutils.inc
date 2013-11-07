@@ -22,6 +22,7 @@ FILES_${PN} = " \
         ${bindir}/embedspu"
 
 RPROVIDES_${PN} += "${PN}-symlinks"
+RREPLACES_${PN} += "${PN}-symlinks"
 
 FILES_${PN}-dev = " \
 	${includedir} \

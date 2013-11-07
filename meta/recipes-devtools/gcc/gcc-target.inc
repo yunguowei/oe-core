@@ -18,12 +18,12 @@ export gcc_cv_objdump = "${TARGET_PREFIX}objdump"
 EXTRA_OECONF_GCC_FLOAT = "${@get_gcc_float_setting(bb, d)}"
 
 PACKAGES = "\
-    ${PN} ${PN}-plugins ${PN}-symlinks \
-    g++ g++-symlinks \
-    cpp cpp-symlinks \
-    g77 g77-symlinks \
-    gfortran gfortran-symlinks \
-    gcov gcov-symlinks \
+    ${PN} ${PN}-plugins \
+    g++ \
+    cpp \
+    g77 \
+    gfortran \
+    gcov \
     ${PN}-doc \
     ${PN}-dev \
     ${PN}-dbg \
@@ -43,6 +43,8 @@ FILES_${PN} = "\
     ${gcclibdir}/${TARGET_SYS}/${BINV}/include-fixed \
 "
 INSANE_SKIP_${PN} += "dev-so"
+RPROVIDES_${PN} += "${PN}-symlinks"
+RREPLACES_${PN} += "${PN}-symlinks"
 
 FILES_${PN}-dbg += "\
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/.debug/ \
@@ -55,11 +57,6 @@ FILES_${PN}-dev = "\
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/plugin/gengtype \
     ${gcclibdir}/${TARGET_SYS}/${BINV}/plugin/gtype.state \
 "
-FILES_${PN}-symlinks = "\
-    ${bindir}/cc \
-    ${bindir}/gcc \
-    ${bindir}/gccbug \
-"
 
 FILES_${PN}-plugins = "\
     ${gcclibdir}/${TARGET_SYS}/${BINV}/plugin \
@@ -70,23 +67,22 @@ FILES_g77 = "\
     ${bindir}/${TARGET_PREFIX}g77 \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/f771 \
 "
-FILES_g77-symlinks = "\
-    ${bindir}/g77 \
-    ${bindir}/f77 \
-"
+RPROVIDES_g77 += "g77-symlinks"
+RREPLACES_g77 += "g77-symlinks"
+
 FILES_gfortran = "\
     ${bindir}/${TARGET_PREFIX}gfortran \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/f951 \
 "
-FILES_gfortran-symlinks = "\
-    ${bindir}/gfortran \
-    ${bindir}/f95"
+RPROVIDES_gfortran += "gfortran-symlinks"
+RREPLACES_gfortran += "gfortran-symlinks"
 
 FILES_cpp = "\
     ${bindir}/${TARGET_PREFIX}cpp* \
     ${base_libdir}/cpp \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc1"
-FILES_cpp-symlinks = "${bindir}/cpp"
+RPROVIDES_cpp += "cpp-symlinks"
+RREPLACES_cpp += "cpp-symlinks"
 
 FILES_gcov = "${bindir}/${TARGET_PREFIX}gcov* \
     ${bindir}/${TARGET_PREFIX}gcov-tool* \
@@ -94,15 +90,15 @@ FILES_gcov = "${bindir}/${TARGET_PREFIX}gcov* \
 FILES_gcov-symlinks = "${bindir}/gcov \
     ${bindir}/gcov-tool \
 "
+RPROVIDES_gcov += "gcov-symlinks"
+RREPLACES_gcov += "gcov-symlinks"
 
 FILES_g++ = "\
     ${bindir}/${TARGET_PREFIX}g++* \
     ${libexecdir}/gcc/${TARGET_SYS}/${BINV}/cc1plus \
 "
-FILES_g++-symlinks = "\
-    ${bindir}/c++ \
-    ${bindir}/g++ \
-"
+RPROVIDES_g++ += "g++-symlinks"
+RREPLACES_g++ += "g++-symlinks"
 
 FILES_${PN}-doc = "\
     ${infodir} \
@@ -153,22 +149,8 @@ do_install () {
 	# Not sure why we end up with these but we don't want them...
 	rm -f ${TARGET_PREFIX}${TARGET_PREFIX}*
 
-	# Symlinks so we can use these trivially on the target
-	if [ -e ${TARGET_PREFIX}g77 ]; then
-		ln -sf ${TARGET_PREFIX}g77 g77 || true
-		ln -sf g77 f77 || true
-	fi
-	if [ -e ${TARGET_PREFIX}gfortran ]; then
-		ln -sf ${TARGET_PREFIX}gfortran gfortran || true
-		ln -sf gfortran f95 || true
-	fi
-	ln -sf ${TARGET_PREFIX}g++ g++
-	ln -sf ${TARGET_PREFIX}gcc gcc
-	ln -sf ${TARGET_PREFIX}cpp cpp
 	install -d ${D}${base_libdir}
 	ln -sf ${bindir}/${TARGET_PREFIX}cpp ${D}${base_libdir}/cpp
-	ln -sf g++ c++
-	ln -sf gcc cc
 
 	chown -R root:root ${D}
 }
@@ -212,3 +194,47 @@ do_install_append () {
 sysroot_stage_dirs_append () {
 	rm -rf $to${libdir}/gcc
 }
+inherit update-alternatives
+
+ALTERNATIVE_PRIORITY = "100"
+
+ALTERNATIVE_${PN} = "cc gcc"
+ALTERNATIVE_g77 = "${@['', 'g77 f77']['f77' in d.getVar('FORTRAN', True)]}"
+ALTERNATIVE_gfortran = "${@['', 'gfortran f95']['fortran' in d.getVar('FORTRAN', True)]}"
+ALTERNATIVE_cpp = "cpp"
+ALTERNATIVE_gcov = "gcov"
+ALTERNATIVE_g++ = "c++ g++"
+
+ALTERNATIVE_LINK_NAME[cc] = "${bindir}/cc"
+ALTERNATIVE_TARGET[cc] = "${bindir}/${TARGET_PREFIX}gcc"
+
+ALTERNATIVE_LINK_NAME[gcc] = "${bindir}/gcc"
+ALTERNATIVE_TARGET[gcc] = "${bindir}/${TARGET_PREFIX}gcc"
+
+# Not really generated any longer, avoid warnings...
+#ALTERNATIVE_LINK_NAME[gccbug] = "${bindir}/gccbug"
+#ALTERNATIVE_TARGET[gccbug] = "${bindir}/${TARGET_PREFIX}gccbug"
+
+ALTERNATIVE_LINK_NAME[g77] = "${bindir}/g77"
+ALTERNATIVE_TARGET[g77] = "${bindir}/${TARGET_PREFIX}g77"
+
+ALTERNATIVE_LINK_NAME[f77] = "${bindir}/f77"
+ALTERNATIVE_TARGET[f77] = "${bindir}/${TARGET_PREFIX}g77"
+
+ALTERNATIVE_LINK_NAME[gfortran] = "${bindir}/gfortran"
+ALTERNATIVE_TARGET[gfortran] = "${bindir}/${TARGET_PREFIX}gfortran"
+
+ALTERNATIVE_LINK_NAME[f95] = "${bindir}/f95"
+ALTERNATIVE_TARGET[f95] = "${bindir}/${TARGET_PREFIX}gfortran"
+
+ALTERNATIVE_LINK_NAME[cpp] = "${bindir}/cpp"
+ALTERNATIVE_TARGET[cpp] = "${bindir}/${TARGET_PREFIX}cpp"
+
+ALTERNATIVE_LINK_NAME[gcov] = "${bindir}/gcov"
+ALTERNATIVE_TARGET[gcov] = "${bindir}/${TARGET_PREFIX}gcov"
+
+ALTERNATIVE_LINK_NAME[c++] = "${bindir}/c++"
+ALTERNATIVE_TARGET[c++] = "${bindir}/${TARGET_PREFIX}g++"
+
+ALTERNATIVE_LINK_NAME[g++] = "${bindir}/g++"
+ALTERNATIVE_TARGET[g++] = "${bindir}/${TARGET_PREFIX}g++"
