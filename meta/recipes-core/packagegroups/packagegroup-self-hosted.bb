@@ -61,33 +61,23 @@ RRECOMMENDS_packagegroup-self-hosted-host-tools = "\
 
 # glibc-utils: for rpcgen
 RDEPENDS_packagegroup-self-hosted-sdk = "\
-    autoconf \
-    automake \
-    binutils \
     ccache \
     coreutils \
-    cpp \
     distcc \
     glibc-utils \
     glibc-gconv-ibm850 \
     file \
     findutils \
-    g++ \
-    gcc \
     intltool \
     ldd \
     less \
     libssp \
     libssp-dev \
     libssp-staticdev \
-    libstdc++ \
-    libstdc++-dev \
-    libtool \
-    make \
     mktemp \
+    packagegroup-core-buildessential \
     perl-module-re \
     perl-module-text-wrap \
-    pkgconfig \
     quilt \
     sed \
     "
