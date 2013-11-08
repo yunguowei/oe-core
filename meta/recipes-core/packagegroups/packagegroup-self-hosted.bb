@@ -64,20 +64,16 @@ RDEPENDS_packagegroup-self-hosted-sdk = "\
     autoconf \
     automake \
     binutils \
-    binutils-symlinks \
     ccache \
     coreutils \
     cpp \
-    cpp-symlinks \
     distcc \
     glibc-utils \
     glibc-gconv-ibm850 \
     file \
     findutils \
     g++ \
-    g++-symlinks \
     gcc \
-    gcc-symlinks \
     intltool \
     ldd \
     less \

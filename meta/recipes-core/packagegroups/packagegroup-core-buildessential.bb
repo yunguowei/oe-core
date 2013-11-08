@@ -12,13 +12,9 @@ RDEPENDS_packagegroup-core-buildessential = "\
     autoconf \
     automake \
     binutils \
-    binutils-symlinks \
     cpp \
-    cpp-symlinks \
     gcc \
-    gcc-symlinks \
     g++ \
-    g++-symlinks \
     gettext \
     make \
     libstdc++ \
