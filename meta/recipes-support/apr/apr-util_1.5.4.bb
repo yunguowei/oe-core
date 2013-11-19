@@ -38,6 +38,11 @@ do_configure_append() {
 	if [ "${CLASSOVERRIDE}" = "class-target" ]; then
 		cp ${STAGING_DATADIR}/apr/apr_rules.mk ${B}/build/rules.mk
 	fi
+
+	# When ccache is enabled, libtool needs --tag=CC to choose correct handle methods.
+	if [ -f ${S}/build/rules.mk ]; then
+		sed -i "s,^LTFLAGS,LTFLAGS      = --silent --tag=CC\n#LTFLAGS,g" ${S}/build/rules.mk
+	fi
 }
 do_configure_prepend_class-native() {
 	mkdir ${B}/build
