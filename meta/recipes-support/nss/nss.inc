@@ -27,6 +27,7 @@ SRC_URI = "\
 SRC_URI_append = "\
     file://nss.pc.in \
     file://signlibs.sh \
+    file://nss-fix-nsinstall-build.patch \
 "
 inherit siteinfo
 PR = "r0"
