@@ -4,6 +4,7 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://get_header_tar.patch \
            file://busybox-appletlib-dependency.patch \
            file://busybox-udhcpc-no_deconfig.patch \
+           file://busybox-install-ping6-to-usr-bin.patch \
            file://find-touchscreen.sh \
            file://busybox-cron \
            file://busybox-httpd \
