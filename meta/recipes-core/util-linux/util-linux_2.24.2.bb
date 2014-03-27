@@ -7,6 +7,7 @@ PR = "r1"
 OLDHOST = ""
 OLDHOST_class-native = "file://util-linux-native.patch \
                         file://util-linux-native-qsort.patch \
+                        file://util-linux-native-MS.patch \
 			"
 
 SRC_URI += "file://util-linux-ng-replace-siginterrupt.patch \
