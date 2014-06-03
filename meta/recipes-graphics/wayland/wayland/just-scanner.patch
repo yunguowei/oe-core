@@ -1,0 +1,126 @@
+From 7acb2c82371c17f9e6d8cd58fb906b998ecb5e97 Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Tue, 3 Jun 2014 15:09:31 +0800
+Subject: [PATCH] Makefile.am: just scanner for native
+
+We only build wayland-native for the scanner, so disable the bits we don't
+actually need. This gives us a small speed up but importantly should allow
+wayland-native to compile on older hosts such as CentOS 5 which currently fails:
+
+| wayland-1.0.6/src/wayland-server.c:1245: error: 'O_CLOEXEC' undeclared (first use in this function)
+| wayland-1.0.6/src/event-loop.c:34:25: error: sys/timerfd.h: No such file or directory
+| wayland-1.0.6/src/event-loop.c:199: error: 'CLOCK_MONOTONIC' undeclared (first use in this function)
+| wayland-1.0.6/src/event-loop.c:199: error: 'TFD_CLOEXEC' undeclared (first use in this function)
+| wayland-1.0.6/src/event-loop.c:268: error: 'SFD_CLOEXEC' undeclared (first use in this function)
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Valentin Popa <valentin.popa@intel.com>
+
+Updated for 1.5.0
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ Makefile.am | 42 +++---------------------------------------
+ 1 file changed, 3 insertions(+), 39 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index c15d8b8..53e8560 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -15,7 +15,6 @@ dist_pkgdata_DATA =				\
+ pkgconfigdir = $(libdir)/pkgconfig
+ pkgconfig_DATA =
+ 
+-lib_LTLIBRARIES = libwayland-server.la libwayland-client.la
+ noinst_LTLIBRARIES = libwayland-util.la
+ 
+ include_HEADERS =				\
+@@ -25,10 +24,6 @@ include_HEADERS =				\
+ 	src/wayland-egl.h			\
+ 	src/wayland-version.h
+ 
+-nodist_include_HEADERS =			\
+-	protocol/wayland-server-protocol.h	\
+-	protocol/wayland-client-protocol.h
+-
+ libwayland_util_la_SOURCES =			\
+ 	src/connection.c			\
+ 	src/wayland-util.c			\
+@@ -38,26 +33,8 @@ libwayland_util_la_SOURCES =			\
+ 	src/wayland-private.h
+ 
+ libwayland_server_la_CFLAGS = $(FFI_CFLAGS) $(GCC_CFLAGS) -pthread
+-libwayland_server_la_LIBADD = $(FFI_LIBS) libwayland-util.la -lrt -lm
+-libwayland_server_la_LDFLAGS = -version-info 1:0:1
+-libwayland_server_la_SOURCES =			\
+-	src/wayland-server.c			\
+-	src/wayland-shm.c			\
+-	src/event-loop.c
+-
+-nodist_libwayland_server_la_SOURCES =		\
+-	protocol/wayland-server-protocol.h	\
+-	protocol/wayland-protocol.c
+ 
+ libwayland_client_la_CFLAGS = $(FFI_CFLAGS) $(GCC_CFLAGS) -pthread
+-libwayland_client_la_LIBADD = $(FFI_LIBS) libwayland-util.la -lrt -lm
+-libwayland_client_la_LDFLAGS = -version-info 2:0:2
+-libwayland_client_la_SOURCES =			\
+-	src/wayland-client.c
+-
+-nodist_libwayland_client_la_SOURCES =		\
+-	protocol/wayland-client-protocol.h	\
+-	protocol/wayland-protocol.c
+ 
+ pkgconfig_DATA += src/wayland-client.pc src/wayland-server.pc
+ 
+@@ -73,13 +50,13 @@ wayland_scanner = wayland-scanner
+ endif
+ 
+ protocol/%-protocol.c : $(top_srcdir)/protocol/%.xml
+-	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(wayland_scanner) code < $< > $@
++	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
+ 
+ protocol/%-server-protocol.h : $(top_srcdir)/protocol/%.xml
+-	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(wayland_scanner) server-header < $< > $@
++	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
+ 
+ protocol/%-client-protocol.h : $(top_srcdir)/protocol/%.xml
+-	$(AM_V_GEN)$(MKDIR_P) $(dir $@) && $(wayland_scanner) client-header < $< > $@
++	$(AM_V_GEN)$(MKDIR_P) $(dir $@)
+ 
+ BUILT_SOURCES =					\
+ 	$(nodist_libwayland_server_la_SOURCES)	\
+@@ -91,19 +68,8 @@ EXTRA_DIST = src/wayland-version.h.in
+ 
+ 
+ 
+-lib_LTLIBRARIES += libwayland-cursor.la
+-
+ include_HEADERS += cursor/wayland-cursor.h
+ 
+-libwayland_cursor_la_SOURCES =			\
+-	cursor/wayland-cursor.c			\
+-	cursor/os-compatibility.c		\
+-	cursor/os-compatibility.h		\
+-	cursor/cursor-data.h			\
+-	cursor/xcursor.c			\
+-	cursor/xcursor.h
+-libwayland_cursor_la_LIBADD = libwayland-client.la
+-
+ pkgconfig_DATA += cursor/wayland-cursor.pc
+ 
+ libwayland_cursor_la_CFLAGS =			\
+@@ -145,8 +111,6 @@ libtest_runner_la_SOURCES =			\
+ 	tests/test-helpers.c
+ libtest_runner_la_LIBADD =			\
+ 	libwayland-util.la			\
+-	libwayland-client.la			\
+-	libwayland-server.la			\
+ 	-lrt -ldl $(FFI_LIBS)
+ 
+ 
+-- 
+1.8.2.1
+

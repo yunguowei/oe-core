@@ -15,6 +15,7 @@ SRC_URI[md5sum] = "1d882776b27329b91d2d500b6d66dd1d"
 SRC_URI[sha256sum] = "0069e1e9af888b3e05384380ad8cc6c976ea3e81d08ba19b7675ce1d693a41b5"
 SRC_URI_append_class-native = " \
     file://disable-macro-checks-not-used-for-scanner.patch \
+    file://just-scanner.patch \
     "
 EXTRA_OECONF_class-native = "--disable-documentation --enable-scanner"
 
