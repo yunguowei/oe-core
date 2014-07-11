@@ -13,7 +13,8 @@ INITRAMFS_IMAGE_BUNDLE ?= ""
 
 python __anonymous () {
     kerneltype = d.getVar('KERNEL_IMAGETYPE', True)
-    if kerneltype == 'uImage':
+    kernelalttype = d.getVar('KERNEL_ALT_IMAGETYPE', True)
+    if kerneltype == 'uImage' or kernelalttype == 'uImage':
         depends = d.getVar("DEPENDS", True)
         depends = "%s u-boot-mkimage-native" % depends
         d.setVar("DEPENDS", depends)
@@ -74,6 +75,7 @@ KERNEL_EXTRA_ARGS ?= ""
 EXTRA_OEMAKE = ""
 
 KERNEL_ALT_IMAGETYPE ??= ""
+KERNEL_ALT_OUTPUT ?= "arch/${ARCH}/boot/${KERNEL_ALT_IMAGETYPE}"
 
 # Define where the kernel headers are installed on the target as well as where
 # they are staged.
@@ -215,6 +217,9 @@ kernel_do_install() {
 	install -d ${D}/${KERNEL_IMAGEDEST}
 	install -d ${D}/boot
 	install -m 0644 ${KERNEL_OUTPUT} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+	if [ "${KERNEL_ALT_IMAGETYPE}" != "" ]; then
+		install -m 0644 ${KERNEL_ALT_OUTPUT} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_ALT_IMAGETYPE}-${KERNEL_VERSION}
+	fi
 	install -m 0644 System.map ${D}/boot/System.map-${KERNEL_VERSION}
 	install -m 0644 .config ${D}/boot/config-${KERNEL_VERSION}
 	install -m 0644 vmlinux ${D}/boot/vmlinux-${KERNEL_VERSION}
@@ -241,6 +246,7 @@ kernel_do_install() {
 	#
 
 	echo "${KERNEL_IMAGE_BASE_NAME}" >$kerneldir/kernel-image-name
+	echo "${KERNEL_ALT_IMAGE_BASE_NAME}" >$kerneldir/kernel-alt-image-name
 
 	#
 	# Copy the entire source tree. In case an external build directory is
@@ -261,6 +267,9 @@ kernel_do_install() {
 	# the same file. If hardlinking is used, they will be the same, and there's
 	# no need to install.
 	! [ ${KERNEL_OUTPUT} -ef $kerneldir/${KERNEL_IMAGETYPE} ] && install -m 0644 ${KERNEL_OUTPUT} $kerneldir/${KERNEL_IMAGETYPE}
+	if [ "${KERNEL_ALT_IMAGETYPE}" != "" ]; then
+		! [ ${KERNEL_ALT_OUTPUT} -ef $kerneldir/${KERNEL_ALT_IMAGETYPE} ] && install -m 0644 ${KERNEL_ALT_OUTPUT} $kerneldir/${KERNEL_ALT_IMAGETYPE}
+	fi
 	install -m 0644 System.map $kerneldir/System.map-${KERNEL_VERSION}
 
 	# Dummy Makefile so the clean below works
@@ -358,10 +367,11 @@ EXPORT_FUNCTIONS do_compile do_install do_configure
 
 # kernel-base becomes kernel-${KERNEL_VERSION}
 # kernel-image becomes kernel-image-${KERNEL_VERISON}
-PACKAGES = "kernel kernel-base kernel-vmlinux kernel-image kernel-dev kernel-modules"
+PACKAGES = "kernel kernel-base kernel-vmlinux kernel-image kernel-alt-image kernel-dev kernel-modules"
 FILES_${PN} = ""
 FILES_kernel-base = "/lib/modules/${KERNEL_VERSION}/modules.order /lib/modules/${KERNEL_VERSION}/modules.builtin"
 FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}*"
+FILES_kernel-alt-image = "/boot/${KERNEL_ALT_IMAGETYPE}*"
 FILES_kernel-dev = "/boot/System.map* /boot/Module.symvers* /boot/config* ${KERNEL_SRC_PATH} /lib/modules/${KERNEL_VERSION}/build"
 FILES_kernel-vmlinux = "/boot/vmlinux*"
 FILES_kernel-modules = ""
@@ -370,11 +380,13 @@ RDEPENDS_kernel = "kernel-base"
 # not wanted in images as standard
 RDEPENDS_kernel-base ?= "kernel-image"
 PKG_kernel-image = "kernel-image-${@legitimize_package_name('${KERNEL_VERSION}')}"
+PKG_kernel-alt-image = "kernel-alt-image-${@legitimize_package_name('${KERNEL_VERSION}')}"
 PKG_kernel-base = "kernel-${@legitimize_package_name('${KERNEL_VERSION}')}"
 RPROVIDES_kernel-base += "kernel-${KERNEL_VERSION}"
 ALLOW_EMPTY_kernel = "1"
 ALLOW_EMPTY_kernel-base = "1"
 ALLOW_EMPTY_kernel-image = "1"
+ALLOW_EMPTY_kernel-alt-image = "1"
 ALLOW_EMPTY_kernel-modules = "1"
 DESCRIPTION_kernel-modules = "Kernel modules meta package"
 
@@ -395,6 +407,14 @@ pkg_postinst_kernel-image () {
 
 pkg_postrm_kernel-image () {
 	update-alternatives --remove ${KERNEL_IMAGETYPE} ${KERNEL_IMAGETYPE}-${KERNEL_VERSION} || true
+}
+
+pkg_postinst_kernel-alt-image () {
+	update-alternatives --install /${KERNEL_IMAGEDEST}/${KERNEL_ALT_IMAGETYPE} ${KERNEL_ALT_IMAGETYPE} /${KERNEL_IMAGEDEST}/${KERNEL_ALT_IMAGETYPE}-${KERNEL_VERSION} ${KERNEL_PRIORITY} || true
+}
+
+pkg_postrm_kernel-alt-image () {
+	update-alternatives --remove ${KERNEL_ALT_IMAGETYPE} ${KERNEL_ALT_IMAGETYPE}-${KERNEL_VERSION} || true
 }
 
 PACKAGESPLITFUNCS_prepend = "split_kernel_packages "
@@ -454,6 +474,10 @@ KERNEL_IMAGE_BASE_NAME ?= "${KERNEL_IMAGETYPE}-${PKGE}-${PKGV}-${PKGR}-${MACHINE
 # Don't include the DATETIME variable in the sstate package signatures
 KERNEL_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"
 KERNEL_IMAGE_SYMLINK_NAME ?= "${KERNEL_IMAGETYPE}-${MACHINE}"
+KERNEL_ALT_IMAGE_BASE_NAME ?= "${KERNEL_ALT_IMAGETYPE}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
+# Don't include the DATETIME variable in the sstate package signatures
+KERNEL_ALT_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"
+KERNEL_ALT_IMAGE_SYMLINK_NAME ?= "${KERNEL_ALT_IMAGETYPE}-${MACHINE}"
 MODULE_IMAGE_BASE_NAME ?= "modules-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
 MODULE_IMAGE_BASE_NAME[vardepsexclude] = "DATETIME"
 MODULE_TARBALL_BASE_NAME ?= "${MODULE_IMAGE_BASE_NAME}.tgz"
@@ -462,7 +486,7 @@ MODULE_TARBALL_SYMLINK_NAME ?= "modules-${MACHINE}.tgz"
 MODULE_TARBALL_DEPLOY ?= "1"
 
 do_uboot_mkimage() {
-	if test "x${KERNEL_IMAGETYPE}" = "xuImage" ; then 
+	if test "x${KERNEL_IMAGETYPE}" = "xuImage" or "x${KERNEL_ALT_IMAGETYPE}" = "xuImage"; then
 		if test "x${KEEPUIMAGE}" != "xyes" ; then
 			ENTRYPOINT=${UBOOT_ENTRYPOINT}
 			if test -n "${UBOOT_ENTRYSYMBOL}"; then
@@ -488,6 +512,9 @@ addtask uboot_mkimage before do_install after do_compile
 
 kernel_do_deploy() {
 	install -m 0644 ${KERNEL_OUTPUT} ${DEPLOYDIR}/${KERNEL_IMAGE_BASE_NAME}.bin
+	if [ "${KERNEL_ALT_IMAGETYPE}" != "" ]; then
+		install -m 0644 ${KERNEL_ALT_OUTPUT} ${DEPLOYDIR}/${KERNEL_ALT_IMAGE_BASE_NAME}.bin
+	fi
 	if [ ${MODULE_TARBALL_DEPLOY} = "1" ] && (grep -q -i -e '^CONFIG_MODULES=y$' .config); then
 		# Generate modules.* files in order to adding the modules.* into kernel module tar ball
 		# after making the tar ball, remove the modules.* files to avoid unnecessary QA warnings.
@@ -502,6 +529,11 @@ kernel_do_deploy() {
 
 	ln -sf ${KERNEL_IMAGE_BASE_NAME}.bin ${DEPLOYDIR}/${KERNEL_IMAGE_SYMLINK_NAME}.bin
 	ln -sf ${KERNEL_IMAGE_BASE_NAME}.bin ${DEPLOYDIR}/${KERNEL_IMAGETYPE}
+
+	if [ "${KERNEL_ALT_IMAGETYPE}" != "" ]; then
+		ln -sf ${KERNEL_ALT_IMAGE_BASE_NAME}.bin ${DEPLOYDIR}/${KERNEL_ALT_IMAGE_SYMLINK_NAME}.bin
+		ln -sf ${KERNEL_ALT_IMAGE_BASE_NAME}.bin ${DEPLOYDIR}/${KERNEL_ALT_IMAGETYPE}
+	fi
 
 	cp ${COREBASE}/meta/files/deploydir_readme.txt ${DEPLOYDIR}/README_-_DO_NOT_DELETE_FILES_IN_THIS_DIRECTORY.txt
 
