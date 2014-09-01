@@ -13,6 +13,7 @@ SRC_URI[md5sum] = "6726977292b448cbc7f89998fac6983b"
 SRC_URI[sha256sum] = "397e23184f4bf613589a8fe0c6542461dc2afdf17ed337e97e6fd2f31e8f8802"
 
 COMPATIBLE_HOST_class-target_mips64 = "null"
+COMPATIBLE_HOST_class-target_mips = "null"
 
 do_sanitize_sources() {
     # These .git files point to a nonexistent path "../.git/modules" and will confuse git

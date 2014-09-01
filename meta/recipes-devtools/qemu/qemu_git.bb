@@ -13,3 +13,4 @@ S = "${WORKDIR}/git"
 DEFAULT_PREFERENCE = "-1"
 
 COMPATIBLE_HOST_class-target_mips64 = "null"
+COMPATIBLE_HOST_class-target_mips = "null"
