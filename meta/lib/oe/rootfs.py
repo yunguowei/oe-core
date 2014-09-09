@@ -295,9 +295,13 @@ class RpmRootfs(Rootfs):
 
     def _create(self):
         pkgs_to_install = self.manifest.parse_initial_manifest()
+        rpm_pre_process_cmds = self.d.getVar('RPM_PREPROCESS_COMMANDS', True)
+        rpm_post_process_cmds = self.d.getVar('RPM_POSTPROCESS_COMMANDS', True)
 
         # update PM index files
         self.pm.write_index()
+
+        execute_pre_post_process(self.d, rpm_pre_process_cmds)
 
         self.pm.dump_all_available_pkgs()
 
@@ -319,6 +323,8 @@ class RpmRootfs(Rootfs):
         self.pm.install(pkgs_attempt, True)
 
         self.pm.install_complementary()
+
+        execute_pre_post_process(self.d, rpm_post_process_cmds)
 
         self._log_check()
 
@@ -419,12 +425,16 @@ class DpkgRootfs(Rootfs):
 
     def _create(self):
         pkgs_to_install = self.manifest.parse_initial_manifest()
+        deb_pre_process_cmds = self.d.getVar('DEB_PREPROCESS_COMMANDS', True)
+        deb_post_process_cmds = self.d.getVar('DEB_POSTPROCESS_COMMANDS', True)
 
         alt_dir = self.d.expand("${IMAGE_ROOTFS}/var/lib/dpkg/alternatives")
         bb.utils.mkdirhier(alt_dir)
 
         # update PM index files
         self.pm.write_index()
+
+        execute_pre_post_process(self.d, deb_pre_process_cmds)
 
         self.pm.update()
 
@@ -441,9 +451,11 @@ class DpkgRootfs(Rootfs):
 
         self.pm.run_pre_post_installs()
 
+        execute_pre_post_process(self.d, deb_post_process_cmds)
+
     @staticmethod
     def _depends_list():
-        return ['DEPLOY_DIR_DEB', 'DEB_SDK_ARCH', 'APTCONF_TARGET', 'APT_ARGS', 'DPKG_ARCH', 'DEB_PREPROCESS_COMMANDS', 'DEB_POSTPROCESS_COMMAND']
+        return ['DEPLOY_DIR_DEB', 'DEB_SDK_ARCH', 'APTCONF_TARGET', 'APT_ARGS', 'DPKG_ARCH', 'DEB_PREPROCESS_COMMANDS', 'DEB_POSTPROCESS_COMMANDS']
 
     def _get_delayed_postinsts(self):
         pkg_list = []
