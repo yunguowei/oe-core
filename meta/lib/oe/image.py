@@ -5,7 +5,7 @@ import multiprocessing
 
 
 def generate_image(arg):
-    (type, subimages, create_img_cmd) = arg
+    (type, subimages, create_img_cmd, image_name, image_link_name) = arg
 
     bb.note("Running image creation script for %s: %s ..." %
             (type, create_img_cmd))
@@ -168,28 +168,29 @@ class Image(ImageDepGraph):
 
         return base_size
 
-    def _create_symlinks(self, subimages):
+    def _create_symlinks(self, subimages, image_name, image_link_name):
         """create symlinks to the newly created image"""
         deploy_dir = self.d.getVar('DEPLOY_DIR_IMAGE', True)
-        img_name = self.d.getVar('IMAGE_NAME', True)
-        link_name = self.d.getVar('IMAGE_LINK_NAME', True)
         manifest_name = self.d.getVar('IMAGE_MANIFEST', True)
 
         os.chdir(deploy_dir)
 
-        if link_name is not None:
+        if image_link_name is not None:
             for type in subimages:
-                if os.path.exists(img_name + ".rootfs." + type):
-                    dst = link_name + "." + type
-                    src = img_name + ".rootfs." + type
+                if os.path.exists(image_name + ".rootfs." + type):
+                    dst = image_link_name + "." + type
+                    src = image_name + ".rootfs." + type
                     bb.note("Creating symlink: %s -> %s" % (dst, src))
                     os.symlink(src, dst)
 
-            if manifest_name is not None and \
+            # If ${IMAGE_NAME} != image_name, we processing a debugfs.
+            # A debugfs does not have a manifest file.
+            if self.d.getVar('IMAGE_NAME', True) == image_name and \
+                    manifest_name is not None and \
                     os.path.exists(manifest_name) and \
-                    not os.path.exists(link_name + ".manifest"):
+                    not os.path.exists(image_link_name + ".manifest"):
                 os.symlink(os.path.basename(manifest_name),
-                           link_name + ".manifest")
+                           image_link_name + ".manifest")
 
     def _remove_old_symlinks(self):
         """remove the symlinks to old binaries"""
@@ -236,10 +237,12 @@ class Image(ImageDepGraph):
 
         return (filtered_groups, cimages)
 
-    def _get_image_types(self):
+    def _get_image_types(self, data=None):
         """returns a (types, cimages) tuple"""
+        if not data:
+            data = self.d
 
-        alltypes, fstype_groups = self.group_fstypes(self.d.getVar('IMAGE_FSTYPES', True).split())
+        alltypes, fstype_groups = self.group_fstypes(data.getVar('IMAGE_FSTYPES', True).split())
 
         filtered_groups, cimages = self._filter_out_commpressed(fstype_groups)
 
@@ -263,8 +266,11 @@ class Image(ImageDepGraph):
 
         return script_name
 
-    def _get_imagecmds(self):
-        old_overrides = self.d.getVar('OVERRIDES', 0)
+    def _get_imagecmds(self, data=None, suffix=""):
+        if not data:
+            data = self.d
+
+        old_overrides = data.getVar('OVERRIDES', 0)
 
         alltypes, fstype_groups, cimages = self._get_image_types()
 
@@ -277,10 +283,13 @@ class Image(ImageDepGraph):
                 cmds = []
                 subimages = []
 
-                localdata = bb.data.createCopy(self.d)
+                localdata = bb.data.createCopy(data)
                 localdata.setVar('OVERRIDES', '%s:%s' % (type, old_overrides))
                 bb.data.update_data(localdata)
                 localdata.setVar('type', type)
+
+                image_name = localdata.getVar("IMAGE_NAME", True)
+                image_link_name = localdata.getVar("IMAGE_LINK_NAME", True)
 
                 cmds.append("\t" + localdata.getVar("IMAGE_CMD", True))
                 cmds.append(localdata.expand("\tcd ${DEPLOY_DIR_IMAGE}"))
@@ -295,9 +304,9 @@ class Image(ImageDepGraph):
                 else:
                     subimages.append(type)
 
-                script_name = self._write_script(type, cmds)
+                script_name = self._write_script(type + suffix, cmds)
 
-                image_cmds.append((type, subimages, script_name))
+                image_cmds.append((type, subimages, script_name, image_name, image_link_name))
 
             image_cmd_groups.append(image_cmds)
 
@@ -314,6 +323,20 @@ class Image(ImageDepGraph):
 
         image_cmd_groups = self._get_imagecmds()
 
+        if self.d.getVar('IMAGE_GEN_DEBUGFS', True) == "1":
+            image_rootfs = self.d.getVar('IMAGE_ROOTFS', True) + '-dbg'
+            image_fstypes = self.d.getVar('IMAGE_FSTYPES_DEBUGFS', True)
+            image_name = self.d.getVar('IMAGE_NAME', True) + '-dbg'
+            image_link_name = self.d.getVar('IMAGE_LINK_NAME', True) + '-dbg'
+
+            data_debugfs = bb.data.createCopy(self.d)
+            data_debugfs.setVar('IMAGE_ROOTFS', image_rootfs)
+            if image_fstypes:
+                data_debugfs.setVar('IMAGE_FSTYPES', image_fstypes)
+            data_debugfs.setVar('IMAGE_NAME', image_name)
+            data_debugfs.setVar('IMAGE_LINK_NAME', image_link_name)
+            image_cmd_groups += self._get_imagecmds(data_debugfs, "-dbg")
+
         for image_cmds in image_cmd_groups:
             # create the images in parallel
             nproc = multiprocessing.cpu_count()
@@ -326,9 +349,9 @@ class Image(ImageDepGraph):
                 if result is not None:
                     bb.fatal(result)
 
-            for image_type, subimages, script in image_cmds:
+            for image_type, subimages, script, image_name, image_link_name in image_cmds:
                 bb.note("Creating symlinks for %s image ..." % image_type)
-                self._create_symlinks(subimages)
+                self._create_symlinks(subimages, image_name, image_link_name)
 
         execute_pre_post_process(self.d, post_process_cmds)
 
