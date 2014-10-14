@@ -1,0 +1,56 @@
+From fc33841c7b1d511d665d7ac769681d4f58aa2b71 Mon Sep 17 00:00:00 2001
+From: Siddhesh Poyarekar <siddhesh@redhat.com>
+Date: Tue, 14 Oct 2014 21:05:33 +0530
+Subject: [PATCH] Fix infinite loop in check_pf (BZ #12926)
+
+The recvmsg could return 0 under some conditions and cause the
+make_request function to be stuck in an infinite loop.
+
+Thank you Jim King <jim.king@simplivity.com> for posting Paul's patch
+on the list.
+---
+ ChangeLog                          | 6 ++++++
+ NEWS                               | 2 +-
+ sysdeps/unix/sysv/linux/check_pf.c | 2 +-
+ 3 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index f343428..c2f7e95 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -0,0 +1,6 @@
++2014-10-14  Paul Pluzhnikov  <ppluzhnikov@google.com>
++
++	[BZ #12926]
++	* sysdeps/unix/sysv/linux/check_pf.c (make_request): Avoid
++	infinite loop when __recvmsg returns 0.
++
+diff --git a/NEWS b/NEWS
+index 721b457..3a0dc8a 100644
+--- a/NEWS
++++ b/NEWS
+@@ -9,7 +9,7 @@ Version 2.20
+ 
+ * The following bugs are resolved with this release:
+ 
+-  6804, 9894, 12994, 13347, 13651, 14308, 14770, 15119, 15132, 15347, 15514,
++  6804, 9894, 12926, 12994, 13347, 13651, 14308, 14770, 15119, 15132, 15347, 15514,
+   15698, 15804, 15894, 15946, 16002, 16064, 16095, 16194, 16198, 16275,
+   16284, 16287, 16315, 16348, 16349, 16354, 16357, 16362, 16447, 16516,
+   16532, 16539, 16545, 16561, 16562, 16564, 16574, 16599, 16600, 16609,
+diff --git a/sysdeps/unix/sysv/linux/check_pf.c b/sysdeps/unix/sysv/linux/check_pf.c
+index c7fd9b0..976f249 100644
+--- a/sysdeps/unix/sysv/linux/check_pf.c
++++ b/sysdeps/unix/sysv/linux/check_pf.c
+@@ -180,7 +180,7 @@ make_request (int fd, pid_t pid)
+ 	};
+ 
+       ssize_t read_len = TEMP_FAILURE_RETRY (__recvmsg (fd, &msg, 0));
+-      if (read_len < 0)
++      if (read_len <= 0)
+ 	goto out_fail2;
+ 
+       if (msg.msg_flags & MSG_TRUNC)
+-- 
+2.2.2
+
