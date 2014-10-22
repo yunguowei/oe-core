@@ -1,0 +1,42 @@
+From ac53e445f9b81305d3e09093eb72ba157ad8133d Mon Sep 17 00:00:00 2001
+From: He Zhe <zhe.he@windriver.com>
+Date: Wed, 22 Oct 2014 09:30:58 +0800
+Subject: [PATCH] syscalls/sync_file_range01: fix argument passing for mips32
+
+On mips32, 64-bit arguments need to align to 64-bit boundary. So the way of
+calling sync_file_range() is adjusted accordingly for sync_file_range01.
+
+Upstream-Status: Pending
+
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ .../kernel/syscalls/sync_file_range/sync_file_range01.c     | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/testcases/kernel/syscalls/sync_file_range/sync_file_range01.c b/testcases/kernel/syscalls/sync_file_range/sync_file_range01.c
+index 96703c4..1384c47 100644
+--- a/testcases/kernel/syscalls/sync_file_range/sync_file_range01.c
++++ b/testcases/kernel/syscalls/sync_file_range/sync_file_range01.c
+@@ -216,6 +216,19 @@ static inline long syncfilerange(int fd, off64_t offset, off64_t nbytes,
+ #else
+ 	return ltp_syscall(__NR_sync_file_range2, fd, flags, offset, nbytes);
+ #endif
++#elif defined(__mips__)
++#if (__WORDSIZE == 32)
++#if __BYTE_ORDER == __BIG_ENDIAN
++	return ltp_syscall(__NR_sync_file_range, fd, 0, (int)(offset >> 32),
++			(int)offset, (int)(nbytes >> 32), (int)nbytes, flags);
++#elif __BYTE_ORDER == __LITTLE_ENDIAN
++	return ltp_syscall(__NR_sync_file_range, fd, 0, (int)offset,
++			(int)(offset >> 32), (int)nbytes, (int)(nbytes >> 32),
++			flags);
++#endif
++#else
++	return ltp_syscall(__NR_sync_file_range, fd, offset, nbytes, flags);
++#endif
+ #else
+ 	return ltp_syscall(__NR_sync_file_range, fd, offset, nbytes, flags);
+ #endif
+-- 
+1.8.2.1
+
