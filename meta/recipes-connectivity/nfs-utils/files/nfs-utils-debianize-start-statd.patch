@@ -1,0 +1,39 @@
+[PATCH] nfs-utils: debianize start-statd
+
+Upstream-status: Pending
+
+make start-statd command to use nfscommon configure, too.
+
+Signed-off-by: Henrik Riomar <henrik.riomar@ericsson.com>
+Signed-off-by: Li Wang <li.wang@windriver.com>
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ utils/statd/start-statd |   10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/utils/statd/start-statd b/utils/statd/start-statd
+index 803aeba..7d3c07b 100644
+--- a/utils/statd/start-statd
++++ b/utils/statd/start-statd
+@@ -4,9 +4,17 @@
+ # /var/run/rpc.statd.pid).
+ # It should run statd with whatever flags are apropriate for this
+ # site.
++
+ PATH=/sbin:/usr/sbin:/bin
++# Read config
++DEFAULTFILE=/etc/default/nfs-common
++NEED_IDMAPD=
++if [ -f $DEFAULTFILE ]; then
++    . $DEFAULTFILE
++fi
++
+ if systemctl start statd.service 2>/dev/null
+ then :
+ else
+-    exec rpc.statd --no-notify
++    exec rpc.statd --no-notify $STATDOPTS
+ fi
+-- 
+1.7.10.4
+
