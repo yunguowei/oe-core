@@ -150,6 +150,10 @@ do_install() {
 	sed -i -e 's/.*ForwardToSyslog.*/ForwardToSyslog=yes/' ${D}${sysconfdir}/systemd/journald.conf
 	# Enable syslog.socket by default, this is specific to our system
 	ln -sf ../syslog.socket ${D}${systemd_unitdir}/system/sockets.target.wants/syslog.socket
+
+	# Make systemd-udev-hwdb-update to check /etc/udev
+	cp ${D}${systemd_unitdir}/system/systemd-udev-hwdb-update.service ${D}${sysconfdir}/systemd/system
+	sed -i -e 's#ConditionNeedsUpdate=/etc#ConditionNeedsUpdate=/etc/udev#g' ${D}${sysconfdir}/systemd/system/systemd-udev-hwdb-update.service
 }
 
 do_install_ptest () {
@@ -357,10 +361,18 @@ ALTERNATIVE_PRIORITY[runlevel] ?= "300"
 
 pkg_postinst_udev-hwdb () {
 	if test -n "$D"; then
-		${@qemu_run_binary(d, '$D', '${base_bindir}/udevadm')} hwdb --update \
-			--root $D
+		if ${@qemu_run_binary(d, '$D', '${base_bindir}/udevadm')} hwdb --update \
+			--root $D; then
+			touch $D/etc/udev/.updated
+		else
+			exit 1
+		fi
 	else
-		udevadm hwdb --update
+		if udevadm hwdb --update; then
+			touch $D/etc/udev/.updated
+		else
+			exit 1
+		fi
 	fi
 }
 
