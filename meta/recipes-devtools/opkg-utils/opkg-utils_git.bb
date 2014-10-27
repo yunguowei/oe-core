@@ -10,7 +10,9 @@ PROVIDES += "virtual/update-alternatives"
 SRCREV = "eae0d8fa44e8594aa90eadf06e5f4fbeef314509"
 PV = "0.1.8+git${SRCPV}"
 
-SRC_URI = "git://git.yoctoproject.org/opkg-utils"
+SRC_URI = "git://git.yoctoproject.org/opkg-utils \
+           file://handle-leftbracket-for-update-alternatives.patch \
+"
 
 S = "${WORKDIR}/git"
 
