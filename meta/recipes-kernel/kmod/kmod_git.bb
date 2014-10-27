@@ -36,6 +36,10 @@ do_install_append () {
             # mv the .pc file to ${libdir}
             install -d ${D}${libdir}
             mv ${D}${base_libdir}/pkgconfig ${D}${libdir}
+	fi
+        if ${@base_contains('DISTRO_FEATURES', 'ptest', 'true', 'false', d)}; then
+                find testsuite -name *.ko -exec tar rf testmodule.tar {} \;
+                find testsuite -name *.ko -exec rm -f {} \;
         fi
 }
 
@@ -47,7 +51,10 @@ do_compile_ptest () {
         oe_runmake buildtest-TESTS rootfs
 }
 
-INHIBIT_PACKAGE_STRIP = "${@bb.utils.contains("DISTRO_FEATURES", "ptest", "1", "0", d)}"
+do_install_ptest () {
+        install testmodule.tar ${D}${PTEST_PATH}
+}
+
 INSANE_SKIP_${PN}-ptest = "arch"
 
 inherit update-alternatives
