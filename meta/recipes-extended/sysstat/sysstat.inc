@@ -25,6 +25,12 @@ do_install() {
 	rm -rf ${D}/var
 	install -d ${D}/etc/default/volatiles
 	install -m 0644 ${WORKDIR}/99_sysstat ${D}/etc/default/volatiles
+
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+		install -d ${D}${sysconfdir}/tmpfiles.d
+		echo "d ${localstatedir}/log/sa - - - -" \
+		    > ${D}${sysconfdir}/tmpfiles.d/sysstat.conf
+	fi
 }
 
 pkg_postinst_${PN} () {
