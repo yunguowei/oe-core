@@ -5,7 +5,7 @@ DEPENDS = "glib-2.0 zlib pixman"
 RDEPENDS_${PN}_class-target += "bash python"
 
 require qemu-targets.inc
-inherit autotools-brokensep
+inherit autotools-brokensep ptest
 BBCLASSEXTEND = "native nativesdk"
 
 # QEMU_TARGETS is overridable variable
@@ -16,6 +16,8 @@ SRC_URI = "\
     file://larger_default_ram_size.patch \
     file://disable-grabs.patch \
     file://exclude-some-arm-EABI-obsolete-syscalls.patch \
+    file://add-ptest-in-makefile.patch \
+    file://run-ptest \
     "
 
 SRC_URI_append_class-native = "\
@@ -60,6 +62,20 @@ do_configure() {
 
     ${S}/configure --prefix=${prefix} --sysconfdir=${sysconfdir} --libexecdir=${libexecdir} --localstatedir=${localstatedir} --disable-strip ${EXTRA_OECONF} $KVMOPTS
     test ! -e ${S}/target-i386/beginend_funcs.sh || chmod a+x ${S}/target-i386/beginend_funcs.sh
+}
+
+do_compile_ptest() {
+        if [ ${PTEST_ENABLED} = "1" ]; then
+                make buildtest-TESTS || true
+        fi
+}
+
+do_install_ptest() {
+        if [ ${PTEST_ENABLED} = "1" ]; then
+                cd ${S}/tests
+                cp -r ${S}/tests                        ${D}${PTEST_PATH}
+                find ${D}${PTEST_PATH}/tests -type f -name "*.[Sshcod]" | xargs -i rm -rf {}
+        fi
 }
 
 do_install () {

@@ -1,0 +1,29 @@
+From 9b25fbc38c2c57c93ab53bf48a759bd2bd4c209d Mon Sep 17 00:00:00 2001
+From: HYANG2 <hyang2@pek-hyang2-d1.(none)>
+Date: Tue, 15 Jul 2014 10:13:22 +0800
+Subject: [PATCH] fix for ptest
+
+---
+ tests/Makefile |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/tests/Makefile b/tests/Makefile
+index 88f7105..3f40b4b 100644
+--- a/tests/Makefile
++++ b/tests/Makefile
+@@ -405,3 +405,12 @@ all: $(QEMU_IOTESTS_HELPERS-y)
+ 
+ -include $(wildcard tests/*.d)
+ -include $(wildcard tests/libqos/*.d)
++
++buildtest-TESTS: $(check-unit-y) $(check-qtest-i386-y)
++
++runtest-TESTS:
++	for f in $(check-unit-y); do \
++		nf=$$(echo $$f | sed 's/tests\//\.\//g'); \
++		$$nf; \
++	done
++
+-- 
+1.7.9.5
+
