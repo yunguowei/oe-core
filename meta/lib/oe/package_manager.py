@@ -791,6 +791,22 @@ class RpmPM(PackageManager):
 
         return ""
 
+    def _search_pkg_provider_in_smart(self, pkg, feed_archs):
+        output = self._invoke_smart('query  --provides %s' % pkg) or ''
+        for provider in output.split('\n'):
+            # Filter out the line which is empty or start with space
+            if provider.strip() == '' or provider[0] == ' ':
+                continue
+
+            for arch in feed_archs:
+                arch = '@' + arch.replace('-', '_')
+                if arch in provider:
+                    # First found is best match
+                    return provider
+
+        return ''
+
+
     '''
     Translate the OE multilib format names to the RPM/Smart format names
     It searched the RPM/Smart format names in probable multilib feeds first,
@@ -811,7 +827,8 @@ class RpmPM(PackageManager):
                 # if the pkg in this multilib feed
                 if subst != pkg:
                     feed_archs = self.ml_prefix_list[mlib]
-                    new_pkg = self._search_pkg_name_in_feeds(subst, feed_archs)
+                    new_pkg = self._search_pkg_name_in_feeds(subst, feed_archs) or \
+                        self._search_pkg_provider_in_smart(subst, feed_archs)
                     if not new_pkg:
                         # Failed to translate, package not found!
                         err_msg = '%s not found in the %s feeds (%s).\n' % \
@@ -829,7 +846,8 @@ class RpmPM(PackageManager):
             if pkg == new_pkg:
                 # Search new_pkg in default archs
                 default_archs = self.ml_prefix_list['default']
-                new_pkg = self._search_pkg_name_in_feeds(pkg, default_archs)
+                new_pkg = self._search_pkg_name_in_feeds(pkg, default_archs) or \
+                    self._search_pkg_provider_in_smart(pkg, default_archs)
                 if not new_pkg:
                     err_msg = '%s not found in the base feeds (%s).\n' % \
                               (pkg, ' '.join(default_archs))
