@@ -36,9 +36,7 @@ do_configure_prepend () {
 
 export PYTHON_SITE_PACKAGES="${PYTHON_SITEPACKAGES_DIR}"
 
-PACKAGECONFIG ??= ""
-PACKAGECONFIG_class-native ??= "python"
-PACKAGECONFIG_class-nativesdk ??= "python"
+PACKAGECONFIG ??= "python"
 PACKAGECONFIG_linuxstdbase ??= ""
 
 PACKAGECONFIG[python] = "--with-python=${PYTHON},--without-python,python,python-core"
