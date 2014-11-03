@@ -4,6 +4,7 @@ require recipes-kernel/linux/linux-yocto.inc
 
 # board specific branches
 KBRANCH_qemuarm  ?= "standard/arm-versatile-926ejs"
+KBRANCH_qemuarm64 ?= "standard/qemuarm64"
 KBRANCH_qemumips ?= "standard/mti-malta32"
 KBRANCH_qemuppc  ?= "standard/qemuppc"
 KBRANCH_qemux86  ?= "standard/common-pc"
@@ -11,6 +12,7 @@ KBRANCH_qemux86-64 ?= "standard/common-pc-64/base"
 KBRANCH_qemumips64 ?= "standard/mti-malta64"
 
 SRCREV_machine_qemuarm ?= "d156e4658a13349f7a30adafd436e32fb722d248"
+SRCREV_machine_qemuarm64 ?= "268b7677421eef003a84f31c6bd0b8ec3acc1e36"
 SRCREV_machine_qemumips ?= "5aa58a6ca9d4efe79ddf66c9d09695b42c84a3b6"
 SRCREV_machine_qemuppc ?= "cc4943bf3b93f9c424b63c357ab2c9f71384f3ac"
 SRCREV_machine_qemux86 ?= "268b7677421eef003a84f31c6bd0b8ec3acc1e36"
@@ -27,7 +29,7 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 
 KMETA = "meta"
 
-COMPATIBLE_MACHINE = "qemuarm|qemux86|qemuppc|qemumips|qemumips64|qemux86-64"
+COMPATIBLE_MACHINE = "qemuarm|qemuarm64|qemux86|qemuppc|qemumips|qemumips64|qemux86-64"
 
 # Functionality flags
 KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc"
