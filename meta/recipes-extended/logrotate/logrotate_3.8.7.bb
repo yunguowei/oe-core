@@ -54,3 +54,5 @@ do_install(){
     install -p -m 755 examples/logrotate.cron ${D}${sysconfdir}/cron.daily/logrotate
     touch ${D}${localstatedir}/lib/logrotate.status
 }
+
+CONFFILES_${PN} += "${localstatedir}/lib/logrotate.status"
