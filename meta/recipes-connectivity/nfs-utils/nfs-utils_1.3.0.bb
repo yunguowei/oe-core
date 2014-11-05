@@ -117,3 +117,5 @@ do_install_append () {
 	rm -f ${D}${sbindir}/rpcgen
 	rm -f ${D}${sbindir}/locktest
 }
+
+CONFFILES_${PN}-client += "${localstatedir}/lib/nfs/etab ${localstatedir}/lib/nfs/statd/state ${localstatedir}/lib/nfs/rmtab"
