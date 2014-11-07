@@ -41,10 +41,6 @@ def get_optimization(d):
 
 SELECTED_OPTIMIZATION := "${@get_optimization(d)}"
 
-do_configure_prepend () {
-	sed -i 's/BUILD_INFO=info/BUILD_INFO=/' ${S}/gcc/configure
-}
-
 do_compile () {
 	export CC="${BUILD_CC}"
 	export AR_FOR_TARGET="${TARGET_SYS}-ar"
