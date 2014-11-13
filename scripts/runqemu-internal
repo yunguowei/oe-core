@@ -126,7 +126,7 @@ if [ "$SLIRP_ENABLED" = "yes" ]; then
         ROOTFS_OPTIONS="-drive file=$ROOTFS,if=virtio"
     else
         QEMU_NETWORK_CMD=""
-        DROOT="/dev/hda"
+        DROOT="/dev/sda"
         ROOTFS_OPTIONS="-hda $ROOTFS"
     fi
 
@@ -260,7 +260,7 @@ else
             ROOTFS_OPTIONS="-drive file=$ROOTFS,if=virtio"
         else
             QEMU_NETWORK_CMD="-net nic,vlan=0 $QEMU_TAP_CMD"
-            DROOT="/dev/hda"
+            DROOT="/dev/sda"
             ROOTFS_OPTIONS="-hda $ROOTFS"
         fi
         if [ "$MACHINE" = "qemuarm64" ]; then
