@@ -99,6 +99,7 @@ mkdir -p $target_sdk_dir >/dev/null 2>&1
 
 # if don't have the right to access dir, gain by sudo 
 if [ ! -x $target_sdk_dir -o ! -w $target_sdk_dir -o ! -r $target_sdk_dir ]; then 
+	echo "Sorry, you do not have permission to install the SDK to \"$target_sdk_dir\"." && exit 1
 	SUDO_EXEC=$(which "sudo")
 	if [ -z $SUDO_EXEC ]; then
 		echo "No command 'sudo' found, please install sudo first. Abort!"
