@@ -1,0 +1,42 @@
+Using correct macro for x86
+
+Upstream-Status: Backport
+
+squash 11040 and 11043 as one patch
+
+changeset:   11040:60412aa39b8d
+user:        Stephan Bergmann <sbergman@redhat.com>
+date:        Fri Feb 14 17:45:40 2014 -0800
+files:       lib/freebl/Makefile
+description:
+Bug 972450: Define -DMP_USE_UINT_DIGIT for Linux x86 because mpi_x86.s
+requires mp_digit to be an unsigned int. The MP_USE_UINT_DIGIT macro
+ensures that. We were previously relying on ULLONG_MAX being undefined
+in the compilation environment, which isn't true in C99 mode. Also
+define -DMP_NO_MP_WORD to match Windows x86. r=wtc.
+
+
+changeset:   11043:fa9a3a970910
+parent:      11040:60412aa39b8d
+user:        Wan-Teh Chang <wtc@google.com>
+date:        Tue Feb 18 14:26:25 2014 -0800
+files:       lib/freebl/Makefile
+description:
+Bug 972450: Don't define -DMP_NO_MP_WORD for Linux x86 (unless one
+can show it improves performance).
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+
+diff -r f451ea1a2b12 -r 60412aa39b8d nss/lib/freebl/Makefile
+--- a/nss/lib/freebl/Makefile	Thu Feb 13 18:55:13 2014 -0800
++++ b/nss/lib/freebl/Makefile	Fri Feb 14 17:45:40 2014 -0800
+@@ -195,7 +195,7 @@
+ ifeq ($(CPU_ARCH),x86)
+     ASFILES  = mpi_x86.s
+     DEFINES += -DMP_ASSEMBLY_MULTIPLY -DMP_ASSEMBLY_SQUARE 
+-    DEFINES += -DMP_ASSEMBLY_DIV_2DX1D
++    DEFINES += -DMP_ASSEMBLY_DIV_2DX1D -DMP_USE_UINT_DIGIT
+     DEFINES += -DMP_CHAR_STORE_SLOW -DMP_IS_LITTLE_ENDIAN
+     # The floating point ECC code doesn't work on Linux x86 (bug 311432).
+     #ECL_USE_FP = 1
+
