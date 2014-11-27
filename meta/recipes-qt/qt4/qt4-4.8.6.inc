@@ -38,6 +38,11 @@ S = "${WORKDIR}/qt-everywhere-opensource-src-${PV}"
 # disable webkit for aarch64 temporarily that fails to compile
 QT_CONFIG_FLAGS_append_aarch64 = " -no-webkit"
 
+# disable webkit for mips64 n32 temporarily that fails to compile,
+# qt upstream defect:
+# https://bugreports.qt-project.org/browse/QTBUG-39224
+QT_CONFIG_FLAGS_append_mips64 = "${@bb.utils.contains("TUNE_FEATURES", "n32", " -no-webkit", "" ,d)}"
+
 FILES_${QT_BASE_NAME}-tools_append     = " ${bindir}/qml ${bindir}/qmlplugindump"
 FILES_${QT_BASE_NAME}-tools-dbg_append = " ${bindir}/.debug/qml ${bindir}/.debug/qmlplugindump"
 
