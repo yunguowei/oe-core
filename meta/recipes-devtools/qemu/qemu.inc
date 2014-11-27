@@ -18,6 +18,7 @@ SRC_URI = "\
     file://exclude-some-arm-EABI-obsolete-syscalls.patch \
     file://add-ptest-in-makefile.patch \
     file://run-ptest \
+    file://wacom.patch \
     "
 
 SRC_URI_append_class-native = "\
