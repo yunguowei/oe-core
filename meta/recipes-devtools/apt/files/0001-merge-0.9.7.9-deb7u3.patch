@@ -1,0 +1,391 @@
+From 33cb8ac173733b716cbaec5ae0e7296cd75bca8d Mon Sep 17 00:00:00 2001
+From: Michael Vogt <mvo@ubuntu.com>
+Date: Wed, 17 Sep 2014 14:11:50 +0200
+Subject: [PATCH] merge 0.9.7.9+deb7u3
+
+(Upstream commit 33cb8ac173733b716cbaec5ae0e7296cd75bca8d debian/wheezy)
+
+Upstream-Status: Backport
+
+---
+ apt-pkg/acquire-item.cc                    |   96 ++++++++++++++++++++++------
+ apt-pkg/acquire-item.h                     |    8 +++
+ cmdline/apt-get.cc                         |    6 ++
+ debian/changelog                           |   10 +++
+ methods/copy.cc                            |   36 +++++++++--
+ test/integration/test-apt-get-download     |   13 ++++
+ test/integration/test-hashsum-verification |   14 +++-
+ 7 files changed, 152 insertions(+), 31 deletions(-)
+
+diff --git a/apt-pkg/acquire-item.cc b/apt-pkg/acquire-item.cc
+index a30e988..1ffab96 100644
+--- a/apt-pkg/acquire-item.cc
++++ b/apt-pkg/acquire-item.cc
+@@ -844,6 +844,31 @@ void pkgAcqIndex::Failed(string Message,pkgAcquire::MethodConfig *Cnf)	/*{{{*/
+    Item::Failed(Message,Cnf);
+ }
+ 									/*}}}*/
++// pkgAcqIndex::GetFinalFilename - Return the full final file path      /*{{{*/
++std::string pkgAcqIndex::GetFinalFilename(std::string const &URI,
++                                          std::string const &compExt)
++{
++   std::string FinalFile = _config->FindDir("Dir::State::lists");
++   FinalFile += URItoFileName(URI);
++   if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz")
++      FinalFile += ".gz";
++   return FinalFile;
++}
++									/*}}}*/
++// AcqIndex::ReverifyAfterIMS - Reverify index after an ims-hit		/*{{{*/
++void pkgAcqIndex::ReverifyAfterIMS(std::string const &FileName)
++{
++   std::string const compExt = CompressionExtension.substr(0, CompressionExtension.find(' '));
++   if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz")
++      DestFile += ".gz";
++
++   string FinalFile = GetFinalFilename(RealURI, compExt);
++   Rename(FinalFile, FileName);
++   Decompression = true;
++   Desc.URI = "copy:" + FileName;
++   QueueURI(Desc);
++}
++									/*}}}*/
+ // AcqIndex::Done - Finished a fetch					/*{{{*/
+ // ---------------------------------------------------------------------
+ /* This goes through a number of states.. On the initial fetch the
+@@ -855,6 +880,7 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+ 		       pkgAcquire::MethodConfig *Cfg)
+ {
+    Item::Done(Message,Size,Hash,Cfg);
++   std::string const compExt = CompressionExtension.substr(0, CompressionExtension.find(' '));
+ 
+    if (Decompression == true)
+    {
+@@ -866,6 +892,7 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+ 
+       if (!ExpectedHash.empty() && ExpectedHash.toStr() != Hash)
+       {
++         Desc.URI = RealURI;
+          Status = StatAuthError;
+          ErrorText = _("Hash Sum mismatch");
+          Rename(DestFile,DestFile + ".FAILED");
+@@ -877,7 +904,7 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+        * have a Package field) (LP: #346386) (Closes: #627642) */
+       if (Verify == true)
+       {
+-	 FileFd fd(DestFile, FileFd::ReadOnly);
++	 FileFd fd(DestFile, FileFd::ReadOnlyGzip);
+ 	 pkgTagSection sec;
+ 	 pkgTagFile tag(&fd);
+ 
+@@ -898,8 +925,7 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+       }
+        
+       // Done, move it into position
+-      string FinalFile = _config->FindDir("Dir::State::lists");
+-      FinalFile += URItoFileName(RealURI);
++      string FinalFile = GetFinalFilename(RealURI, compExt);
+       Rename(DestFile,FinalFile);
+       chmod(FinalFile.c_str(),0644);
+       
+@@ -907,7 +933,9 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+          will work OK */
+       DestFile = _config->FindDir("Dir::State::lists") + "partial/";
+       DestFile += URItoFileName(RealURI);
+-      
++      if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz")
++         DestFile += ".gz";
++     
+       // Remove the compressed version.
+       if (Erase == true)
+ 	 unlink(DestFile.c_str());
+@@ -923,7 +951,10 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+    {
+       // The files timestamp matches
+       if (StringToBool(LookupTag(Message,"Alt-IMS-Hit"),false) == true)
+-	 return;
++      {
++         ReverifyAfterIMS(FileName);
++         return;
++      }
+       Decompression = true;
+       Local = true;
+       DestFile += ".decomp";
+@@ -940,15 +971,12 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+       ErrorText = "Method gave a blank filename";
+    }
+ 
+-   std::string const compExt = CompressionExtension.substr(0, CompressionExtension.find(' '));
+-
+    // The files timestamp matches
+-   if (StringToBool(LookupTag(Message,"IMS-Hit"),false) == true) {
+-       if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz")
+-	  // Update DestFile for .gz suffix so that the clean operation keeps it
+-	  DestFile += ".gz";
++   if (StringToBool(LookupTag(Message,"IMS-Hit"),false) == true)
++   {
++      ReverifyAfterIMS(FileName);
+       return;
+-    }
++   }
+ 
+    if (FileName == DestFile)
+       Erase = true;
+@@ -957,16 +985,16 @@ void pkgAcqIndex::Done(string Message,unsigned long long Size,string Hash,
+    
+    string decompProg;
+ 
+-   // If we enable compressed indexes and already have gzip, keep it
+-   if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz" && !Local) {
+-      string FinalFile = _config->FindDir("Dir::State::lists");
+-      FinalFile += URItoFileName(RealURI) + ".gz";
+-      Rename(DestFile,FinalFile);
+-      chmod(FinalFile.c_str(),0644);
+-      
+-      // Update DestFile for .gz suffix so that the clean operation keeps it
+-      DestFile = _config->FindDir("Dir::State::lists") + "partial/";
++   // If we enable compressed indexes, queue for hash verification
++   if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz" && !Local) 
++   {
++      DestFile = _config->FindDir("Dir::State::lists");
+       DestFile += URItoFileName(RealURI) + ".gz";
++
++      Decompression = true;
++      Desc.URI = "copy:" + FileName;
++      QueueURI(Desc);
++
+       return;
+     }
+ 
+@@ -1008,6 +1036,10 @@ string pkgAcqIndexTrans::Custom600Headers()
+    string Final = _config->FindDir("Dir::State::lists");
+    Final += URItoFileName(RealURI);
+ 
++   std::string const compExt = CompressionExtension.substr(0, CompressionExtension.find(' '));
++   if (_config->FindB("Acquire::GzipIndexes",false) && compExt == "gz")
++      DestFile += ".gz";
++
+    struct stat Buf;
+    if (stat(Final.c_str(),&Buf) != 0)
+       return "\nFail-Ignore: true\nIndex-File: true";
+@@ -1325,6 +1357,28 @@ void pkgAcqMetaIndex::AuthDone(string Message)				/*{{{*/
+       std::cerr << "Signature verification succeeded: "
+                 << DestFile << std::endl;
+ 
++   // do not trust any previously unverified content that we may have
++   string LastGoodSigFile = _config->FindDir("Dir::State::lists").append("partial/").append(URItoFileName(RealURI));
++   if (DestFile != SigFile)
++      LastGoodSigFile.append(".gpg");
++   LastGoodSigFile.append(".reverify");
++   if(IMSHit == false && RealFileExists(LastGoodSigFile) == false)
++   {
++      for (vector <struct IndexTarget*>::const_iterator Target = IndexTargets->begin();
++           Target != IndexTargets->end();
++           ++Target)
++      {
++         // remove old indexes
++         std::string index = _config->FindDir("Dir::State::lists") +
++            URItoFileName((*Target)->URI);
++         unlink(index.c_str());
++         // and also old gzipindexes
++         index += ".gz";
++         unlink(index.c_str());
++      }
++   }
++
++
+    // Download further indexes with verification
+    QueueIndexes(true);
+ 
+diff --git a/apt-pkg/acquire-item.h b/apt-pkg/acquire-item.h
+index 51d5394..3859a25 100644
+--- a/apt-pkg/acquire-item.h
++++ b/apt-pkg/acquire-item.h
+@@ -595,6 +595,14 @@ class pkgAcqIndex : public pkgAcquire::Item
+     */
+    std::string CompressionExtension;
+ 
++   /** \brief Get the full pathname of the final file for the given URI
++    */
++   std::string GetFinalFilename(std::string const &URI,
++                                std::string const &compExt);
++
++   /** \brief Schedule file for verification after a IMS hit */
++   void ReverifyAfterIMS(std::string const &FileName);
++
+    public:
+    
+    // Specialized action members
+diff --git a/cmdline/apt-get.cc b/cmdline/apt-get.cc
+index 112b7ca..ee10a53 100644
+--- a/cmdline/apt-get.cc
++++ b/cmdline/apt-get.cc
+@@ -2373,6 +2373,7 @@ bool DoDownload(CommandLine &CmdL)
+    pkgSourceList *SrcList = Cache.GetSourceList();
+    bool gotAll = true;
+ 
++   std::string UntrustedList;
+    for (APT::VersionList::const_iterator Ver = verset.begin(); 
+         Ver != verset.end(); 
+         ++Ver) 
+@@ -2396,6 +2397,8 @@ bool DoDownload(CommandLine &CmdL)
+ 	 gotAll = false;
+ 	 continue;
+       }
++      if (index->IsTrusted() == false)
++         UntrustedList += Pkg.Name() + string(" ");
+       string uri = index->ArchiveURI(rec.FileName());
+       strprintf(descr, _("Downloading %s %s"), Pkg.Name(), Ver.VerStr());
+       // get the most appropriate hash
+@@ -2424,6 +2427,9 @@ bool DoDownload(CommandLine &CmdL)
+       return true;
+    }
+ 
++   if (UntrustedList != "" && !AuthPrompt(UntrustedList, false))
++      return false;
++
+    return (Fetcher.Run() == pkgAcquire::Continue);
+ }
+ 									/*}}}*/
+diff --git a/debian/changelog b/debian/changelog
+index e659975..15bf860 100644
+--- a/debian/changelog
++++ b/debian/changelog
+@@ -1,3 +1,13 @@
++apt (0.9.9.4+) wheezy-security; urgency=high
++
++  * SECURITY UPDATE:
++    - incorrect invalidating of unauthenticated data (CVE-2014-0488)
++    - incorect verification of 304 reply (CVE-2014-0487)
++    - incorrect verification of Acquire::Gzip indexes (CVE-2014-0489)
++    - incorrect apt-get download validation (CVE-2014-0490)
++
++ -- Michael Vogt <mvo@debian.org>  Mon, 15 Sep 2014 09:24:15 +0200
++
+ apt (0.9.9.4) unstable; urgency=low
+ 
+   [ David Kalnischkies ]
+diff --git a/methods/copy.cc b/methods/copy.cc
+index e81d002..5985b64 100644
+--- a/methods/copy.cc
++++ b/methods/copy.cc
+@@ -16,6 +16,7 @@
+ #include <apt-pkg/acquire-method.h>
+ #include <apt-pkg/error.h>
+ #include <apt-pkg/hashes.h>
++#include <apt-pkg/configuration.h>
+ 
+ #include <sys/stat.h>
+ #include <utime.h>
+@@ -26,12 +27,28 @@
+ class CopyMethod : public pkgAcqMethod
+ {
+    virtual bool Fetch(FetchItem *Itm);
++   void CalculateHashes(FetchResult &Res);
+    
+    public:
+    
+-   CopyMethod() : pkgAcqMethod("1.0",SingleInstance) {};
++   CopyMethod() : pkgAcqMethod("1.0",SingleInstance|SendConfig) {};
+ };
+ 
++void CopyMethod::CalculateHashes(FetchResult &Res)
++{
++   // For gzip indexes we need to look inside the gzip for the hash
++   // We can not use the extension here as its not used in partial 
++   // on a IMS hit
++   FileFd::OpenMode OpenMode = FileFd::ReadOnly;
++   if (_config->FindB("Acquire::GzipIndexes", false) == true)
++      OpenMode = FileFd::ReadOnlyGzip;
++
++   Hashes Hash;
++   FileFd Fd(Res.Filename, OpenMode);
++   Hash.AddFD(Fd);
++   Res.TakeHashes(Hash);
++}
++
+ // CopyMethod::Fetch - Fetch a file					/*{{{*/
+ // ---------------------------------------------------------------------
+ /* */
+@@ -52,7 +69,15 @@ bool CopyMethod::Fetch(FetchItem *Itm)
+    Res.LastModified = Buf.st_mtime;
+    Res.IMSHit = false;      
+    URIStart(Res);
+-   
++
++   // when the files are identical, just compute the hashes
++   if(File == Itm->DestFile)
++   {
++      CalculateHashes(Res);
++      URIDone(Res);
++      return true;
++   }
++  
+    // See if the file exists
+    FileFd From(File,FileFd::ReadOnly);
+    FileFd To(Itm->DestFile,FileFd::WriteAtomic);
+@@ -83,10 +108,7 @@ bool CopyMethod::Fetch(FetchItem *Itm)
+       return _error->Errno("utime",_("Failed to set modification time"));
+    }
+    
+-   Hashes Hash;
+-   FileFd Fd(Res.Filename, FileFd::ReadOnly);
+-   Hash.AddFD(Fd);
+-   Res.TakeHashes(Hash);
++   CalculateHashes(Res);
+ 
+    URIDone(Res);
+    return true;
+diff --git a/test/integration/test-apt-get-download b/test/integration/test-apt-get-download
+index b164f7d..4b7b683 100755
+--- a/test/integration/test-apt-get-download
++++ b/test/integration/test-apt-get-download
+@@ -30,3 +30,16 @@ testequal "'file://${DEBFILE}' apt_2.0_all.deb $(stat -c%s $DEBFILE) sha512:$(sh
+ 
+ # deb:677887
+ testequal "E: Can't find a source to download version '1.0' of 'vrms:i386'" aptget download vrms
++
++
++# ensure authentication warning is displayed
++rm aptarchive/dists/unstable/*Release*
++testsuccess aptget update
++testequal "WARNING: The following packages cannot be authenticated!
++  apt
++E: Some packages could not be authenticated" aptget download -qq apt
++
++# ensure authentication warning is displayed
++testequal "WARNING: The following packages cannot be authenticated!
++  apt
++Authentication warning overridden." aptget download -qq --allow-unauthenticated apt
+diff --git a/test/integration/test-hashsum-verification b/test/integration/test-hashsum-verification
+index 99ea8bf..2cc1603 100755
+--- a/test/integration/test-hashsum-verification
++++ b/test/integration/test-hashsum-verification
+@@ -66,7 +66,7 @@ runtest() {
+         msgtest 'No package from the source available'
+         [ "$(aptcache show apt 2>&1)" = "E: No packages found" ] && msgpass || msgfail
+         msgtest 'No Packages file in /var/lib/apt/lists'
+-        [ "$(ls rootdir/var/lib/apt/lists/*Package* 2>/dev/null)" = "" ] && msgpass || msgfail 
++        [ "$(ls rootdir/var/lib/apt/lists/*Package* 2>/dev/null | grep -v FAILED 2>/dev/null)" = "" ] && msgpass || msgfail 
+         
+         # now with the unsigned Release file
+         rm -rf rootdir/var/lib/apt/lists
+@@ -77,5 +77,13 @@ runtest() {
+ 
+ }
+ 
+-runtest
+-
++for COMPRESSEDINDEXES in 'false' 'true'; do
++	echo "Acquire::GzipIndexes \"$COMPRESSEDINDEXES\";" > rootdir/etc/apt/apt.conf.d/compressindexes
++	if $COMPRESSEDINDEXES; then
++		msgmsg 'Run tests with GzipIndexes enabled'
++	else
++		msgmsg 'Run tests with GzipIndexes disabled'
++	fi
++ 
++        runtest
++done
+-- 
+1.7.9.5
+

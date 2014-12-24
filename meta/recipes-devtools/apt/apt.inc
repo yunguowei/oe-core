@@ -12,6 +12,8 @@ SRC_URI = "${DEBIAN_MIRROR}/main/a/apt/apt_${PV}.tar.gz \
            file://nodoc.patch \
            file://disable-configure-in-makefile.patch \
            file://apt-0.9.9.4-CVE-2014-0478.patch \
+           file://0001-merge-0.9.7.9-deb7u3.patch \
+           file://0001-Fix-regression-for-file-uris-from-CVE-2014-0487.patch \
            "
 
 inherit autotools gettext
