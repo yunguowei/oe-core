@@ -60,6 +60,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-avcodec-mmvideo-Bounds-check-2nd-line-of-HHV-Intra-b.patch \
            file://0001-avcodec-pngdec-Check-bits-per-pixel-before-setting-m.patch \
            file://0001-avcodec-tiff-more-completely-check-bpp-bppcount.patch \
+           file://0001-avcodec-gifdec-factorize-interleave-end-handling-out.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
