@@ -42,8 +42,8 @@ def is_target(d):
         return "yes"
     return "no"
 
-PERLLIBDIRS := "${@perl_get_libdirs(d)}"
-PERLVERSION := "${@get_perl_version(d)}"
+PERLLIBDIRS = "${@perl_get_libdirs(d)}"
+PERLVERSION = "${@get_perl_version(d)}"
 PERLVERSION[vardepvalue] = ""
 
 FILES_${PN}-dbg += "${PERLLIBDIRS}/auto/*/.debug \
