@@ -36,6 +36,7 @@ SRC_URI += "file://configure-targets.patch \
             file://Makefiles-ptest.patch \
             file://ptest-deps.patch \
             file://run-ptest \
+            file://0001-Keep-old-method-in-case-of-an-unsupported-protocol.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
