@@ -1,6 +1,7 @@
 
 SRC_URI = "http://serf.googlecode.com/svn/src_releases/serf-1.3.7.tar.bz2 \
-           file://norpath.patch"
+           file://norpath.patch \
+           file://env.patch"
 SRC_URI[md5sum] = "0a6fa745df4517dd8f79c75c538919bc"
 SRC_URI[sha256sum] = "ecccb74e665e6ea7539271e126a21d0f7eeddfeaa8ce090adb3aec6682f9f0ae"
 
@@ -14,7 +15,7 @@ FULLCC_class-native = "${CC}"
 
 do_compile() {
 	${STAGING_BINDIR_NATIVE}/scons ${PARALLEL_MAKE} PREFIX=${prefix} \
-		CC="${FULLCC}" \
+		CC="${CC}" \
 		APR=`which apr-1-config` APU=`which apu-1-config` \
 		CFLAGS="${CFLAGS}" LINKFLAGS="${LDFLAGS}" \
 		OPENSSL="${STAGING_EXECPREFIXDIR}"
