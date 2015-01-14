@@ -52,6 +52,7 @@ do_compile () {
 	export CPPFLAGS_FOR_TARGET="${TARGET_CPPFLAGS}"
 	export CXXFLAGS_FOR_TARGET="${TARGET_CXXFLAGS}"
 	export LDFLAGS_FOR_TARGET="${TARGET_LDFLAGS}"
+	export target_libdir="${target_libdir}"
 
 	oe_runmake all-host configure-target-libgcc
 	# now generate script to drive testing

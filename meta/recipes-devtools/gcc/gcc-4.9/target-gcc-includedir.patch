@@ -1,0 +1,44 @@
+Ensure target gcc headers can be included
+
+There are a few headers installed as part of OE's gcc-runtime (omp.h,
+ssp/*.h). Being built for the target architecture, these are within the
+target sysroot and not cross/nativesdk; thus they weren't able to be
+found by gcc with the existing search paths. Add optional support for a
+path under the sysroot supplied on the gcc command line in order to
+resolve this.
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+
+Upstream-Status: Pending
+
+--- a/gcc/Makefile.in	2014-12-23 11:57:33.327873331 +0000
++++ b/gcc/Makefile.in	2015-01-13 18:04:51.677518993 +0000
+@@ -587,6 +587,7 @@
+ 
+ # Directory in which the compiler finds libraries etc.
+ libsubdir = $(libdir)/gcc/$(target_noncanonical)/$(version)
++libsubdir_target = $(if $(target_libdir),$(target_libdir)/gcc/$(target_noncanonical)/$(version))
+ # Directory in which the compiler finds executables
+ libexecsubdir = $(libexecdir)/gcc/$(target_noncanonical)/$(version)
+ # Directory in which all plugin resources are installed
+@@ -2534,6 +2535,7 @@
+ 
+ PREPROCESSOR_DEFINES = \
+   -DGCC_INCLUDE_DIR=\"$(libsubdir)/include\" \
++  $(if $(libsubdir_target),-DGCC_INCLUDE_DIR_TARGET=\"$(libsubdir_target)/include\") \
+   -DFIXED_INCLUDE_DIR=\"$(libsubdir)/include-fixed\" \
+   -DGPLUSPLUS_INCLUDE_DIR=\"$(gcc_gxx_include_dir)\" \
+   -DGPLUSPLUS_INCLUDE_DIR_ADD_SYSROOT=$(gcc_gxx_include_dir_add_sysroot) \
+--- a/gcc/cppdefault.c	2015-01-13 17:40:26.131012725 +0000
++++ b/gcc/cppdefault.c	2015-01-13 17:41:01.083072271 +0000
+@@ -59,6 +59,10 @@
+     /* This is the dir for gcc's private headers.  */
+     { GCC_INCLUDE_DIR, "GCC", 0, 0, 0, 0 },
+ #endif
++#ifdef GCC_INCLUDE_DIR_TARGET
++    /* This is the dir for gcc's private headers that is part of the sysroot.  */
++    { GCC_INCLUDE_DIR_TARGET, "GCC", 0, 0, 1, 0 },
++#endif
+ #ifdef LOCAL_INCLUDE_DIR
+     /* /usr/local/include comes before the fixincluded header files.  */
+     { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 2 },

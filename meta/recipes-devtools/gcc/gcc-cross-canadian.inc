@@ -38,6 +38,7 @@ export OBJDUMP_FOR_TARGET = "${TARGET_PREFIX}objdump"
 export RANLIB_FOR_TARGET = "${TARGET_PREFIX}ranlib"
 export STRIP_FOR_TARGET = "${TARGET_PREFIX}strip"
 export WINDRES_FOR_TARGET = "${TARGET_PREFIX}windres"
+export target_libdir
 
 #
 # We need to override this and make sure the compiler can find staging
