@@ -63,6 +63,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-avcodec-gifdec-factorize-interleave-end-handling-out.patch \
            file://0001-avcodec-cinepak-fix-integer-underflow.patch \
            file://0001-avcodec-utils-Add-case-for-jv-to-avcodec_align_dimen.patch \
+           file://0001-avcodec-rawdec-Check-the-return-code-of-avpicture_ge.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
