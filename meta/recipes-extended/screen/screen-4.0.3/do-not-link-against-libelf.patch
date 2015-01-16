@@ -1,0 +1,46 @@
+From f776327231b7327053726c284a620b4c0abeba33 Mon Sep 17 00:00:00 2001
+From: Ivan Diorditsa <address@hidden>
+Date: Tue, 8 Jul 2014 12:07:47 +0300
+Subject: [PATCH] Do not link against libelf.
+
+Screen links against libelf when it's available, though not using its
+symbols when targeting Linux.
+As there's no dependency specified between elfutils and screen, either
+can be built first by bitbake. Normally this should be fine, but
+automatic NX test sometimes reports compilation error on absence of
+libelf. Though the scenario cannot be re-produced, it's still worthy
+to clean up things as many distros (Fedora, Gentoo, etc) do.
+
+Signed-off-by: Yuanjie Huang <Yuanjie.Huang@windriver.com>
+---
+ configure.in | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/configure.in b/configure.in
+index 546130c..150759f 100644
+--- a/configure.in
++++ b/configure.in
+@@ -519,20 +519,6 @@ AC_EGREP_CPP(yes,
+ #endif
+ ], LIBS="$LIBS -lsocket -linet";seqptx=1)
+ 
+-oldlibs="$LIBS"
+-LIBS="$LIBS -lelf"
+-AC_CHECKING(SVR4)
+-AH_TEMPLATE([SVR4],[])
+-AH_TEMPLATE([BUGGYGETLOGIN],
+-[If ttyslot() breaks getlogin() by returning indexes to utmp entries
+- of type DEAD_PROCESS, then our getlogin() replacement should be
+- selected by defining BUGGYGETLOGIN.])
+-AC_TRY_LINK([#include <utmpx.h>
+-],,
+-[AC_CHECK_HEADER(dwarf.h, AC_DEFINE(SVR4) AC_DEFINE(BUGGYGETLOGIN),
+-[AC_CHECK_HEADER(elf.h, AC_DEFINE(SVR4) AC_DEFINE(BUGGYGETLOGIN))])]
+-,LIBS="$oldlibs")
+-
+ AC_CHECKING(for Solaris 2.x)
+ AC_EGREP_CPP(yes,
+ [#if defined(SVR4) && defined(sun)
+-- 
+1.8.5.2.233.g932f7e4
+
