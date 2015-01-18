@@ -43,6 +43,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Fix-for-CVE-2014-3570.patch \
             file://0001-Fix-crash-in-dtls1_get_record-whilst-in-the-listen-s.patch \
             file://0002-Follow-on-from-CVE-2014-3571.-This-fixes-the-code-th.patch \
+            file://0001-ECDH-downgrade-bug-fix.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
