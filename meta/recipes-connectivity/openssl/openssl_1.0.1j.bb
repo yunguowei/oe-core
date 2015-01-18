@@ -40,6 +40,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Unauthenticated-DH-client-certificate-fix.patch \
             file://0001-Only-allow-ephemeral-RSA-keys-in-export-ciphersuites.patch \
             file://0001-A-memory-leak-can-occur-in-dtls1_buffer_record-if-ei.patch \
+            file://0001-Fix-for-CVE-2014-3570.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
