@@ -1,0 +1,82 @@
+From 5951cc004b96cd681ffdf39d3fc9238a1ff597ae Mon Sep 17 00:00:00 2001
+From: "Dr. Stephen Henson" <steve@openssl.org>
+Date: Sun, 14 Dec 2014 23:14:15 +0000
+Subject: [PATCH] Constify ASN1_TYPE_cmp add X509_ALGOR_cmp.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+(Upstream commit 5951cc004b96cd681ffdf39d3fc9238a1ff597ae OpenSSL_1_0_1-stable)
+
+Upstream-Status: Backport
+
+Reviewed-by: Emilia Käsper <emilia@openssl.org>
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+(cherry picked from commit 4c52816d35681c0533c25fdd3abb4b7c6962302d)
+---
+ crypto/asn1/a_type.c  |    2 +-
+ crypto/asn1/asn1.h    |    2 +-
+ crypto/asn1/x_algor.c |   11 +++++++++++
+ crypto/x509/x509.h    |    1 +
+ 4 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/asn1/a_type.c b/crypto/asn1/a_type.c
+index a45d2f9..5e1bc76 100644
+--- a/crypto/asn1/a_type.c
++++ b/crypto/asn1/a_type.c
+@@ -113,7 +113,7 @@ IMPLEMENT_STACK_OF(ASN1_TYPE)
+ IMPLEMENT_ASN1_SET_OF(ASN1_TYPE)
+ 
+ /* Returns 0 if they are equal, != 0 otherwise. */
+-int ASN1_TYPE_cmp(ASN1_TYPE *a, ASN1_TYPE *b)
++int ASN1_TYPE_cmp(const ASN1_TYPE *a, const ASN1_TYPE *b)
+ 	{
+ 	int result = -1;
+ 
+diff --git a/crypto/asn1/asn1.h b/crypto/asn1/asn1.h
+index 672c97f..3c45d5d 100644
+--- a/crypto/asn1/asn1.h
++++ b/crypto/asn1/asn1.h
+@@ -776,7 +776,7 @@ DECLARE_ASN1_FUNCTIONS_fname(ASN1_TYPE, ASN1_ANY, ASN1_TYPE)
+ int ASN1_TYPE_get(ASN1_TYPE *a);
+ void ASN1_TYPE_set(ASN1_TYPE *a, int type, void *value);
+ int ASN1_TYPE_set1(ASN1_TYPE *a, int type, const void *value);
+-int            ASN1_TYPE_cmp(ASN1_TYPE *a, ASN1_TYPE *b);
++int            ASN1_TYPE_cmp(const ASN1_TYPE *a, const ASN1_TYPE *b);
+ 
+ ASN1_OBJECT *	ASN1_OBJECT_new(void );
+ void		ASN1_OBJECT_free(ASN1_OBJECT *a);
+diff --git a/crypto/asn1/x_algor.c b/crypto/asn1/x_algor.c
+index 274e456..57cc956 100644
+--- a/crypto/asn1/x_algor.c
++++ b/crypto/asn1/x_algor.c
+@@ -142,3 +142,14 @@ void X509_ALGOR_set_md(X509_ALGOR *alg, const EVP_MD *md)
+ 	X509_ALGOR_set0(alg, OBJ_nid2obj(EVP_MD_type(md)), param_type, NULL);
+ 
+ 	}
++
++int X509_ALGOR_cmp(const X509_ALGOR *a, const X509_ALGOR *b)
++	{
++	int rv;
++	rv = OBJ_cmp(a->algorithm, b->algorithm);
++	if (rv)
++		return rv;
++	if (!a->parameter && !b->parameter)
++		return 0;
++	return ASN1_TYPE_cmp(a->parameter, b->parameter);
++	}
+diff --git a/crypto/x509/x509.h b/crypto/x509/x509.h
+index 092dd74..ed767f8 100644
+--- a/crypto/x509/x509.h
++++ b/crypto/x509/x509.h
+@@ -768,6 +768,7 @@ int X509_ALGOR_set0(X509_ALGOR *alg, ASN1_OBJECT *aobj, int ptype, void *pval);
+ void X509_ALGOR_get0(ASN1_OBJECT **paobj, int *pptype, void **ppval,
+ 						X509_ALGOR *algor);
+ void X509_ALGOR_set_md(X509_ALGOR *alg, const EVP_MD *md);
++int X509_ALGOR_cmp(const X509_ALGOR *a, const X509_ALGOR *b);
+ 
+ X509_NAME *X509_NAME_dup(X509_NAME *xn);
+ X509_NAME_ENTRY *X509_NAME_ENTRY_dup(X509_NAME_ENTRY *ne);
+-- 
+1.7.9.5
+

@@ -44,6 +44,10 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Fix-crash-in-dtls1_get_record-whilst-in-the-listen-s.patch \
             file://0002-Follow-on-from-CVE-2014-3571.-This-fixes-the-code-th.patch \
             file://0001-ECDH-downgrade-bug-fix.patch \
+            file://0001-Fix-various-certificate-fingerprint-issues.patch \
+            file://0001-use-correct-function-name.patch \
+            file://0001-Return-error-when-a-bit-string-indicates-an-invalid-.patch \
+            file://0001-Constify-ASN1_TYPE_cmp-add-X509_ALGOR_cmp.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
