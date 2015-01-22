@@ -1,0 +1,42 @@
+From 77d73c3ac400d44e3e59283856152916d87ab055 Mon Sep 17 00:00:00 2001
+From: wrlbuild <wrlbuild@57965124ebf1.(none)>
+Date: Thu, 22 Jan 2015 05:57:10 +0000
+Subject: [PATCH] mmc-utils: set the optimization to -O2
+
+The _FORTIFY_SOURCE > 0 must be used with optimization > 0, so force
+the optimization 2.
+
+The build error (_FORTIFY_SOURCE=2 with -O0)
+
+"warning _FORTIFY_SOURCE requires compiling with optimization (-O)"
+
+Upstream-Status: Pending
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index ae846e2..120d422 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,13 +1,13 @@
+ CC ?= gcc
+ AM_CFLAGS = -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2
+-CFLAGS ?= -g -O2
++CFLAGS_append = -g -O2
+ objects = mmc.o mmc_cmds.o
+ 
+ CHECKFLAGS = -Wall -Werror -Wuninitialized -Wundef
+ 
+ DEPFLAGS = -Wp,-MMD,$(@D)/.$(@F).d,-MT,$@
+ 
+-override CFLAGS := $(CHECKFLAGS) $(AM_CFLAGS) $(CFLAGS)
++override CFLAGS := $(CHECKFLAGS) $(AM_CFLAGS) $(CFLAGS_append)
+ 
+ INSTALL = install
+ prefix ?= /usr/local
+-- 
+1.7.1
+
