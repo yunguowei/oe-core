@@ -4,11 +4,12 @@ HOMEPAGE = "https://launchpad.net/mklibs"
 SECTION = "devel"
 LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=98d31037b13d896e33890738ef01af64"
-DEPENDS = "python-native dpkg-native"
+DEPENDS = "python-native"
 
 SRC_URI = "http://ftp.de.debian.org/debian/pool/main/m/mklibs/${BPN}_${PV}.tar.xz \
 	file://ac_init_fix.patch\
 	file://fix_STT_GNU_IFUNC.patch\
+	file://fix_cross_compile.patch\
 "
 
 SRC_URI[md5sum] = "38a579a531401eb76f4bab4ccfb774a2"
