@@ -1,0 +1,19 @@
+Don't bail if there was no error, buf could have been NULL on entry.
+
+Upstream-Status: Backport [file]
+
+Author: Christos Zoulas <christos@zoulas.com>
+
+diff -Nur file-5.18.orig/src/softmagic.c file-5.18/src/softmagic.c
+index cd34890..0c36cd8 100644
+--- file-5.18.orig/src/softmagic.c
++++ file-5.18/src/softmagic.c
+@@ -1758,7 +1758,7 @@ mget(struct magic_set *ms, const unsigned char *s, struct magic *m,
+ 			fprintf(stderr, "indirect @offs=%u[%d]\n", offset, rv);
+ 
+ 		rbuf = file_pop_buffer(ms, pb);
+-		if (rbuf == NULL)
++		if (rbuf == NULL && ms->event_flags & EVENT_HAD_ERR)
+ 			return -1;
+ 
+ 		if (rv == 1) {
