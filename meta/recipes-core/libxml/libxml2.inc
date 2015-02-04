@@ -39,7 +39,6 @@ do_configure_prepend () {
 export PYTHON_SITE_PACKAGES="${PYTHON_SITEPACKAGES_DIR}"
 
 PACKAGECONFIG ??= "python"
-PACKAGECONFIG_linuxstdbase ??= ""
 
 PACKAGECONFIG[python] = "--with-python=${PYTHON},--without-python,python,python-core"
 # WARNING: zlib is require for RPM use
