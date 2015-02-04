@@ -1,0 +1,48 @@
+From b13923f0f7ad697792de96adbf51867122f3ee4f Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Sun, 14 Dec 2014 17:34:02 +0100
+Subject: [PATCH] darwinssl: aprintf() to allocate the session key
+
+(Upstream commit b13923f0f7ad697792de96adbf51867122f3ee4f)
+
+Upstream-Status: Backport
+
+... to avoid using a fixed memory size that risks being too large or too
+small.
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ lib/vtls/curl_darwinssl.c |    9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/lib/vtls/curl_darwinssl.c b/lib/vtls/curl_darwinssl.c
+index f0e1963..b798acb 100644
+--- a/lib/vtls/curl_darwinssl.c
++++ b/lib/vtls/curl_darwinssl.c
+@@ -1468,7 +1468,7 @@ static CURLcode darwinssl_connect_step1(struct connectdata *conn,
+ 
+   /* Check if there's a cached ID we can/should use here! */
+   if(!Curl_ssl_getsessionid(conn, (void **)&ssl_sessionid,
+-    &ssl_sessionid_len)) {
++                            &ssl_sessionid_len)) {
+     /* we got a session id, use it! */
+     err = SSLSetPeerID(connssl->ssl_ctx, ssl_sessionid, ssl_sessionid_len);
+     if(err != noErr) {
+@@ -1482,10 +1482,9 @@ static CURLcode darwinssl_connect_step1(struct connectdata *conn,
+      to starting the handshake. */
+   else {
+     CURLcode retcode;
+-
+-    ssl_sessionid = malloc(256*sizeof(char));
+-    ssl_sessionid_len = snprintf(ssl_sessionid, 256, "curl:%s:%hu",
+-      conn->host.name, conn->remote_port);
++    ssl_sessionid = aprintf(ssl_sessionid, "curl:%s:%hu",
++                            conn->host.name, conn->remote_port);
++    ssl_sessionid_len = strlen(ssl_sessionid);
+     err = SSLSetPeerID(connssl->ssl_ctx, ssl_sessionid, ssl_sessionid_len);
+     if(err != noErr) {
+       failf(data, "SSL: SSLSetPeerID() failed: OSStatus %d", err);
+-- 
+1.7.9.5
+

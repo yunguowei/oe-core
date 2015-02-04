@@ -1,0 +1,51 @@
+From 4ce22c607be9066b321f3eb3c524a6fff251a1e2 Mon Sep 17 00:00:00 2001
+From: Daniel Stenberg <daniel@haxx.se>
+Date: Fri, 19 Dec 2014 08:50:00 +0100
+Subject: [PATCH] darwinssl: fix session ID keys to only reuse identical
+ sessions
+
+(Upstream commit 4ce22c607be9066b321f3eb3c524a6fff251a1e2)
+
+Upstream-Status: Backport
+
+...to avoid a session ID getting cached without certificate checking and
+then after a subsequent _enabling_ of the check libcurl could still
+re-use the session done without cert checks.
+
+Bug: http://curl.haxx.se/docs/adv_20150108A.html
+Reported-by: Marc Hesse
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ lib/vtls/curl_darwinssl.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/lib/vtls/curl_darwinssl.c b/lib/vtls/curl_darwinssl.c
+index 5658673..c056198 100644
+--- a/lib/vtls/curl_darwinssl.c
++++ b/lib/vtls/curl_darwinssl.c
+@@ -6,7 +6,7 @@
+  *                             \___|\___/|_| \_\_____|
+  *
+  * Copyright (C) 2012 - 2014, Nick Zitzmann, <nickzman@gmail.com>.
+- * Copyright (C) 2012 - 2014, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 2012 - 2015, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -1488,8 +1488,10 @@ static CURLcode darwinssl_connect_step1(struct connectdata *conn,
+      to starting the handshake. */
+   else {
+     CURLcode retcode;
+-    ssl_sessionid = aprintf("curl:%s:%hu",
+-                            conn->host.name, conn->remote_port);
++    ssl_sessionid =
++      aprintf("%s:%d:%d:%s:%hu", data->set.str[STRING_SSL_CAFILE],
++              data->set.ssl.verifypeer, data->set.ssl.verifyhost,
++              conn->host.name, conn->remote_port);
+     ssl_sessionid_len = strlen(ssl_sessionid);
+     err = SSLSetPeerID(connssl->ssl_ctx, ssl_sessionid, ssl_sessionid_len);
+     if(err != noErr) {
+-- 
+1.7.9.5
+

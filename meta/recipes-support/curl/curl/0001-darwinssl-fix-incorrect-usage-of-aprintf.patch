@@ -1,0 +1,35 @@
+From 93227ddca5323880a8f4eeb8fca218f2970b3b8d Mon Sep 17 00:00:00 2001
+From: Nick Zitzmann <nickzman@gmail.com>
+Date: Mon, 15 Dec 2014 00:56:09 -0600
+Subject: [PATCH] darwinssl: fix incorrect usage of aprintf()
+
+The patch is from git://github.com/bagder/curl.git as of commit id
+93227ddca5323880a8f4eeb8fca218f2970b3b8d
+
+Upstream-Status: Backport
+
+Commit b13923f changed an snprintf() to use aprintf(), but the API usage
+wasn't correct, and was causing a crash to occur. This fixes it.
+
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ lib/vtls/curl_darwinssl.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/vtls/curl_darwinssl.c b/lib/vtls/curl_darwinssl.c
+index b798acb..2fb57b2 100644
+--- a/lib/vtls/curl_darwinssl.c
++++ b/lib/vtls/curl_darwinssl.c
+@@ -1482,7 +1482,7 @@ static CURLcode darwinssl_connect_step1(struct connectdata *conn,
+      to starting the handshake. */
+   else {
+     CURLcode retcode;
+-    ssl_sessionid = aprintf(ssl_sessionid, "curl:%s:%hu",
++    ssl_sessionid = aprintf("curl:%s:%hu",
+                             conn->host.name, conn->remote_port);
+     ssl_sessionid_len = strlen(ssl_sessionid);
+     err = SSLSetPeerID(connssl->ssl_ctx, ssl_sessionid, ssl_sessionid_len);
+-- 
+1.7.9.5
+
