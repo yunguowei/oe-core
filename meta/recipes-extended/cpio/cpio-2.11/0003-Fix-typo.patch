@@ -1,0 +1,31 @@
+From 58df4f1b44a1142bba500f980fd26806413b1728 Mon Sep 17 00:00:00 2001
+From: Sergey Poznyakoff <gray@gnu.org.ua>
+Date: Tue, 2 Dec 2014 11:33:29 +0200
+Subject: [PATCH 3/3] Fix typo
+
+The patch is backported from git://git.sv.gnu.org/cpio.git
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ src/copyin.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/copyin.c b/src/copyin.c
+index 042cc41..264bfcb 100644
+--- a/src/copyin.c
++++ b/src/copyin.c
+@@ -138,7 +138,7 @@ get_link_name (struct cpio_file_stat *file_hdr, int in_file_des)
+     }
+   else
+     {
+-      link_name = xmalloc (file_hdr->c_filesize);
++      link_name = xmalloc (file_hdr->c_filesize + 1);
+       tape_buffered_read (link_name, in_file_des, file_hdr->c_filesize);
+       link_name[file_hdr->c_filesize] = '\0';
+       tape_skip_padding (in_file_des, file_hdr->c_filesize);
+-- 
+1.7.9.5
+

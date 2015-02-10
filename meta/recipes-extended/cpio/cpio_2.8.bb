@@ -7,6 +7,9 @@ PR = "r3"
 
 SRC_URI += "file://m4extensions.patch \
     file://avoid_heap_overflow.patch \
+    file://0001-Fix-memory-overrun-on-reading-improperly-created-lin.patch \
+    file://0002-Bugfix.patch \
+    file://0003-Fix-typo.patch \
     "
 
 SRC_URI[md5sum] = "0caa356e69e149fb49b76bacc64615a1"
