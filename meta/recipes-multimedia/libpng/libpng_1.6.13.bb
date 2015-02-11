@@ -9,6 +9,7 @@ DEPENDS = "zlib"
 LIBV = "16"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/${PV}/libpng-${PV}.tar.xz \
+           file://0001-libpng16-Fixed-an-overflow-in-png_combine_row-with-v.patch \
           "
 
 SRC_URI[md5sum] = "9822c25466f060142359f80ed142c9e5"
