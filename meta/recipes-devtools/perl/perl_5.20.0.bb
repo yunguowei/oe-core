@@ -76,6 +76,7 @@ SRC_URI += " \
         file://0001-Makefile.SH-fix-do_install-failed.patch \
         file://make_ext.pl-fix-regenerate-makefile-failed-while-cc-.patch \
         file://0001-don-t-recurse-infinitely-in-Data-Dumper.patch \
+        file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
 "
 
 # Fix test case issues

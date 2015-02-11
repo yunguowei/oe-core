@@ -17,7 +17,9 @@ SRC_URI = "http://www.cpan.org/src/5.0/perl-${PV}.tar.gz \
            file://MM_Unix.pm.patch \
            file://debian/errno_ver.diff \
            file://dynaloaderhack.patch \
-           file://perl-5.14.3-fix-CVE-2010-4777.patch "
+           file://perl-5.14.3-fix-CVE-2010-4777.patch \
+           file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
+          "
 
 SRC_URI[md5sum] = "406ec049ebe3afcc80d9c76ec78ca4f8"
 SRC_URI[sha256sum] = "4e8c28ad6ecc89902f9cb2e76f2815bb1a8287ded278e15f7a36ca45f8bbcd02"
