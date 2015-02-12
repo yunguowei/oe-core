@@ -1,0 +1,101 @@
+From a10acfb1d2118f9a180181d3fed5399dbbe1df3c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?P=C3=A1draig=20Brady?= <P@draigBrady.com>
+Date: Tue, 25 Feb 2014 10:58:48 +0000
+Subject: [PATCH] parse-datetime: fix crash or infloop in TZ="" parsing
+
+This was reported in http://bugs.gnu.org/16872
+from the coreutils command: date -d 'TZ="""'
+
+The infinite loop for this case was present since the
+initial TZ="" parsing support in commit de95bdc2 29-10-2004.
+This was changed to a crash or heap corruption depending
+on the platform with commit 2e3e4195 18-01-2010.
+
+* lib/parse-datetime.y (parse_datetime): Break out of the
+TZ="" parsing loop once the second significant " is found.
+Also skip over any subsequent whitespace to be consistent
+with the non TZ= case.
+* tests/test-parse-datetime.c: Add test cases for TZ="" parsing.
+
+Upstream-commit: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ ChangeLog                   |    9 +++++++++
+ lib/parse-datetime.y        |    7 +++++--
+ tests/test-parse-datetime.c |   16 ++++++++++++++++
+ 3 files changed, 30 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index e938204..4e1984c 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,12 @@
++2014-02-26  Pádraig Brady <P@draigBrady.com>
++
++	parse-datetime: fix crash or infloop in TZ="" parsing
++	* lib/parse-datetime.y (parse_datetime): Break out of the
++	TZ="" parsing loop once the second significant " is found.
++	Also skip over any subsequent whitespace to be consistent
++	with the non TZ= case.
++	* tests/test-parse-datetime.c: Add test cases for TZ="" parsing.
++
+ 2013-12-13  Pádraig Brady  <P@draigBrady.com>
+ 
+ 	version 8.22
+diff --git a/lib/parse-datetime.y b/lib/parse-datetime.y
+index 6ece765..0ba0a52 100644
+--- a/lib/parse-datetime.y
++++ b/lib/parse-datetime.y
+@@ -1303,8 +1303,6 @@ parse_datetime (struct timespec *result, char const *p,
+             char tz1buf[TZBUFSIZE];
+             bool large_tz = TZBUFSIZE < tzsize;
+             bool setenv_ok;
+-            /* Free tz0, in case this is the 2nd or subsequent time through. */
+-            free (tz0);
+             tz0 = get_tz (tz0buf);
+             z = tz1 = large_tz ? xmalloc (tzsize) : tz1buf;
+             for (s = tzbase; *s != '"'; s++)
+@@ -1316,7 +1314,12 @@ parse_datetime (struct timespec *result, char const *p,
+             if (!setenv_ok)
+               goto fail;
+             tz_was_altered = true;
++
+             p = s + 1;
++            while (c = *p, c_isspace (c))
++              p++;
++
++            break;
+           }
+     }
+ 
+diff --git a/gnulib-tests/test-parse-datetime.c b/gnulib-tests/test-parse-datetime.c
+index a410d3d..25385ca 100644
+--- a/gnulib-tests/tests/test-parse-datetime.c
++++ b/gnulib-tests/test-parse-datetime.c
+@@ -419,5 +419,21 @@ main (int argc _GL_UNUSED, char **argv)
+      starting with a high-bit-set byte would be treated like "0".  */
+   ASSERT ( ! parse_datetime (&result, "\xb0", &now));
+ 
++  /* Exercise TZ="" parsing code.  */
++  /* These two would infloop or segfault before Feb 2014.  */
++  ASSERT ( ! parse_datetime (&result, "TZ=\"\"\"", &now));
++  ASSERT ( ! parse_datetime (&result, "TZ=\"\" \"", &now));
++  /* Exercise invalid patterns.  */
++  ASSERT ( ! parse_datetime (&result, "TZ=\"", &now));
++  ASSERT ( ! parse_datetime (&result, "TZ=\"\\\"", &now));
++  ASSERT ( ! parse_datetime (&result, "TZ=\"\\n", &now));
++  ASSERT ( ! parse_datetime (&result, "TZ=\"\\n\"", &now));
++  /* Exercise valid patterns.  */
++  ASSERT (   parse_datetime (&result, "TZ=\"\"", &now));
++  ASSERT (   parse_datetime (&result, "TZ=\"\" ", &now));
++  ASSERT (   parse_datetime (&result, " TZ=\"\"", &now));
++  ASSERT (   parse_datetime (&result, "TZ=\"\\\\\"", &now));
++  ASSERT (   parse_datetime (&result, "TZ=\"\\\"\"", &now));
++
+   return 0;
+ }
+-- 
+1.7.9.5
+

@@ -17,6 +17,7 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz \
            file://dummy_help2man.patch \
            file://fix-for-dummy-man-usage.patch \
            file://fix-selinux-flask.patch \
+           file://0001-parse-datetime-fix-crash-or-infloop-in-TZ-parsing.patch \
           "
 
 SRC_URI[md5sum] = "8fb0ae2267aa6e728958adc38f8163a2"
@@ -105,3 +106,4 @@ python __anonymous() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
