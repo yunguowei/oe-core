@@ -1,0 +1,49 @@
+From 709cae2bcbc0ea2c5d46c932b3d8301cf8f98e6b Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Mon, 1 Jul 2013 02:09:29 +0200
+Subject: [PATCH] vorbisdec: Check VLC tables during use instead of setup
+
+Fixes regression and Ticket2720
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+
+(Upstream commit 709cae2bcbc0ea2c5d46c932b3d8301cf8f98e6b)
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/vorbisdec.c |   15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/vorbisdec.c b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+index 7a7a6dd..c5950e6 100644
+--- a/gst-libs/ext/libav/libavcodec/vorbisdec.c
++++ b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+@@ -1180,8 +1180,11 @@ static int vorbis_floor1_decode(vorbis_context *vc,
+ 
+             cval = cval >> cbits;
+             if (book > -1) {
+-                floor1_Y[offset+j] = get_vlc2(gb, vc->codebooks[book].vlc.table,
+-                vc->codebooks[book].nb_bits, 3);
++                int v = get_vlc2(gb, vc->codebooks[book].vlc.table,
++                                 vc->codebooks[book].nb_bits, 3);
++                if (v < 0)
++                    return AVERROR_INVALIDDATA;
++                floor1_Y[offset+j] = v;
+             } else {
+                 floor1_Y[offset+j] = 0;
+             }
+@@ -1275,6 +1278,9 @@ static av_always_inline int setup_classifs(vorbis_context *vc,
+ 
+             av_dlog(NULL, "Classword: %u\n", temp);
+ 
++            if ((int)temp < 0)
++                return temp;
++
+             av_assert0(vr->classifications > 1); //needed for inverse[]
+ 
+             if (temp <= 65536) {
+-- 
+1.7.9.5
+

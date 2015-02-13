@@ -1,0 +1,70 @@
+From db347280eb3746d7b70888db97f1efe5f06f5624 Mon Sep 17 00:00:00 2001
+From: Luca Barbato <lu_zero@gentoo.org>
+Date: Sun, 19 May 2013 19:06:54 +0200
+Subject: [PATCH] vorbis: fallback to normal division instead of crashing
+
+The use of ff_inverse speeds up slightly arches + compilers that
+do not provide a division faster than the whole machinery, such
+as ppc32 + gcc4.7, but has operational limits.
+
+Drop the always-enable assert and provide a fallback.
+
+(Upstream commit db347280eb3746d7b70888db97f1efe5f06f5624)
+
+git://git.videolan.org/ffmpeg.git
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/vorbisdec.c |   23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/vorbisdec.c b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+index caf36eb..80051b9 100644
+--- a/gst-libs/ext/libav/libavcodec/vorbisdec.c
++++ b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+@@ -38,9 +38,6 @@
+ #define V_MAX_VLCS (1 << 16)
+ #define V_MAX_PARTITIONS (1 << 20)
+ 
+-#undef NDEBUG
+-#include <assert.h>
+-
+ typedef struct {
+     uint8_t      dimensions;
+     uint8_t      lookup_type;
+@@ -1278,14 +1275,24 @@ static av_always_inline int setup_classifs(vorbis_context *vc,
+ 
+             av_dlog(NULL, "Classword: %u\n", temp);
+ 
+-            assert(vr->classifications > 1 && temp <= 65536); //needed for inverse[]
++            av_assert0(vr->classifications > 1); //needed for inverse[]
+ 
+-            for (i = partition_count + c_p_c - 1; i >= partition_count; i--) {
+-                temp2 = (((uint64_t)temp) * inverse_class) >> 32;
++            if (temp <= 65536) {
++                for (i = partition_count + c_p_c - 1; i >= partition_count; i--) {
++                    temp2 = (((uint64_t)temp) * inverse_class) >> 32;
+ 
+-                if (i < vr->ptns_to_read)
+-                    vr->classifs[p + i] = temp - temp2 * vr->classifications;
+-                temp = temp2;
++                    if (i < vr->ptns_to_read)
++                        vr->classifs[p + i] = temp - temp2 * vr->classifications;
++                    temp = temp2;
++                }
++            } else {
++                for (i = partition_count + c_p_c - 1; i >= partition_count; i--) {
++                    temp2 = temp / vr->classifications;
++
++                    if (i < vr->ptns_to_read)
++                        vr->classifs[p + i] = temp - temp2 * vr->classifications;
++                    temp = temp2;
++                }
+             }
+         }
+         p += vr->ptns_to_read;
+-- 
+1.7.9.5
+

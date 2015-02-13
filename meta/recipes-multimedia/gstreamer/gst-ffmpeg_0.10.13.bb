@@ -64,6 +64,12 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-avcodec-cinepak-fix-integer-underflow.patch \
            file://0001-avcodec-utils-Add-case-for-jv-to-avcodec_align_dimen.patch \
            file://0001-avcodec-rawdec-Check-the-return-code-of-avpicture_ge.patch \
+           file://0001-vorbis-refactor-vorbis_residue_decode_internal.patch \
+           file://0001-vorbis-simplify-the-inner-loop-in-setup_classifs.patch \
+           file://0001-vorbis-fallback-to-normal-division-instead-of-crashi.patch \
+           file://0001-vorbisdec-Check-VLC-tables-during-use-instead-of-set.patch \
+           file://0001-vorbisdec-propagate-errors-from-setup_classifs.patch \
+           file://0001-avcodec-vorbisdec-Fix-off-by-1-error-in-ptns_to_read.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 

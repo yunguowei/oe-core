@@ -1,0 +1,34 @@
+From ae038c0914460646503be083e30e3971093239a1 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Mon, 1 Jul 2013 02:07:26 +0200
+Subject: [PATCH] vorbisdec: propagate errors from setup_classifs()
+
+Signed-off-by: Michael Niedermayer <michaelni@gmx.at>
+
+(Upstream commit ae038c0914460646503be083e30e3971093239a1)
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/vorbisdec.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/vorbisdec.c b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+index 7396c16..7a7a6dd 100644
+--- a/gst-libs/ext/libav/libavcodec/vorbisdec.c
++++ b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+@@ -1397,7 +1397,9 @@ static av_always_inline int vorbis_residue_decode_internal(vorbis_context *vc,
+         voffset = vr->begin;
+         for (partition_count = 0; partition_count < ptns_to_read;) {  // SPEC        error
+             if (!pass) {
+-                setup_classifs(vc, vr, do_not_decode, ch_used, partition_count);
++                int ret;
++                if ((ret = setup_classifs(vc, vr, do_not_decode, ch_used, partition_count)) < 0)
++                    return ret;
+             }
+             for (i = 0; (i < c_p_c) && (partition_count < ptns_to_read); ++i) {
+                 for (j_times_ptns_to_read = 0, j = 0; j < ch_used; ++j) {
+-- 
+1.7.9.5
+

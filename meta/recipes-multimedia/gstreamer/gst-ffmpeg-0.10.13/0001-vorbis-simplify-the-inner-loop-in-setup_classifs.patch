@@ -1,0 +1,37 @@
+From ddf1b4a2f8a680126eb611428e4f47e6e5b8c6c0 Mon Sep 17 00:00:00 2001
+From: Luca Barbato <lu_zero@gentoo.org>
+Date: Sun, 19 May 2013 18:59:13 +0200
+Subject: [PATCH] vorbis: simplify the inner loop in setup_classifs
+
+(Upstream commit ddf1b4a2f8a680126eb611428e4f47e6e5b8c6c0)
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ libavcodec/vorbisdec.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/vorbisdec.c b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+index 718f760..caf36eb 100644
+--- a/gst-libs/ext/libav/libavcodec/vorbisdec.c
++++ b/gst-libs/ext/libav/libavcodec/vorbisdec.c
+@@ -1321,11 +1321,11 @@ static av_always_inline int setup_classifs(vorbis_context *vc,
+ 
+             assert(vr->classifications > 1 && temp <= 65536); //needed for inverse[]
+ 
+-            for (i = 0; i < c_p_c; ++i) {
++            for (i = partition_count + c_p_c - 1; i >= partition_count; i--) {
+                 temp2 = (((uint64_t)temp) * inverse_class) >> 32;
+-                if (partition_count + c_p_c - 1 - i < vr->ptns_to_read)
+-                    vr->classifs[p + partition_count + c_p_c - 1 - i] =
+-                        temp - temp2 * vr->classifications;
++
++                if (i < vr->ptns_to_read)
++                    vr->classifs[p + i] = temp - temp2 * vr->classifications;
+                 temp = temp2;
+             }
+         }
+-- 
+1.7.9.5
+
