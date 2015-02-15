@@ -70,6 +70,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-vorbisdec-Check-VLC-tables-during-use-instead-of-set.patch \
            file://0001-vorbisdec-propagate-errors-from-setup_classifs.patch \
            file://0001-avcodec-vorbisdec-Fix-off-by-1-error-in-ptns_to_read.patch \
+           file://0001-matroskadec-Fix-read-after-free-in-matroska_read_see.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
