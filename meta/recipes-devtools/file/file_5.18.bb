@@ -25,6 +25,7 @@ SRC_URI = "ftp://ftp.astron.com/pub/file/file-${PV}.tar.gz \
            file://fix-parameter-options.patch \
            file://put-the-changes-in-the-original-file.patch \
            file://add-a-limit-to-the-number.patch \
+           file://file-limit-string-printing-to-100-chars.patch \
           "
 
 SRC_URI[md5sum] = "d420d8f2990cd344673acfbf8d76ff5a"

@@ -1,0 +1,45 @@
+Limit string printing to 100 chars, and add flags I forgot in the previous
+commit.
+This patch is to fix CVE-2014-9621.
+
+Upstream-Status: Backport [file]
+
+Written-by: Christos Zoulas <christos@zoulas.com>
+
+diff -Nur file-5.18.orig/src/readelf.c file-5.18/src/readelf.c
+--- file-5.18.orig/src/readelf.c	2015-02-15 09:58:23.380652835 +0800
++++ file-5.18/src/readelf.c	2015-02-15 10:02:53.864652598 +0800
+@@ -898,19 +898,23 @@
+ 	}
+ 
+ 	if (namesz == 7 && strcmp((char *)&nbuf[noff], "NetBSD") == 0) {
++		if (descsz > 100)
++			descsz = 100;
+ 		switch (xnh_type) {
+ 	    	case NT_NETBSD_VERSION:
+ 			return size;
+ 		case NT_NETBSD_MARCH:
+ 			if (*flags & FLAGS_DID_NETBSD_MARCH)
+ 				return size;
+-			if (file_printf(ms, ", compiled for: %.*s", (int)descsz,
+-			    (const char *)&nbuf[doff]) == -1)
++			*flags |= FLAGS_DID_NETBSD_MARCH;
++			if (file_printf(ms, ", compiled for: %.*s",
++			    (int)descsz, (const char *)&nbuf[doff]) == -1)
+ 				return size;
+ 			break;
+ 		case NT_NETBSD_CMODEL:
+ 			if (*flags & FLAGS_DID_NETBSD_CMODEL)
+ 				return size;
++			*flags |= FLAGS_DID_NETBSD_CMODEL;
+ 			if (file_printf(ms, ", compiler model: %.*s",
+ 			    (int)descsz, (const char *)&nbuf[doff]) == -1)
+ 				return size;
+@@ -918,6 +922,7 @@
+ 		default:
+ 			if (*flags & FLAGS_DID_NETBSD_UNKNOWN)
+ 				return size;
++			*flags |= FLAGS_DID_NETBSD_UNKNOWN;
+ 			if (file_printf(ms, ", note=%u", xnh_type) == -1)
+ 				return size;
+ 			break;
