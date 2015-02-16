@@ -19,6 +19,12 @@ SRC_URI = "ftp://ftp.astron.com/pub/file/file-${PV}.tar.gz \
            file://adjust-limits-better.patch \
            file://bump-recursion.patch \
            file://do-not-bail-if-there-was-no-error.patch \
+           file://kill--R-and-replace-with--P.patch \
+           file://add-a-limit-to-the-number-of-times.patch \
+           file://remove-name-recursion-limit.patch \
+           file://fix-parameter-options.patch \
+           file://put-the-changes-in-the-original-file.patch \
+           file://add-a-limit-to-the-number.patch \
           "
 
 SRC_URI[md5sum] = "d420d8f2990cd344673acfbf8d76ff5a"

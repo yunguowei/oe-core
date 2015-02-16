@@ -1,0 +1,317 @@
+Remove name recursion limit, it is always lower than the count... Rename
+things for consistency.
+
+Upstream-Status: Backport [file]
+
+Written-by: Christos Zoulas <christos@zoulas.com>
+
+diff -Nur file-5.18.orig/src/apprentice.c file-5.18/src/apprentice.c
+--- file-5.18.orig/src/apprentice.c	2015-02-15 12:58:45.335652803 +0800
++++ file-5.18/src/apprentice.c	2015-02-15 12:59:16.930652802 +0800
+@@ -506,11 +506,10 @@
+ 		ms->mlist[i] = NULL;
+ 	ms->file = "unknown";
+ 	ms->line = 0;
+-	ms->indir_recursion = FILE_INDIR_RECURSION;
+-	ms->name_recursion = FILE_NAME_RECURSION;
++	ms->indir_max = FILE_INDIR_MAX;
+ 	ms->name_max = FILE_NAME_MAX;
+-	ms->shnum_max = FILE_ELF_SHNUM;
+-	ms->phnum_max = FILE_ELF_PHNUM;
++	ms->elf_shnum_max = FILE_ELF_SHNUM_MAX;
++	ms->elf_phnum_max = FILE_ELF_PHNUM_MAX;
+ 	return ms;
+ free:
+ 	free(ms);
+diff -Nur file-5.18.orig/src/ascmagic.c file-5.18/src/ascmagic.c
+--- file-5.18.orig/src/ascmagic.c	2015-02-15 12:58:45.336652817 +0800
++++ file-5.18/src/ascmagic.c	2015-02-15 12:59:16.930652802 +0800
+@@ -147,7 +147,7 @@
+ 		    == NULL)
+ 			goto done;
+ 		if ((rv = file_softmagic(ms, utf8_buf,
+-		    (size_t)(utf8_end - utf8_buf), 0, 0, NULL,
++		    (size_t)(utf8_end - utf8_buf), 0, NULL,
+ 		    TEXTTEST, text)) == 0)
+ 			rv = -1;
+ 	}
+diff -Nur file-5.18.orig/src/elfclass.h file-5.18/src/elfclass.h
+--- file-5.18.orig/src/elfclass.h	2015-02-15 12:58:45.335652803 +0800
++++ file-5.18/src/elfclass.h	2015-02-15 12:59:16.931605277 +0800
+@@ -36,7 +36,7 @@
+ #ifdef ELFCORE
+ 	case ET_CORE:
+ 		phnum = elf_getu16(swap, elfhdr.e_phnum);
+-		if (phnum > ms->phnum_max)
++		if (phnum > ms->elf_phnum_max)
+ 			return toomany(ms, "program", phnum);
+ 		flags |= FLAGS_IS_CORE;
+ 		if (dophn_core(ms, clazz, swap, fd,
+@@ -49,10 +49,10 @@
+ 	case ET_EXEC:
+ 	case ET_DYN:
+ 		phnum = elf_getu16(swap, elfhdr.e_phnum);
+-		if (phnum > ms->phnum_max)
++		if (phnum > ms->elf_phnum_max)
+ 			return toomany(ms, "program", phnum);
+ 		shnum = elf_getu16(swap, elfhdr.e_shnum);
+-		if (shnum > ms->shnum_max)
++		if (shnum > ms->elf_shnum_max)
+ 			return toomany(ms, "section", shnum);
+ 		if (dophn_exec(ms, clazz, swap, fd,
+ 		    (off_t)elf_getu(swap, elfhdr.e_phoff), phnum,
+@@ -62,7 +62,7 @@
+ 		/*FALLTHROUGH*/
+ 	case ET_REL:
+ 		shnum = elf_getu16(swap, elfhdr.e_shnum);
+-		if (shnum > ms->shnum_max)
++		if (shnum > ms->elf_shnum_max)
+ 			return toomany(ms, "section", shnum);
+ 		if (doshn(ms, clazz, swap, fd,
+ 		    (off_t)elf_getu(swap, elfhdr.e_shoff), shnum,
+diff -Nur file-5.18.orig/src/file.c file-5.18/src/file.c
+--- file-5.18.orig/src/file.c	2015-02-15 12:58:45.335652803 +0800
++++ file-5.18/src/file.c	2015-02-15 12:59:16.931605277 +0800
+@@ -124,11 +124,10 @@
+ 	int tag;
+ 	size_t value;
+ } pm[] = {
+-	{ "indir",	MAGIC_PARAM_INDIR_RECURSION, 0 },
+-	{ "name",	MAGIC_PARAM_NAME_RECURSION, 0 },
+-	{ "namenum",	MAGIC_PARAM_NAME_MAX, 0 },
+-	{ "phnum",	MAGIC_PARAM_PHNUM_MAX, 0 },
+-	{ "shnum",	MAGIC_PARAM_SHNUM_MAX, 0 },
++	{ "indir",	MAGIC_PARAM_INDIR_MAX, 0 },
++	{ "name",	MAGIC_PARAM_NAME_MAX, 0 },
++	{ "elf_phnum",	MAGIC_PARAM_ELF_PHNUM_MAX, 0 },
++	{ "elf_shnum",	MAGIC_PARAM_ELF_SHNUM_MAX, 0 },
+ };
+ 
+ private char *progname;		/* used throughout 		*/
+diff -Nur file-5.18.orig/src/file.h file-5.18/src/file.h
+--- file-5.18.orig/src/file.h	2015-02-15 12:58:45.336652817 +0800
++++ file-5.18/src/file.h	2015-02-15 12:59:16.931605277 +0800
+@@ -400,16 +400,14 @@
+ 	/* FIXME: Make the string dynamically allocated so that e.g.
+ 	   strings matched in files can be longer than MAXstring */
+ 	union VALUETYPE ms_value;	/* either number or string */
+-	uint16_t indir_recursion;
+-	uint16_t name_recursion;
++	uint16_t indir_max;
+ 	uint16_t name_max;
+-	uint16_t shnum_max;
+-	uint16_t phnum_max;
+-#define	FILE_INDIR_RECURSION	15
+-#define	FILE_NAME_RECURSION	40
+-#define	FILE_NAME_MAX		30
+-#define	FILE_ELF_SHNUM		32768
+-#define	FILE_ELF_PHNUM		128
++	uint16_t elf_shnum_max;
++	uint16_t elf_phnum_max;
++#define	FILE_INDIR_MAX			15
++#define	FILE_NAME_MAX			30
++#define	FILE_ELF_SHNUM_MAX		32768
++#define	FILE_ELF_PHNUM_MAX		128
+ };
+ 
+ /* Type for Unicode characters */
+@@ -449,7 +447,7 @@
+     unichar **, size_t *, const char **, const char **, const char **);
+ protected int file_is_tar(struct magic_set *, const unsigned char *, size_t);
+ protected int file_softmagic(struct magic_set *, const unsigned char *, size_t,
+-    uint16_t, uint16_t, uint16_t *, int, int);
++    uint16_t, uint16_t *, int, int);
+ protected int file_apprentice(struct magic_set *, const char *, int);
+ protected int file_magicfind(struct magic_set *, const char *, struct mlist *);
+ protected uint64_t file_signextend(struct magic_set *, struct magic *,
+diff -Nur file-5.18.orig/src/funcs.c file-5.18/src/funcs.c
+--- file-5.18.orig/src/funcs.c	2015-02-15 12:58:45.336652817 +0800
++++ file-5.18/src/funcs.c	2015-02-15 12:59:16.931605277 +0800
+@@ -230,7 +230,7 @@
+ 
+ 	/* try soft magic tests */
+ 	if ((ms->flags & MAGIC_NO_CHECK_SOFT) == 0)
+-		if ((m = file_softmagic(ms, ubuf, nb, 0, 0, NULL, BINTEST,
++		if ((m = file_softmagic(ms, ubuf, nb, 0, NULL, BINTEST,
+ 		    looks_text)) != 0) {
+ 			if ((ms->flags & MAGIC_DEBUG) != 0)
+ 				(void)fprintf(stderr, "softmagic %d\n", m);
+diff -Nur file-5.18.orig/src/magic.c file-5.18/src/magic.c
+--- file-5.18.orig/src/magic.c	2015-02-15 12:58:45.335652803 +0800
++++ file-5.18/src/magic.c	2015-02-15 12:59:16.931605277 +0800
+@@ -495,20 +495,17 @@
+ magic_setparam(struct magic_set *ms, int param, const void *val)
+ {
+ 	switch (param) {
+-	case MAGIC_PARAM_INDIR_RECURSION:
+-		ms->indir_recursion = *(const size_t *)val;
+-		return 0;
+-	case MAGIC_PARAM_NAME_RECURSION:
+-		ms->name_recursion = *(const size_t *)val;
++	case MAGIC_PARAM_INDIR_MAX:
++		ms->indir_max = *(const size_t *)val;
+ 		return 0;
+ 	case MAGIC_PARAM_NAME_MAX:
+ 		ms->name_max = *(const size_t *)val;
+ 		return 0;
+-	case MAGIC_PARAM_PHNUM_MAX:
+-		ms->phnum_max = *(const size_t *)val;
++	case MAGIC_PARAM_ELF_PHNUM_MAX:
++		ms->elf_phnum_max = *(const size_t *)val;
+ 		return 0;
+-	case MAGIC_PARAM_SHNUM_MAX:
+-		ms->shnum_max = *(const size_t *)val;
++	case MAGIC_PARAM_ELF_SHNUM_MAX:
++		ms->elf_shnum_max = *(const size_t *)val;
+ 		return 0;
+ 	default:
+ 		errno = EINVAL;
+@@ -520,20 +517,17 @@
+ magic_getparam(struct magic_set *ms, int param, void *val)
+ {
+ 	switch (param) {
+-	case MAGIC_PARAM_INDIR_RECURSION:
+-		*(size_t *)val = ms->indir_recursion;
+-		return 0;
+-	case MAGIC_PARAM_NAME_RECURSION:
+-		*(size_t *)val = ms->name_recursion;
++	case MAGIC_PARAM_INDIR_MAX:
++		*(size_t *)val = ms->indir_max;
+ 		return 0;
+ 	case MAGIC_PARAM_NAME_MAX:
+ 		*(size_t *)val = ms->name_max;
+ 		return 0;
+-	case MAGIC_PARAM_PHNUM_MAX:
+-		*(size_t *)val = ms->phnum_max;
++	case MAGIC_PARAM_ELF_PHNUM_MAX:
++		*(size_t *)val = ms->elf_phnum_max;
+ 		return 0;
+-	case MAGIC_PARAM_SHNUM_MAX:
+-		*(size_t *)val = ms->shnum_max;
++	case MAGIC_PARAM_ELF_SHNUM_MAX:
++		*(size_t *)val = ms->elf_shnum_max;
+ 		return 0;
+ 	default:
+ 		errno = EINVAL;
+diff -Nur file-5.18.orig/src/softmagic.c file-5.18/src/softmagic.c
+--- file-5.18.orig/src/softmagic.c	2015-02-15 12:58:45.336652817 +0800
++++ file-5.18/src/softmagic.c	2015-02-15 13:08:08.748652671 +0800
+@@ -48,11 +48,11 @@
+ 
+ 
+ private int match(struct magic_set *, struct magic *, uint32_t,
+-    const unsigned char *, size_t, size_t, int, int, int, uint16_t, uint16_t,
++    const unsigned char *, size_t, size_t, int, int, int, uint16_t,
+     uint16_t *, int *, int *, int *);
+ private int mget(struct magic_set *, const unsigned char *,
+     struct magic *, size_t, size_t, unsigned int, int, int, int, uint16_t,
+-    uint16_t, uint16_t *, int *, int *, int *);
++    uint16_t *, int *, int *, int *);
+ private int magiccheck(struct magic_set *, struct magic *);
+ private int32_t mprint(struct magic_set *, struct magic *);
+ private int32_t moffset(struct magic_set *, struct magic *);
+@@ -76,8 +76,7 @@
+ /*ARGSUSED1*/		/* nbytes passed for regularity, maybe need later */
+ protected int
+ file_softmagic(struct magic_set *ms, const unsigned char *buf, size_t nbytes,
+-    uint16_t indir_level, uint16_t name_level, uint16_t *name_count,
+-	int mode, int text)
++    uint16_t indir_level, uint16_t *name_count, int mode, int text)
+ {
+ 	struct mlist *ml;
+ 	int rv, printed_something = 0, need_separator = 0;
+@@ -90,7 +89,7 @@
+ 
+ 	for (ml = ms->mlist[0]->next; ml != ms->mlist[0]; ml = ml->next)
+ 		if ((rv = match(ms, ml->magic, ml->nmagic, buf, nbytes, 0, mode,
+-		    text, 0, indir_level, name_level, name_count,
++		    text, 0, indir_level, name_count,
+ 		    &printed_something, &need_separator, NULL)) != 0)
+ 			return rv;
+ 
+@@ -127,7 +126,7 @@
+ private int
+ match(struct magic_set *ms, struct magic *magic, uint32_t nmagic,
+     const unsigned char *s, size_t nbytes, size_t offset, int mode, int text,
+-    int flip, uint16_t indir_level, uint16_t name_level, uint16_t *name_count,
++    int flip, uint16_t indir_level, uint16_t *name_count,
+     int *printed_something, int *need_separator, int *returnval)
+ {
+ 	uint32_t magindex = 0;
+@@ -165,7 +164,7 @@
+ 
+ 		/* if main entry matches, print it... */
+ 		switch (mget(ms, s, m, nbytes, offset, cont_level, mode, text,
+-		    flip, indir_level, name_level, name_count,
++		    flip, indir_level, name_count,
+ 		    printed_something, need_separator, returnval)) {
+ 		case -1:
+ 			return -1;
+@@ -254,7 +253,7 @@
+ 			}
+ #endif
+ 			switch (mget(ms, s, m, nbytes, offset, cont_level, mode,
+-			    text, flip, indir_level, name_level, name_count,
++			    text, flip, indir_level, name_count,
+ 			    printed_something, need_separator, returnval)) {
+ 			case -1:
+ 				return -1;
+@@ -1164,7 +1163,7 @@
+ private int
+ mget(struct magic_set *ms, const unsigned char *s, struct magic *m,
+     size_t nbytes, size_t o, unsigned int cont_level, int mode, int text,
+-    int flip, uint16_t indir_level, uint16_t name_level, uint16_t *name_count,
++    int flip, uint16_t indir_level, uint16_t *name_count,
+     int *printed_something, int *need_separator, int *returnval)
+ {
+ 	uint32_t offset = ms->offset;
+@@ -1175,18 +1174,12 @@
+ 	union VALUETYPE *p = &ms->ms_value;
+ 	struct mlist ml;
+ 
+-	if (indir_level >= ms->indir_recursion) {
++	if (indir_level >= ms->indir_max) {
+ 		file_error(ms, 0, "indirect recursion nesting (%hu) exceeded",
+ 		    indir_level);
+ 		return -1;
+ 	}
+ 
+-	if (name_level >= ms->name_recursion) {
+-		file_error(ms, 0, "name recursion nesting (%hu) exceeded",
+-		    name_level);
+-		return -1;
+-	}
+-
+ 	if (*name_count >= ms->name_max) {
+ 		file_error(ms, 0, "name use count (%hu) exceeded",
+ 		    *name_count);
+@@ -1200,9 +1193,9 @@
+ 	if ((ms->flags & MAGIC_DEBUG) != 0) {
+ 		fprintf(stderr, "mget(type=%d, flag=%x, offset=%u, o=%"
+ 		    SIZE_T_FORMAT "u, " "nbytes=%" SIZE_T_FORMAT
+-		    "u, il=%hu, nl=%hu nc=%hu)\n",
++		    "u, il=%hu, nc=%hu)\n",
+ 		    m->type, m->flag, offset, o, nbytes,
+-		    indir_level, name_level, *name_count);
++		    indir_level, *name_count);
+ 		mdebug(offset, (char *)(void *)p, sizeof(union VALUETYPE));
+ #ifndef COMPILE_ONLY
+ 		file_mdump(m);
+@@ -1774,7 +1767,7 @@
+ 			return -1;
+ 
+ 		rv = file_softmagic(ms, s + offset, nbytes - offset,
+-		    indir_level + 1, name_level, name_count, BINTEST, text);
++		    indir_level + 1, name_count, BINTEST, text);
+ 
+ 		if ((ms->flags & MAGIC_DEBUG) != 0)
+ 			fprintf(stderr, "indirect @offs=%u[%d]\n", offset, rv);
+@@ -1814,7 +1807,7 @@
+ 		if (m->flag & NOSPACE)
+ 			*need_separator = 0;
+ 		rv = match(ms, ml.magic, ml.nmagic, s, nbytes, offset + o,
+-		    mode, text, flip, indir_level, name_level + 1, name_count,
++		    mode, text, flip, indir_level, name_count,
+ 		    printed_something, need_separator, returnval);
+ 		if (rv != 1)
+ 		    *need_separator = oneed_separator;

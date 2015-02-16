@@ -1,0 +1,44 @@
+put the changes in the original file not the generated file.
+
+Upstream-Status: Backport [file]
+
+Written-by: Christos Zoulas <christos@zoulas.com>
+
+diff -Nur file-5.18.orig/src/magic.h file-5.18/src/magic.h
+--- file-5.18.orig/src/magic.h	2015-02-13 17:05:36.492652885 +0800
++++ file-5.18/src/magic.h	2015-02-13 17:06:59.075571616 +0800
+@@ -101,11 +101,10 @@
+ int magic_list(magic_t, const char *);
+ int magic_errno(magic_t);
+ 
+-#define MAGIC_PARAM_INDIR_RECURSION	0
+-#define MAGIC_PARAM_NAME_RECURSION	1
+-#define MAGIC_PARAM_NAME_MAX		2
+-#define MAGIC_PARAM_PHNUM_MAX		3
+-#define MAGIC_PARAM_SHNUM_MAX		4
++#define MAGIC_PARAM_INDIR_MAX		0
++#define MAGIC_PARAM_NAME_MAX		1
++#define MAGIC_PARAM_ELF_PHNUM_MAX	2
++#define MAGIC_PARAM_ELF_SHNUM_MAX	3
+ 
+ int magic_setparam(magic_t, int, const void *);
+ int magic_getparam(magic_t, int, void *);
+diff -Nur file-5.18.orig/src/magic.h.in file-5.18/src/magic.h.in
+--- file-5.18.orig/src/magic.h.in	2015-02-13 17:05:36.492652885 +0800
++++ file-5.18/src/magic.h.in	2015-02-13 17:05:55.251652621 +0800
+@@ -101,11 +101,10 @@
+ int magic_list(magic_t, const char *);
+ int magic_errno(magic_t);
+ 
+-#define MAGIC_PARAM_INDIR_RECURSION	0
+-#define MAGIC_PARAM_NAME_RECURSION	1
+-#define MAGIC_PARAM_NAME_MAX		2
+-#define MAGIC_PARAM_PHNUM_MAX		3
+-#define MAGIC_PARAM_SHNUM_MAX		4
++#define MAGIC_PARAM_INDIR_MAX		0
++#define MAGIC_PARAM_NAME_MAX		1
++#define MAGIC_PARAM_ELF_PHNUM_MAX	2
++#define MAGIC_PARAM_ELF_SHNUM_MAX	3
+ 
+ int magic_setparam(magic_t, int, const void *);
+ int magic_getparam(magic_t, int, void *);
