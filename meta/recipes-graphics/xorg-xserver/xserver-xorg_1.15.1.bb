@@ -11,6 +11,12 @@ SRC_URI += "file://crosscompile.patch \
             file://0002-render-unvalidated-lengths-in-Render-extn.-swapped-p.patch \
             file://0001-randr-unvalidated-lengths-in-RandR-extension-swapped.patch \
             file://0001-unchecked-malloc-may-allow-unauthed-client-to-crash-.patch \
+            file://0001-dix-integer-overflow-in-ProcPutImage-CVE-2014-8092-1.patch \
+            file://0002-dix-integer-overflow-in-GetHosts-CVE-2014-8092-2-4.patch \
+            file://0003-dix-integer-overflow-in-RegionSizeof-CVE-2014-8092-3.patch \
+            file://0004-dix-integer-overflow-in-REQUEST_FIXED_SIZE-CVE-2014-.patch \
+            file://0005-Missing-parens-in-REQUEST_FIXED_SIZE-macro-CVE-2014-.patch \
+            file://0006-dix-GetHosts-bounds-check-using-wrong-pointer-value-.patch \
            "
 
 SRC_URI[md5sum] = "e4c70262ed89764be8f8f5d699ed9227"
