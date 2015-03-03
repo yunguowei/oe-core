@@ -28,6 +28,15 @@ SRC_URI += "file://crosscompile.patch \
             file://0001-xcmisc-unvalidated-length-in-SProcXCMiscGetXIDList-C.patch \
             file://0001-dbe-unvalidated-lengths-in-DbeSwapBuffers-calls-CVE-.patch \
             file://0002-dbe-Call-to-DDX-SwapBuffers-requires-address-of-int-.patch \
+            file://0001-glx-Fix-image-size-computation-for-EXT_texture_integ.patch \
+            file://0002-glx-Length-checking-for-GLXRender-requests-v2-CVE-20.patch \
+            file://0003-glx-Length-checking-for-RenderLarge-requests-v2-CVE-.patch \
+            file://0004-glx-Top-level-length-checking-for-swapped-VendorPriv.patch \
+            file://0005-glx-Request-length-checks-for-SetClientInfoARB-CVE-2.patch \
+            file://0006-glx-Length-checking-for-non-generated-vendor-private.patch \
+            file://0007-glx-Length-checking-for-non-generated-single-request.patch \
+            file://0008-glx-Pass-remaining-request-length-into-varsize-v2-CV.patch \
+            file://0009-glx-Can-t-mix-declarations-and-code-in-X.org-sources.patch \
            "
 
 SRC_URI[md5sum] = "e4c70262ed89764be8f8f5d699ed9227"
