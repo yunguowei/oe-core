@@ -10,6 +10,7 @@ SRC_URI += "file://crosscompile.patch \
             file://0001-render-check-request-size-before-reading-it-CVE-2014.patch \
             file://0002-render-unvalidated-lengths-in-Render-extn.-swapped-p.patch \
             file://0001-randr-unvalidated-lengths-in-RandR-extension-swapped.patch \
+            file://0001-unchecked-malloc-may-allow-unauthed-client-to-crash-.patch \
            "
 
 SRC_URI[md5sum] = "e4c70262ed89764be8f8f5d699ed9227"
