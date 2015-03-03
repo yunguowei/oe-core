@@ -17,6 +17,12 @@ SRC_URI += "file://crosscompile.patch \
             file://0004-dix-integer-overflow-in-REQUEST_FIXED_SIZE-CVE-2014-.patch \
             file://0005-Missing-parens-in-REQUEST_FIXED_SIZE-macro-CVE-2014-.patch \
             file://0006-dix-GetHosts-bounds-check-using-wrong-pointer-value-.patch \
+            file://0001-glx-Be-more-paranoid-about-variable-length-requests-.patch \
+            file://0002-glx-Be-more-strict-about-rejecting-invalid-image-siz.patch \
+            file://0003-glx-Additional-paranoia-in-__glXGetAnswerBuffer-__GL.patch \
+            file://0004-glx-Add-safe_-add-mul-pad-v3-CVE-2014-8093-4-6.patch \
+            file://0005-glx-Integer-overflow-protection-for-non-generated-re.patch \
+            file://0006-glx-Fix-mask-truncation-in-__glXGetAnswerBuffer-CVE-.patch \
            "
 
 SRC_URI[md5sum] = "e4c70262ed89764be8f8f5d699ed9227"
