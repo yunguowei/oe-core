@@ -19,6 +19,7 @@ S = "${WORKDIR}/git"
 
 PV = "3.14.2+git${SRCPV}"
 
+EXTRA_OEMAKE += "DISABLE_DOCUMENTATION=1"
 
 do_install () {
 	oe_runmake 'DESTDIR=${D}' install
