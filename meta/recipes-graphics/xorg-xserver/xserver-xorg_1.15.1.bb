@@ -23,6 +23,7 @@ SRC_URI += "file://crosscompile.patch \
             file://0004-glx-Add-safe_-add-mul-pad-v3-CVE-2014-8093-4-6.patch \
             file://0005-glx-Integer-overflow-protection-for-non-generated-re.patch \
             file://0006-glx-Fix-mask-truncation-in-__glXGetAnswerBuffer-CVE-.patch \
+            file://0001-dri2-integer-overflow-in-ProcDRI2GetBuffers-CVE-2014.patch \
            "
 
 SRC_URI[md5sum] = "e4c70262ed89764be8f8f5d699ed9227"
