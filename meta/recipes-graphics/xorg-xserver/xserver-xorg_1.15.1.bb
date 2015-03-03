@@ -39,6 +39,8 @@ SRC_URI += "file://crosscompile.patch \
             file://0009-glx-Can-t-mix-declarations-and-code-in-X.org-sources.patch \
             file://0001-Xv-unvalidated-lengths-in-XVideo-extension-swapped-p.patch \
             file://0001-xfixes-unvalidated-length-in-SProcXFixesSelectSelect.patch \
+            file://0001-dri3-unvalidated-lengths-in-DRI3-extension-swapped-p.patch \
+            file://0002-present-unvalidated-lengths-in-Present-extension-pro.patch \
            "
 
 SRC_URI[md5sum] = "e4c70262ed89764be8f8f5d699ed9227"
