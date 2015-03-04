@@ -142,6 +142,7 @@ do_install () {
 
 PACKAGES =+ "pybootchartgui"
 FILES_pybootchartgui += "${libdir}/python*/site-packages/pybootchartgui ${bindir}/pybootchartgui"
+RDEPENDS_${PN} = "sysvinit-pidof lsb"
 RDEPENDS_pybootchartgui = "python-pycairo python-compression python-image python-textutils python-shell python-compression python-codecs"
 DEPENDS_append_class-native = " python-pycairo-native"
 
