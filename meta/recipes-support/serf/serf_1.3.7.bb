@@ -10,9 +10,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 DEPENDS = "python-scons-native openssl apr apr-util util-linux expat"
 
-FULLCC = "${STAGING_BINDIR_TOOLCHAIN}/${CC}"
-FULLCC_class-native = "${CC}"
-
 do_compile() {
 	${STAGING_BINDIR_NATIVE}/scons ${PARALLEL_MAKE} PREFIX=${prefix} \
 		CC="${CC}" \
