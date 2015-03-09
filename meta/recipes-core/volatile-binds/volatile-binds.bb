@@ -52,6 +52,7 @@ END
         # after the volatile /var/lib is mounted.
         sed -i -e "/^Before=/s/\$/ systemd-random-seed.service/" \
                -e "/^WantedBy=/s/\$/ systemd-random-seed.service/" \
+               -e "/^ExecStop=/s/sbin/bin/" \
                var-volatile-lib.service
     fi
 }
