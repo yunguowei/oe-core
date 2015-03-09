@@ -33,6 +33,7 @@ SRC_URI = "file://functions \
            file://GPLv2.patch \
            file://dmesg.sh \
            file://logrotate-dmesg.conf \
+           file://sushell \
 "
 
 SRC_URI_append_arm = " file://alignment.sh"
@@ -75,6 +76,7 @@ do_install () {
 	install -d ${D}${sysconfdir}/default/volatiles
 	# Holds state information pertaining to urandom
 	install -d ${D}/var/lib/urandom
+	install -d ${D}/${base_sbindir}
 
 	install -m 0644    ${WORKDIR}/functions		${D}${sysconfdir}/init.d
 	install -m 0755    ${WORKDIR}/bootmisc.sh	${D}${sysconfdir}/init.d
@@ -98,6 +100,7 @@ do_install () {
 	install -m 0644    ${WORKDIR}/volatiles		${D}${sysconfdir}/default/volatiles/00_core
 	install -m 0755    ${WORKDIR}/dmesg.sh		${D}${sysconfdir}/init.d
 	install -m 0644    ${WORKDIR}/logrotate-dmesg.conf ${D}${sysconfdir}/
+	install -m 0755    ${WORKDIR}/sushell		${D}/${base_sbindir}
 
 	if [ "${TARGET_ARCH}" = "arm" ]; then
 		install -m 0755 ${WORKDIR}/alignment.sh	${D}${sysconfdir}/init.d
