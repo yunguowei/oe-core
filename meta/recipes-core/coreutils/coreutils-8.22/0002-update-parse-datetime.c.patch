@@ -1,0 +1,52 @@
+From d2c4621b181a0599e115423017e9571e5e4c2793 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Tue, 10 Mar 2015 14:53:29 +0800
+Subject: [PATCH] coreutils: update parse-datetime.c
+
+After the parse-datetime.y updated by previous commit 0bb52967, then
+the parse-datetime.c should be updated accordingly to get coreutils
+build for SDK environment.
+
+The file can be regenerated while compiling but that will need bison
+which is not included by SDK, just update it to remove the buildtime
+dependency.
+
+This commit should be removed with 0bb52967 together after the
+coreutils upgraded to 8.23.
+
+Upstream-Status: Inappropriate [WR 7.0 Only]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ lib/parse-datetime.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/lib/parse-datetime.c b/lib/parse-datetime.c
+index 08b2d32..12bdd39 100644
+--- a/lib/parse-datetime.c
++++ b/lib/parse-datetime.c
+@@ -3207,8 +3207,6 @@ parse_datetime (struct timespec *result, char const *p,
+             char tz1buf[TZBUFSIZE];
+             bool large_tz = TZBUFSIZE < tzsize;
+             bool setenv_ok;
+-            /* Free tz0, in case this is the 2nd or subsequent time through. */
+-            free (tz0);
+             tz0 = get_tz (tz0buf);
+             z = tz1 = large_tz ? xmalloc (tzsize) : tz1buf;
+             for (s = tzbase; *s != '"'; s++)
+@@ -3220,7 +3218,12 @@ parse_datetime (struct timespec *result, char const *p,
+             if (!setenv_ok)
+               goto fail;
+             tz_was_altered = true;
++
+             p = s + 1;
++            while (c = *p, c_isspace (c))
++              p++;
++
++            break;
+           }
+     }
+ 
+-- 
+1.9.1
+

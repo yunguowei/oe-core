@@ -18,6 +18,7 @@ SRC_URI = "${GNU_MIRROR}/coreutils/${BP}.tar.xz \
            file://fix-for-dummy-man-usage.patch \
            file://fix-selinux-flask.patch \
            file://0001-parse-datetime-fix-crash-or-infloop-in-TZ-parsing.patch \
+           file://0002-update-parse-datetime.c.patch \
           "
 
 SRC_URI[md5sum] = "8fb0ae2267aa6e728958adc38f8163a2"
