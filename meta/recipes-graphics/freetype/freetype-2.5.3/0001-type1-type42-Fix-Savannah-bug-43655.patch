@@ -1,0 +1,64 @@
+From dd89710f0f643eb0f99a3830e0712d26c7642acd Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Fri, 21 Nov 2014 22:19:28 +0100
+Subject: [PATCH] [type1, type42] Fix Savannah bug #43655.
+
+* src/type1/t1load.c (parse_charstrings), src/type42/t42parse.c
+(t42_parse_charstrings): Fix boundary testing.
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ ChangeLog             |    7 +++++++
+ src/type1/t1load.c    |    2 +-
+ src/type42/t42parse.c |    2 +-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 630771b..ee27f70 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -83,6 +83,13 @@
+ 	* src/bdf/bdflib.c (_bdf_parse_glyphs) <"ENDFONT">: Check
+ 	`_BDF_GLYPH_BITS'.
+ 
++2014-11-21  Werner Lemberg  <wl@gnu.org>
++
++	[type1, type42] Fix Savannah bug #43655.
++
++	* src/type1/t1load.c (parse_charstrings), src/type42/t42parse.c
++	(t42_parse_charstrings): Fix boundary testing.
++
+ 2014-03-06  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* Version 2.5.3 released.
+diff --git a/src/type1/t1load.c b/src/type1/t1load.c
+index fd06432..caa75bd 100644
+--- a/src/type1/t1load.c
++++ b/src/type1/t1load.c
+@@ -1604,7 +1604,7 @@
+         FT_PtrDist  len;
+ 
+ 
+-        if ( cur + 1 >= limit )
++        if ( cur + 2 >= limit )
+         {
+           error = FT_THROW( Invalid_File_Format );
+           goto Fail;
+diff --git a/src/type42/t42parse.c b/src/type42/t42parse.c
+index 9b66888..a60e216 100644
+--- a/src/type42/t42parse.c
++++ b/src/type42/t42parse.c
+@@ -858,7 +858,7 @@
+         FT_PtrDist  len;
+ 
+ 
+-        if ( cur + 1 >= limit )
++        if ( cur + 2 >= limit )
+         {
+           FT_ERROR(( "t42_parse_charstrings: out of bounds\n" ));
+           error = FT_THROW( Invalid_File_Format );
+-- 
+1.7.9.5
+
