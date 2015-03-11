@@ -1,0 +1,55 @@
+From 54abd22891bd51ef8b533b24df53b3019b5cee81 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Sat, 15 Nov 2014 09:05:22 +0100
+Subject: [PATCH] [sfnt] Fix Savannah bug #43597.
+
+* src/sfnt/pngshim.c (Load_SBit_Png): Protect against too large
+bitmaps.
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ ChangeLog          |    7 +++++++
+ src/sfnt/pngshim.c |    7 +++++++
+ 2 files changed, 14 insertions(+)
+
+diff --git a/ChangeLog b/ChangeLog
+index a6465e7..4cebb38 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -90,6 +90,13 @@
+ 	* src/type1/t1load.c (parse_charstrings), src/type42/t42parse.c
+ 	(t42_parse_charstrings): Fix boundary testing.
+ 
++2014-11-15  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43597.
++
++	* src/sfnt/pngshim.c (Load_SBit_Png): Protect against too large
++	bitmaps.
++
+ 2014-03-06  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* Version 2.5.3 released.
+diff --git a/src/sfnt/pngshim.c b/src/sfnt/pngshim.c
+index 9afbe5a..fdb15d4 100644
+--- a/src/sfnt/pngshim.c
++++ b/src/sfnt/pngshim.c
+@@ -269,6 +269,13 @@
+       map->pitch      = map->width * 4;
+       map->num_grays  = 256;
+ 
++      /* reject too large bitmaps similarly to the rasterizer */
++      if ( map->rows > 0x7FFF || map->width > 0x7FFF )
++      {
++        error = FT_THROW( Array_Too_Large );
++        goto DestroyExit;
++      }
++
+       size = map->rows * map->pitch;
+ 
+       error = ft_glyphslot_alloc_bitmap( slot, size );
+-- 
+1.7.9.5
+

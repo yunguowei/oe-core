@@ -25,6 +25,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/freetype/freetype-${PV}.tar.bz2 \
            file://0001-sfnt-Fix-Savannah-bug-43656.patch \
            file://0001-type1-type42-Another-fix-for-Savannah-bug-43655.patch \
            file://0001-type1-type42-Fix-Savannah-bug-43655.patch \
+           file://0001-Change-some-fields-in-FT_Bitmap-to-unsigned-type.patch \
+           file://0001-sfnt-Fix-Savannah-bug-43597.patch \
 "
 SRC_URI[md5sum] = "d6b60f06bfc046e43ab2a6cbfd171d65"
 SRC_URI[sha256sum] = "c0848b29d52ef3ca27ad92e08351f023c5e24ce8cea7d8fe69fc96358e65f75e"
