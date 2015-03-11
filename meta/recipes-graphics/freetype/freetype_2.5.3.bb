@@ -34,6 +34,12 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/freetype/freetype-${PV}.tar.bz2 \
            file://0001-Fix-Savannah-bug-43548.patch \
            file://0001-Fix-Savannah-bug-43547.patch \
            file://0001-Fix-Savannah-bug-43540.patch \
+           file://0001-src-base-ftobjs.c-Mac_Read_POST_Resource-Avoid-memor.patch \
+           file://0001-Fix-Savannah-bug-43539.patch \
+           file://0001-Fix-Savannah-bug-43538.patch \
+           file://0001-src-base-ftobjs.c-Mac_Read_POST_Resource-Use-unsigne.patch \
+           file://0001-src-base-ftobjs.c-Mac_Read_POST_Resource-Insert-comm.patch \
+           file://0001-src-base-ftobj.c-Mac_Read_POST_Resource-Additional.patch \
 "
 SRC_URI[md5sum] = "d6b60f06bfc046e43ab2a6cbfd171d65"
 SRC_URI[sha256sum] = "c0848b29d52ef3ca27ad92e08351f023c5e24ce8cea7d8fe69fc96358e65f75e"

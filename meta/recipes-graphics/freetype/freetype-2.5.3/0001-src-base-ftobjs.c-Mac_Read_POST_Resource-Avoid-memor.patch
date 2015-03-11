@@ -1,0 +1,51 @@
+From 5aff85301bdce7677766fa1367c82ff41a739637 Mon Sep 17 00:00:00 2001
+From: suzuki toshiya <mpsuzuki@hiroshima-u.ac.jp>
+Date: Wed, 26 Nov 2014 14:36:12 +0900
+Subject: [PATCH] * src/base/ftobjs.c (Mac_Read_POST_Resource): Avoid memory
+ leak by a broken POST table in resource-fork.  Return after
+ freeing the buffered POST table when it is found to be
+ broken.
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ ChangeLog         |    6 ++++++
+ src/base/ftobjs.c |    4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index f0e7d7e..985512e 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,5 +1,11 @@
+ 2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
+ 
++	* src/base/ftobjs.c (Mac_Read_POST_Resource): Avoid memory leak
++	by a broken POST table in resource-fork.  Return after freeing
++	the buffered POST table when it is found to be broken.
++
++2014-11-26  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
++
+ 	Fix Savannah bug #43540.
+ 
+ 	* src/base/ftmac.c (parse_fond): Prevent a buffer overrun
+diff --git a/src/base/ftobjs.c b/src/base/ftobjs.c
+index fe49dd8..4d60e88 100644
+--- a/src/base/ftobjs.c
++++ b/src/base/ftobjs.c
+@@ -1603,9 +1603,9 @@
+       if ( error )
+         goto Exit2;
+       if ( FT_READ_LONG( rlen ) )
+-        goto Exit;
++        goto Exit2;
+       if ( FT_READ_USHORT( flags ) )
+-        goto Exit;
++        goto Exit2;
+       FT_TRACE3(( "POST fragment[%d]: offsets=0x%08x, rlen=0x%08x, flags=0x%04x\n",
+                    i, offsets[i], rlen, flags ));
+ 
+-- 
+1.7.9.5
+
