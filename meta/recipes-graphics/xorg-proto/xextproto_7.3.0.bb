@@ -22,3 +22,5 @@ BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI[md5sum] = "70c90f313b4b0851758ef77b95019584"
 SRC_URI[sha256sum] = "f3f4b23ac8db9c3a9e0d8edb591713f3d70ef9c3b175970dd8823dfc92aa5bb0"
+
+ALLOW_EMPTY_${PN} = "1"
