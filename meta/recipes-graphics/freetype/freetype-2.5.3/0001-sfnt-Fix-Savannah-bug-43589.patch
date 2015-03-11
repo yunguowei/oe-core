@@ -1,0 +1,54 @@
+From f46add13895337ece929b18bb8f036431b3fb538 Mon Sep 17 00:00:00 2001
+From: Werner Lemberg <wl@gnu.org>
+Date: Wed, 12 Nov 2014 21:06:08 +0100
+Subject: [PATCH] [sfnt] Fix Savannah bug #43589.
+
+* src/sfnt/sfobjs.c (woff_open_font): Protect against addition
+overflow.
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ ChangeLog         |    7 +++++++
+ src/sfnt/sfobjs.c |    6 ++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/ChangeLog b/ChangeLog
+index 5db1130..417af86 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -126,6 +126,13 @@
+ 	* src/sfnt/ttsbit.c (tt_sbit_decoder_init): Protect against addition
+ 	and multiplication overflow.
+ 
++2014-11-12  Werner Lemberg  <wl@gnu.org>
++
++	[sfnt] Fix Savannah bug #43589.
++
++	* src/sfnt/sfobjs.c (woff_open_font): Protect against addition
++	overflow.
++
+ 2014-03-06  Werner Lemberg  <wl@gnu.org>
+ 
+ 	* Version 2.5.3 released.
+diff --git a/src/sfnt/sfobjs.c b/src/sfnt/sfobjs.c
+index cfea9cd..70b988d 100644
+--- a/src/sfnt/sfobjs.c
++++ b/src/sfnt/sfobjs.c
+@@ -567,8 +567,10 @@
+ 
+ 
+       if ( table->Offset != woff_offset                         ||
+-           table->Offset + table->CompLength > woff.length      ||
+-           sfnt_offset + table->OrigLength > woff.totalSfntSize ||
++           table->CompLength > woff.length                      ||
++           table->Offset > woff.length - table->CompLength      ||
++           table->OrigLength > woff.totalSfntSize               ||
++           sfnt_offset > woff.totalSfntSize - table->OrigLength ||
+            table->CompLength > table->OrigLength                )
+       {
+         error = FT_THROW( Invalid_Table );
+-- 
+1.7.9.5
+
