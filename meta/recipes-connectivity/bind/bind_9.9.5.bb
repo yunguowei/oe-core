@@ -16,7 +16,8 @@ SRC_URI = "ftp://ftp.isc.org/isc/bind9/${PV}/${BPN}-${PV}.tar.gz \
            file://generate-rndc-key.sh \
            file://named.service \
            file://bind9 \
-           file://init.d-add-support-for-read-only-rootfs.patch \
+	   file://init.d-add-support-for-read-only-rootfs.patch \
+           file://0001-master-avoid-crash-due-to-managed-key-rollover.patch \
 	   "
 
 SRC_URI[md5sum] = "e676c65cad5234617ee22f48e328c24e"
