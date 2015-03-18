@@ -32,5 +32,8 @@ fi
 
 export PATH PS1 OPIEDIR QPEDIR QTDIR EDITOR TERM
 
+HOSTNAME=`/bin/hostname 2>/dev/null`
+export HOSTNAME
+
 umask 022
 
