@@ -156,6 +156,8 @@ do_install () {
 
 	oe_libinstall -so libcrypto ${D}${libdir}
 	oe_libinstall -so libssl ${D}${libdir}
+	ln -sf libcrypto${SOLIBS} ${D}${libdir}/libcrypto.so.10
+	ln -sf libssl${SOLIBS} ${D}${libdir}/libssl.so.10
 
 	# Moving libcrypto to /lib
 	if [ ! ${D}${libdir} -ef ${D}${base_libdir} ]; then
