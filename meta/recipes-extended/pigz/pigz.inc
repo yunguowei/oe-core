@@ -7,7 +7,8 @@ HOMEPAGE = "http://zlib.net/pigz/"
 SECTION = "console/utils"
 LICENSE = "Zlib"
 
-SRC_URI = "http://zlib.net/pigz/pigz-${PV}.tar.gz"
+SRC_URI = "http://zlib.net/pigz/pigz-${PV}.tar.gz \
+           file://0001-When-decompressing-with-N-or-NT-strip-any-path-from-.patch "
 
 PROVIDES_class-native += "gzip-native"
 
