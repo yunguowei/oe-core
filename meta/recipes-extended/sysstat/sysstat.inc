@@ -5,6 +5,7 @@ LICENSE = "GPLv2+"
 SECTION = "console/utils"
 
 SRC_URI = "http://pagesperso-orange.fr/sebastien.godard/sysstat-${PV}.tar.gz \
+           file://pidstat-Now-handle-processes-with-spaces-in-their-na.patch \
            file://99_sysstat \
           "
 

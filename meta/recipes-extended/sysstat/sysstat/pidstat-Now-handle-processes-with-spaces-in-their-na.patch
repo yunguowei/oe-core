@@ -1,0 +1,113 @@
+pidstat: Now handle processes with spaces in their name properly
+
+the patch comes from sysstat:
+git://github.com/sysstat/sysstat
+commit db2315a399a5cccdd76744cd009b014203686788 upstream
+
+pidstat had a bug which made it unable to handle processes with spaces
+in their name, eg:
+
+$ cat /proc/5768/stat
+5768 (Plex New Transc) S 1264 1252 1252 0 -1 1077960704 17317 0 18 0
+9260 137 0 0 15 -5 8 0 1430749 186589184 16704 18446744073709551615 1 1
+0 0 0 0 0 0 8404998 18446744073709551615 0 0 17 1 0 0 22 0 0 0 0 0 0 0 0
+0 0
+
+This patch fixes the problem.
+
+Reported by Chris Grindstaff (@cgrinds).
+
+Signed-off-by: Sebastien GODARD <sysstat@users.noreply.github.com>
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ pidstat.c |   49 ++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
+
+diff --git a/pidstat.c b/pidstat.c
+index 5dad91e..49e1787 100644
+--- a/pidstat.c
++++ b/pidstat.c
+@@ -23,6 +23,7 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <fcntl.h>
+ #include <signal.h>
+ #include <dirent.h>
+ #include <ctype.h>
+@@ -306,9 +307,10 @@ void read_proc_meminfo(void)
+ int read_proc_pid_stat(unsigned int pid, struct pid_stats *pst,
+ 		       unsigned int *thread_nr, unsigned int tgid)
+ {
+-	FILE *fp;
+-	char filename[128], format[256], comm[MAX_COMM_LEN + 1];
+-	size_t len;
++	int fd, sz, rc, commsz;
++	char filename[128];
++	static char buffer[1024 + 1];
++	char *start, *end;
+ 
+ 	if (tgid) {
+ 		sprintf(filename, TASK_STAT, tgid, pid);
+@@ -317,36 +319,45 @@ int read_proc_pid_stat(unsigned int pid, struct pid_stats *pst,
+ 		sprintf(filename, PID_STAT, pid);
+ 	}
+ 
+-	if ((fp = fopen(filename, "r")) == NULL)
++	if ((fd = open(filename, O_RDONLY)) < 0)
+ 		/* No such process */
+ 		return 1;
+ 
+-	sprintf(format, "%%*d (%%%ds %%*s %%*d %%*d %%*d %%*d %%*d %%*u %%lu %%lu"
+-		" %%lu %%lu %%lu %%lu %%lu %%lu %%*d %%*d %%u %%*u %%*d %%lu %%lu"
+-		" %%*u %%*u %%*u %%*u %%*u %%*u %%*u %%*u %%*u %%*u %%*u %%*u %%*u"
+-		" %%*u %%u %%*u %%*u %%llu %%lu %%lu\\n", MAX_COMM_LEN);
++	sz = read(fd, buffer, 1024);
++	close(fd);
++	if (sz <= 0)
++		return 1;
++	buffer[sz] = '\0';
+ 
+-	fscanf(fp, format, comm,
++	if ((start = strchr(buffer, '(')) == NULL)
++		return 1;
++	start += 1;
++	if ((end = strrchr(start, ')')) == NULL)
++		return 1;
++	commsz = end - start;
++	if (commsz >= MAX_COMM_LEN)
++		return 1;
++	memcpy(pst->comm, start, commsz);
++	pst->comm[commsz] = '\0';
++	start = end + 2;
++
++	rc = sscanf(start,
++		    "%*s %*d %*d %*d %*d %*d %*u %llu %llu"
++		    " %llu %llu %llu %llu %lld %lld %*d %*d %u %*u %*d %llu %llu"
++		    " %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u %*u"
++		    " %*u %u %*u %*u %llu %llu %lld\n",
+ 	       &pst->minflt, &pst->cminflt, &pst->majflt, &pst->cmajflt,
+ 	       &pst->utime,  &pst->stime, &pst->cutime, &pst->cstime,
+ 	       thread_nr, &pst->vsz, &pst->rss, &pst->processor,
+ 	       &pst->blkio_swapin_delays, &pst->gtime, &pst->cgtime);
+ 
+-	fclose(fp);
++	if (rc < 15)
++		return 1;
+ 
+ 	/* Convert to kB */
+ 	pst->vsz >>= 10;
+ 	pst->rss = PG_TO_KB(pst->rss);
+ 
+-	strncpy(pst->comm, comm, MAX_COMM_LEN);
+-	pst->comm[MAX_COMM_LEN - 1] = '\0';
+-
+-	/* Remove trailing ')' */
+-	len = strlen(pst->comm);
+-	if (len && (pst->comm[len - 1] == ')')) {
+-		pst->comm[len - 1] = '\0';
+-	}
+-
+ 	pst->pid = pid;
+ 	pst->tgid = tgid;
+ 	return 0;
