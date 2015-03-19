@@ -727,12 +727,6 @@ python fixup_perms () {
 }
 
 python split_and_strip_files () {
-
-    stripping = d.getVar('INHIBIT_PACKAGE_STRIP', True) != '1'
-    splitting = d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT', True) != '1'
-    if not (stripping or splitting):
-        return
-
     import stat, errno
 
     dvar = d.getVar('PKGD', True)
@@ -800,64 +794,64 @@ python split_and_strip_files () {
     kernmods = []
     libdir = os.path.abspath(dvar + os.sep + d.getVar("libdir", True))
     baselibdir = os.path.abspath(dvar + os.sep + d.getVar("base_libdir", True))
-
-    for root, dirs, files in cpath.walk(dvar):
-        for f in files:
-            file = os.path.join(root, f)
-            if file.endswith(".ko") and file.find("/lib/modules/") != -1:
-                kernmods.append(file)
-                continue
-
-            # Skip debug files
-            if debugappend and file.endswith(debugappend):
-                continue
-            if debugdir and debugdir in os.path.dirname(file[len(dvar):]):
-                continue
-
-            try:
-                ltarget = cpath.realpath(file, dvar, False)
-                s = cpath.lstat(ltarget)
-            except OSError as e:
-                (err, strerror) = e.args
-                if err != errno.ENOENT:
-                    raise
-                # Skip broken symlinks
-                continue
-            if not s:
-                continue
-            # Check its an excutable
-            if (s[stat.ST_MODE] & stat.S_IXUSR) or (s[stat.ST_MODE] & stat.S_IXGRP) or (s[stat.ST_MODE] & stat.S_IXOTH) \
-                    or ((file.startswith(libdir) or file.startswith(baselibdir)) and ".so" in f):
-                # If it's a symlink, and points to an ELF file, we capture the readlink target
-                if cpath.islink(file):
-                    target = os.readlink(file)
-                    if isELF(ltarget):
-                        #bb.note("Sym: %s (%d)" % (ltarget, isELF(ltarget)))
-                        symlinks[file] = target
+    if (d.getVar('INHIBIT_PACKAGE_STRIP', True) != '1'):
+        for root, dirs, files in cpath.walk(dvar):
+            for f in files:
+                file = os.path.join(root, f)
+                if file.endswith(".ko") and file.find("/lib/modules/") != -1:
+                    kernmods.append(file)
                     continue
-                # It's a file (or hardlink), not a link
-                # ...but is it ELF, and is it already stripped?
-                elf_file = isELF(file)
-                if elf_file & 1:
-                    if elf_file & 2:
-                        if 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn, True) or "").split():
-                            bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dvar):], pn))
-                        else:
-                            msg = "File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dvar):], pn)
-                            package_qa_handle_error("already-stripped", msg, d)
+
+                # Skip debug files
+                if debugappend and file.endswith(debugappend):
+                    continue
+                if debugdir and debugdir in os.path.dirname(file[len(dvar):]):
+                    continue
+
+                try:
+                    ltarget = cpath.realpath(file, dvar, False)
+                    s = cpath.lstat(ltarget)
+                except OSError as e:
+                    (err, strerror) = e.args
+                    if err != errno.ENOENT:
+                        raise
+                    # Skip broken symlinks
+                    continue
+                if not s:
+                    continue
+                # Check its an excutable
+                if (s[stat.ST_MODE] & stat.S_IXUSR) or (s[stat.ST_MODE] & stat.S_IXGRP) or (s[stat.ST_MODE] & stat.S_IXOTH) \
+                        or ((file.startswith(libdir) or file.startswith(baselibdir)) and ".so" in f):
+                    # If it's a symlink, and points to an ELF file, we capture the readlink target
+                    if cpath.islink(file):
+                        target = os.readlink(file)
+                        if isELF(ltarget):
+                            #bb.note("Sym: %s (%d)" % (ltarget, isELF(ltarget)))
+                            symlinks[file] = target
                         continue
-                    # Check if it's a hard link to something else
-                    if s.st_nlink > 1:
-                        file_reference = "%d_%d" % (s.st_dev, s.st_ino)
-                        # Hard link to something else
-                        hardlinks[file] = file_reference
-                        continue
-                    elffiles[file] = elf_file
+                    # It's a file (or hardlink), not a link
+                    # ...but is it ELF, and is it already stripped?
+                    elf_file = isELF(file)
+                    if elf_file & 1:
+                        if elf_file & 2:
+                            if 'already-stripped' in (d.getVar('INSANE_SKIP_' + pn, True) or "").split():
+                                bb.note("Skipping file %s from %s for already-stripped QA test" % (file[len(dvar):], pn))
+                            else:
+                                msg = "File '%s' from %s was already stripped, this will prevent future debugging!" % (file[len(dvar):], pn)
+                                package_qa_handle_error("already-stripped", msg, d)
+                            continue
+                        # Check if it's a hard link to something else
+                        if s.st_nlink > 1:
+                            file_reference = "%d_%d" % (s.st_dev, s.st_ino)
+                            # Hard link to something else
+                            hardlinks[file] = file_reference
+                            continue
+                        elffiles[file] = elf_file
 
     #
     # First lets process debug splitting
     #
-    if splitting:
+    if (d.getVar('INHIBIT_PACKAGE_DEBUG_SPLIT', True) != '1'):
         hardlinkmap = {}
         # For hardlinks, process only one of the files
         for file in hardlinks:
@@ -929,7 +923,7 @@ python split_and_strip_files () {
     #
     # Now lets go back over things and strip them
     #
-    if stripping:
+    if (d.getVar('INHIBIT_PACKAGE_STRIP', True) != '1'):
         strip = d.getVar("STRIP", True)
         sfiles = []
         for file in elffiles:
