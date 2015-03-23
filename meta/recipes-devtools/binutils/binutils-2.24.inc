@@ -33,6 +33,7 @@ SRC_URI = "\
      file://0001-Fix-MMIX-build-breakage-from-bfd_set_section_vma-cha.patch \
      file://binutils-uninitialised-warning.patch \
      file://fix-a-seg-fault-triggered-by-reading-a-mal-formed-ar.patch \
+     file://TCWRLGCC-25.patch \
      "
 
 SRC_URI[md5sum] = "e0f71a7b2ddab0f8612336ac81d9636b"

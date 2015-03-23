@@ -1,0 +1,111 @@
+From 4c34aff883e4fcc958a2d2c98874a035efc07651 Thu Apr 17 13:08:32 2014 +0930
+Author: Alan Modra <amodra@gmail.com>
+Date: Thu Apr 17 13:08:32 2014 +0930
+Subject: Fix LTO mismatched TLS reference
+
+	PR 16846
+	* elflink.c (_bfd_elf_merge_symbol): Ignore TLS mismatch when
+	current bfd is a plugin.  Don't always set type_change_ok
+	when old bfd is a plugin.
+---
+ bfd/elflink.c |   17 ++++++++---------
+----------------------------------------------------------------------------
+From 43c001c7d638bde9f310fdc3a199e02036f7b205 Tue, 22 Apr 2014 22:52:39
++0530 (10:22 -0700)
+Author: H.J. Lu <hjl.tools@gmail.com>
+Date: Tue, 22 Apr 2014 22:52:39 +0530 (10:22 -0700)
+Subject: Add tests for PR ld/16846
+
+PR ld/16846
+* ld-plugin/lto.exp (lto_link_tests): Add tests for PR ld/16846.
+* ld-plugin/pr16846a.c: New file.
+* ld-plugin/pr16846b.c: Likewise.
+* ld-plugin/pr16846c.c: Likewise.
+---
+ ld/testsuite/ld-plugin/lto.exp    |   12 ++++++++++++
+ ld/testsuite/ld-plugin/pr16846a.c |    7 +++++++
+ ld/testsuite/ld-plugin/pr16846b.c |    7 +++++++
+ ld/testsuite/ld-plugin/pr16846c.c |    1 +
+ create mode 100644 ld/testsuite/ld-plugin/pr16846a.c
+ create mode 100644 ld/testsuite/ld-plugin/pr16846b.c
+ create mode 100644 ld/testsuite/ld-plugin/pr16846c.c
+
+Singed-off by: Prashant Purohit <Prashant.Purohit@kpit.com>
+Upstream Status: Backport
+
+diff -urN binutils-2.24/bfd/elflink.c binutils-2.24/bfd/elflink.c
+--- binutils-2.24/bfd/elflink.c	2015-03-02 22:15:43.632865792 -0800
++++ binutils-2.24/bfd/elflink.c	2015-03-03 03:55:54.768294256 -0800
+@@ -1106,15 +1106,14 @@
+       return TRUE;
+     }
+
+-  /* Plugin symbol type isn't currently set.  Stop bogus errors.  */
+-  if (oldbfd != NULL && (oldbfd->flags & BFD_PLUGIN) != 0)
+-    *type_change_ok = TRUE;
+-
+-  /* Check TLS symbol.  We don't check undefined symbol introduced by
+-     "ld -u".  */
+-  else if (oldbfd != NULL
+-	   && ELF_ST_TYPE (sym->st_info) != h->type
+-	   && (ELF_ST_TYPE (sym->st_info) == STT_TLS || h->type == STT_TLS))
++  /* Check TLS symbols.  We don't check undefined symbols introduced
++     by "ld -u" which have no type (and oldbfd NULL), and we don't
++     check symbols from plugins because they also have no type.  */
++  if (oldbfd != NULL
++      && (oldbfd->flags & BFD_PLUGIN) == 0
++      && (abfd->flags & BFD_PLUGIN) == 0
++      && ELF_ST_TYPE (sym->st_info) != h->type
++      && (ELF_ST_TYPE (sym->st_info) == STT_TLS || h->type == STT_TLS))
+     {
+       bfd *ntbfd, *tbfd;
+       bfd_boolean ntdef, tdef;
+diff -urN binutils-2.24/ld/testsuite/ld-plugin/lto.exp binutils-2.24/ld/testsuite/ld-plugin/lto.exp
+--- binutils-2.24/ld/testsuite/ld-plugin/lto.exp	2015-03-02 22:15:42.252841112 -0800
++++ binutils-2.24/ld/testsuite/ld-plugin/lto.exp	2015-03-03 03:54:42.967037803 -0800
+@@ -140,6 +140,18 @@
+   {"PR ld/15323"
+    "" "-O2"
+    {pr15323a.c} {} "libdummy.a" "c"}
++  {"Build libdummy.a(1) PR ld/pr16846"
++   "" "-flto"
++   {pr16846a.c pr16846b.c} {} "libdummy.a"}
++  {"Build libdummy.a(2) PR ld/pr16846"
++   "" ""
++   {pr16846c.c} {} "libdummy.a"}
++  {"PR ld/pr16846(1)"
++   "-flto -fuse-linker-plugin tmpdir/pr16846a.o tmpdir/pr16846b.o tmpdir/pr16846c.o" ""
++   {dummy.c} {} "pr16846a.exe"}
++  {"PR ld/pr16846(2)"
++   "-flto -fuse-linker-plugin tmpdir/pr16846a.o tmpdir/pr16846c.o tmpdir/pr16846b.o" ""
++   {dummy.c} {} "pr16846b.exe"}
+ }
+
+ if { [at_least_gcc_version 4 7] } {
+diff -urN binutils-2.24/ld/testsuite/ld-plugin/pr16846a.c binutils-2.24/ld/testsuite/ld-plugin/pr16846a.c
+--- binutils-2.24/ld/testsuite/ld-plugin/pr16846a.c	1969-12-31 16:00:00.000000000 -0800
++++ binutils-2.24/ld/testsuite/ld-plugin/pr16846a.c	2015-03-03 03:55:06.139443266 -0800
+@@ -0,0 +1,7 @@
++extern int bar (void);
++
++int
++main ()
++{
++  return bar ();
++}
+diff -urN binutils-2.24/ld/testsuite/ld-plugin/pr16846b.c binutils-2.24/ld/testsuite/ld-plugin/pr16846b.c
+--- binutils-2.24/ld/testsuite/ld-plugin/pr16846b.c	1969-12-31 16:00:00.000000000 -0800
++++ binutils-2.24/ld/testsuite/ld-plugin/pr16846b.c	2015-03-03 03:55:06.139443266 -0800
+@@ -0,0 +1,7 @@
++extern __thread int foo;
++
++int
++bar (void)
++{
++  return foo;
++}
+diff -urN binutils-2.24/ld/testsuite/ld-plugin/pr16846c.c binutils-2.24/ld/testsuite/ld-plugin/pr16846c.c
+--- binutils-2.24/ld/testsuite/ld-plugin/pr16846c.c	1969-12-31 16:00:00.000000000 -0800
++++ binutils-2.24/ld/testsuite/ld-plugin/pr16846c.c	2015-03-03 03:55:06.139443266 -0800
+@@ -0,0 +1 @@
++__thread int foo;
