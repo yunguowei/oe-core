@@ -1,0 +1,33 @@
+From 76cb6584196b6f35d6e9b5124974d3eba643f772 Mon Sep 17 00:00:00 2001
+From: Tom Musta <tommusta@gmail.com>
+Date: Fri, 14 Nov 2014 14:01:41 -0600
+Subject: [PATCH] target-ppc: Altivec's mtvscr Decodes Wrong Register
+
+The Move to Vector Status and Control Register (mtvscr) instruction
+uses VRB as the source register.  Fix the code generator to correctly
+decode the VRB field.  That is, use "rB(ctx->opcode)" instead of
+"rD(ctx->opcode)".
+
+Signed-off-by: Tom Musta <tommusta@gmail.com>
+Signed-off-by: Alexander Graf <agraf@suse.de>
+Signed-off-by: Yuanjie Huang <Yuanjie.Huang@windriver.com>
+---
+ target-ppc/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target-ppc/translate.c b/target-ppc/translate.c
+index 910ce56..d381632 100644
+--- a/target-ppc/translate.c
++++ b/target-ppc/translate.c
+@@ -6848,7 +6848,7 @@ static void gen_mtvscr(DisasContext *ctx)
+         gen_exception(ctx, POWERPC_EXCP_VPU);
+         return;
+     }
+-    p = gen_avr_ptr(rD(ctx->opcode));
++    p = gen_avr_ptr(rB(ctx->opcode));
+     gen_helper_mtvscr(cpu_env, p);
+     tcg_temp_free_ptr(p);
+ }
+-- 
+2.3.3
+
