@@ -1,0 +1,79 @@
+From a4517be9e348634ac64f9cf093131e13e8c03e38 Mon Sep 17 00:00:00 2001
+From: Matt Caswell <matt@openssl.org>
+Date: Thu, 19 Mar 2015 10:16:32 +0000
+Subject: [PATCH] Fix a failure to NULL a pointer freed on error.
+
+Reported by the LibreSSL project as a follow on to CVE-2015-0209
+
+Reviewed-by: Richard Levitte <levitte@openssl.org>
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+---
+ crypto/asn1/x_x509.c |   12 +++++++++++-
+ crypto/ec/ec_asn1.c  |    7 +++++--
+ 2 files changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/crypto/asn1/x_x509.c b/crypto/asn1/x_x509.c
+index 2644d5f..d51b76e 100644
+--- a/crypto/asn1/x_x509.c
++++ b/crypto/asn1/x_x509.c
+@@ -170,8 +170,14 @@ X509 *d2i_X509_AUX(X509 **a, const unsigned char **pp, long length)
+ {
+ 	const unsigned char *q;
+ 	X509 *ret;
++	int freeret = 0;
++
+ 	/* Save start position */
+ 	q = *pp;
++
++	if(!a || *a == NULL) {
++		freeret = 1;
++	}
+ 	ret = d2i_X509(a, pp, length);
+ 	/* If certificate unreadable then forget it */
+ 	if(!ret) return NULL;
+@@ -181,7 +187,11 @@ X509 *d2i_X509_AUX(X509 **a, const unsigned char **pp, long length)
+ 	if(!d2i_X509_CERT_AUX(&ret->aux, pp, length)) goto err;
+ 	return ret;
+ 	err:
+-	X509_free(ret);
++	if(freeret) {
++		X509_free(ret);
++		if (a)
++			*a = NULL;
++	}
+ 	return NULL;
+ }
+ 
+diff --git a/crypto/ec/ec_asn1.c b/crypto/ec/ec_asn1.c
+index 6ff94a3..b4b0e9f 100644
+--- a/crypto/ec/ec_asn1.c
++++ b/crypto/ec/ec_asn1.c
+@@ -1378,8 +1378,6 @@ EC_KEY *d2i_ECParameters(EC_KEY **a, const unsigned char **in, long len)
+ 			ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_MALLOC_FAILURE);
+ 			return NULL;
+ 			}
+-		if (a)
+-			*a = ret;
+ 		}
+ 	else
+ 		ret = *a;
+@@ -1387,8 +1385,13 @@ EC_KEY *d2i_ECParameters(EC_KEY **a, const unsigned char **in, long len)
+ 	if (!d2i_ECPKParameters(&ret->group, in, len))
+ 		{
+ 		ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_EC_LIB);
++		if (a == NULL || *a != ret)
++			EC_KEY_free(ret);
+ 		return NULL;
+ 		}
++	
++	if (a)
++		*a = ret;
+ 
+ 	return ret;
+ 	}
+-- 
+1.7.9.5
+
