@@ -48,6 +48,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-use-correct-function-name.patch \
             file://0001-Return-error-when-a-bit-string-indicates-an-invalid-.patch \
             file://0001-Constify-ASN1_TYPE_cmp-add-X509_ALGOR_cmp.patch \
+            file://0001-Check-public-key-is-not-NULL.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
