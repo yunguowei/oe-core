@@ -55,6 +55,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Fix-unsigned-signed-warnings.patch \
             file://0001-PKCS-7-avoid-NULL-pointer-dereferences-with-missing-.patch \
             file://0001-Free-up-ADB-and-CHOICE-if-already-initialised.patch \
+            file://0001-Fix-ASN1_TYPE_cmp.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
