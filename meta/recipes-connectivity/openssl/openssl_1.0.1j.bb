@@ -51,6 +51,8 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Check-public-key-is-not-NULL.patch \
             file://0001-Fix-a-failure-to-NULL-a-pointer-freed-on-error.patch \
             file://0002-Fix-a-failure-to-NULL-a-pointer-freed-on-error.patch \
+            file://0001-Fix-reachable-assert-in-SSLv2-servers.patch \
+            file://0001-Fix-unsigned-signed-warnings.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
