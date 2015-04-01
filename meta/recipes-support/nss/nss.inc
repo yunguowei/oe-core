@@ -85,8 +85,7 @@ do_compile() {
         export USE_64=1
     fi
 
-    make -C ./nss \
-        CCC="${CXX} -g" CC="${CC} -g" \
+    make -C ./nss CCC="${CXX}" \
         OS_TEST=${OS_TEST} \
 }
 
@@ -212,6 +211,9 @@ FILES_${PN}-dev = "\
     ${libdir}/pkgconfig/* \
     ${includedir}/* \
     "
-# FILES_${PN}-dbg is populated automatically
+FILES_${PN}-dbg = "\
+    ${bindir}/.debug/* \
+    ${libdir}/.debug/* \
+    "
 
 BBCLASSEXTEND = "native nativesdk"
