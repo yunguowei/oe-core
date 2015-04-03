@@ -20,6 +20,7 @@ SRC_URI += "file://acinclude.m4 \
             file://0001-e2fsprogs-fix-cross-compilation-problem.patch \
             file://misc-mke2fs.c-return-error-when-failed-to-populate-fs.patch \
             file://0001-libext2fs-avoid-buffer-overflow-if-s_first_meta_bg-i.patch \
+            file://0001-libext2fs-fix-potential-buffer-overflow-in-closefs.patch \
 "
 
 SRC_URI[md5sum] = "3f8e41e63b432ba114b33f58674563f7"
