@@ -226,7 +226,7 @@ def create_tarball(d, srcdir, suffix, ar_outdir, pf=None):
     """
     create the tarball from srcdir
     """
-    import tarfile
+    import tarfile, subprocess, errno
 
     bb.utils.mkdirhier(ar_outdir)
     if pf:
@@ -241,7 +241,21 @@ def create_tarball(d, srcdir, suffix, ar_outdir, pf=None):
     os.chdir(dirname)
     bb.note('Creating %s' % tarname)
     tar = tarfile.open(tarname, 'w:gz')
-    tar.add(basename)
+    # For patch before 2.6 backup files for 
+    # nonexisting files are created with mode 0.
+    # Change the permission of backup files.
+    # In future, this can be deleted if patch-2.6 and above
+    # is used widely.
+    try:
+        tar.add(basename)
+    except IOError as exc:
+        if exc.errno == errno.EACCES:
+            # Make sure the probable back up patches have read permission
+            subprocess.call('chmod a+r -R %s/.pc* >/dev/null 2>&1 | true' %
+                            basename, shell=True)
+            tar.add(basename)
+        else:
+            raise IOError("I/O error({0}): {1}".format(exc.errno, exc.strerror))
     tar.close()
 
 # creating .diff.gz between source.orig and source
