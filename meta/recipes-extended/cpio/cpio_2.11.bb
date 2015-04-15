@@ -9,6 +9,7 @@ SRC_URI += "file://remove-gets.patch \
             file://0001-Fix-memory-overrun-on-reading-improperly-created-lin.patch \
             file://0002-Bugfix.patch \
             file://0003-Fix-typo.patch \
+            file://cpio-CVE-2015-1197.patch \
            "
 
 SRC_URI[md5sum] = "1112bb6c45863468b5496ba128792f6c"
