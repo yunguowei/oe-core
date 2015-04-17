@@ -10,6 +10,7 @@ SRC_URI = "http://ftp.de.debian.org/debian/pool/main/m/mklibs/${BPN}_${PV}.tar.x
 	file://ac_init_fix.patch\
 	file://fix_STT_GNU_IFUNC.patch\
 	file://fix_cross_compile.patch\
+	file://show-GNU-unique-symbols-as-provided-symbols.patch\
 "
 
 SRC_URI[md5sum] = "38a579a531401eb76f4bab4ccfb774a2"
