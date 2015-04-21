@@ -31,6 +31,7 @@ SRC_URI += "\
         file://m4-biarch.m4-tweak-AC_RUN_IFELSE-for-cross-compiling.patch \
         file://fixheadercheck.patch \
         file://Fix_elf_cvt_gunhash.patch \
+        file://CVE-2014-9447.patch \
 "
 
 # Only apply when building uclibc based target recipe
