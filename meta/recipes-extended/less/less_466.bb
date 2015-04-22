@@ -24,7 +24,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://LICENSE;md5=866cc220f330b04ae4661fc3cdfedea7"
 DEPENDS = "ncurses"
 
-SRC_URI = "http://www.greenwoodsoftware.com/${BPN}/${BPN}-${PV}.tar.gz"
+SRC_URI = "http://www.greenwoodsoftware.com/${BPN}/${BPN}-${PV}.tar.gz \
+           file://fix-CVE-2014-9488.patch  \
+"
 
 SRC_URI[md5sum] = "7bc444bdb751bcf80ed0c39c17b4fcf4"
 SRC_URI[sha256sum] = "8305f5a06764ff094ed3428f94f29059541e2483eae201991f90823da6557212"
