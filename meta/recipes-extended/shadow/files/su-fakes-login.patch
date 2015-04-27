@@ -1,0 +1,25 @@
+su: fakes login
+
+the patch comes from:
+http://anonscm.debian.org/viewvc/pkg-shadow?view=revision&revision=3194
+
+src/su.c: shell's name must be -su when a su fakes a login.
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ src/su.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/su.c b/src/su.c
+index bc4f2ac..3704217 100644
+--- a/src/su.c
++++ b/src/su.c
+@@ -1156,7 +1156,7 @@ int main (int argc, char **argv)
+ 		 * Use the shell and create an argv
+ 		 * with the rest of the command line included.
+ 		 */
+-		argv[-1] = shellstr;
++		argv[-1] = cp;
+ 		execve_shell (shellstr, &argv[-1], environ);
+ 		err = errno;
+ 		(void) fprintf (stderr,
