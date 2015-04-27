@@ -17,6 +17,7 @@ SRC_URI += "file://util-linux-ng-replace-siginterrupt.patch \
             file://fix-configure.patch \
             file://fix-parallel-build.patch \
             file://util-linux-ensure-the-existence-of-directory-for-PAT.patch \
+            file://libblkid-gpt-use-real-sector-size-to-set-PTMAGIC_OFF.patch \
             ${OLDHOST} \
 "
 
