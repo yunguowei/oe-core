@@ -38,4 +38,4 @@ RREPLACES_${PN}-bin += "${PN}-utils"
 FILES_${PN} += "${libdir}/libxslt-plugins"
 FILES_${PN}-dev += "${libdir}/xsltConf.sh"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
