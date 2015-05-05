@@ -16,6 +16,8 @@ SRC_URI = "http://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://CVE-2015-3144.patch \
            file://CVE-2015-3145.patch \
            file://CVE-2015-3143.patch \
+           file://0001-Don-t-clear-GSSAPI-state-between-each-exchange-in-th.patch \
+           file://CVE-2015-3148.patch \
 "
 
 # curl likes to set -g0 in CFLAGS, so we stop it
