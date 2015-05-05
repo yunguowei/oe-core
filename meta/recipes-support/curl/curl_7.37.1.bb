@@ -15,6 +15,7 @@ SRC_URI = "http://curl.haxx.se/download/curl-${PV}.tar.bz2 \
            file://0001-darwinssl-fix-session-ID-keys-to-only-reuse-identica.patch \
            file://CVE-2015-3144.patch \
            file://CVE-2015-3145.patch \
+           file://CVE-2015-3143.patch \
 "
 
 # curl likes to set -g0 in CFLAGS, so we stop it
