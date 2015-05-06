@@ -36,6 +36,7 @@ SRC_URI = "\
      file://TCWRLGCC-25.patch \
      file://fix-pr17510-and-pr17512.patch \
      file://fix-CVE-2014-8502.patch \
+     file://fix-CVE-2014-8737.patch \
      "
 
 SRC_URI[md5sum] = "e0f71a7b2ddab0f8612336ac81d9636b"
