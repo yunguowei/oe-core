@@ -466,7 +466,7 @@ MODULE_TARBALL_SYMLINK_NAME ?= "modules-${MACHINE}.tgz"
 MODULE_TARBALL_DEPLOY ?= "1"
 
 do_uboot_mkimage() {
-	if test "x${KERNEL_IMAGETYPE}" = "xuImage" or "x${KERNEL_ALT_IMAGETYPE}" = "xuImage"; then
+	if test "x${KERNEL_IMAGETYPE}" = "xuImage" -o "x${KERNEL_ALT_IMAGETYPE}" = "xuImage"; then
 		if test "x${KEEPUIMAGE}" != "xyes" ; then
 			ENTRYPOINT=${UBOOT_ENTRYPOINT}
 			if test -n "${UBOOT_ENTRYSYMBOL}"; then
