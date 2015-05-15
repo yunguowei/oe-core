@@ -20,6 +20,8 @@ SRC_URI += "file://util-linux-ng-replace-siginterrupt.patch \
             file://libblkid-gpt-use-real-sector-size-to-set-PTMAGIC_OFF.patch \
             file://CVE-2014-9114.patch \
             ${OLDHOST} \
+            file://runuser-l.pamd \
+            file://runuser.pamd \
 "
 
 SRC_URI[md5sum] = "3f191727a0d28f7204b755cf1b6ea0aa"
