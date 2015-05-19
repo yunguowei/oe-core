@@ -12,6 +12,7 @@ BASE_SRC_URI = "http://download.icu-project.org/files/icu4c/${PV}/icu4c-${ICU_PV
 SRC_URI = "${BASE_SRC_URI} \
            file://icu-pkgdata-large-cmd.patch \
            file://icu-CVE-2014-8146.patch \
+           file://icu-CVE-2014-8147.patch \
           "
 
 SRC_URI_append_class-target = "\
