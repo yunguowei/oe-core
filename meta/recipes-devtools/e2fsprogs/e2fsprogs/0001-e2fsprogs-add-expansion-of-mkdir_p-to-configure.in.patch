@@ -1,0 +1,32 @@
+From 34df85a9ae7c27e4f08ca4b02c57c770700127b6 Mon Sep 17 00:00:00 2001
+From: Chuang Dong <Chuang.Dong@windriver.com>
+Date: Tue, 19 May 2015 17:19:22 +0800
+Subject: [PATCH] e2fsprogs: add expansion of mkdir_p to configure.in
+
+Issue: LIN7-3270
+
+the macro named @mkdir_p@ that can't be substituted, which in  the file
+Makefile(/build/e2fsprogs/build/po),@mkdir_p@ equal to @MKDIR_P@ which has
+been substituted. So, add a command in original code of e2fsprogs could
+substitute @mkdir_p@
+
+Upstream-Status: pending
+---
+ configure.in | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.in b/configure.in
+index ed1697b..dc26cf3 100644
+--- a/configure.in
++++ b/configure.in
+@@ -6,6 +6,7 @@ AH_BOTTOM([#include "dirpaths.h"])
+ MCONFIG=./MCONFIG
+ AC_SUBST_FILE(MCONFIG)
+ BINARY_TYPE=bin
++AC_SUBST([mkdir_p], ['$(MKDIR_P)'])
+ dnl
+ dnl This is to figure out the version number and the date....
+ dnl
+-- 
+1.8.5.2.233.g932f7e4
+
