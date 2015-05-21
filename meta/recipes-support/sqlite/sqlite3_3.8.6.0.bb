@@ -10,6 +10,7 @@ PE = "3"
 SQLITE_PV = "${@sqlite_download_version(d)}"
 SRC_URI = "http://www.sqlite.org/2014/sqlite-autoconf-${SQLITE_PV}.tar.gz \
            file://sqlite3-CVE-2015-3414.patch \
+           file://sqlite3-CVE-2015-3416.patch \
           "
 
 SRC_URI[md5sum] = "f7e4a156b583abeba349629e2364224b"
