@@ -9,7 +9,8 @@ LIC_FILES_CHKSUM = "file://quota.c;beginline=1;endline=33;md5=331c7d77744bfe0ad2
 PR = "r1"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/linuxquota/quota-tools/${PV}/quota-${PV}.tar.gz \
-           file://config-tcpwrappers.patch"
+           file://config-tcpwrappers.patch \
+           file://quota_install_man_2_not_exist.patch"
 
 SRC_URI[md5sum] = "5c2c31e321d2e1322ce12d69ae5c66d6"
 SRC_URI[sha256sum] = "a36300bbc126b79b745bf937245092808b4585aa3309ef3335d4ab9d873cd206"
@@ -26,5 +27,5 @@ PACKAGECONFIG ??= "tcp-wrappers"
 PACKAGECONFIG[tcp-wrappers] = "--with-tcpwrappers,--without-tcpwrappers,tcp-wrappers"
 
 do_install() {
-	oe_runmake prefix=${D}${prefix} install
+	oe_runmake prefix=${D}${prefix} sysconfdir=${D}${sysconfdir} mandir=${D}${mandir} install
 }
