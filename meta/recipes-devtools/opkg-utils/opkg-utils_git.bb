@@ -24,8 +24,11 @@ PYTHONRDEPS_class-native = ""
 PACKAGECONFIG = "python"
 PACKAGECONFIG[python] = ",,,${PYTHONRDEPS}"
 
+OPKGLIBDIR ?= "/var/lib"
+
 do_install() {
 	oe_runmake PREFIX=${prefix} DESTDIR=${D} install
+	sed -i s:/usr/lib/opkg:${OPKGLIBDIR}/opkg: ${D}${bindir}/update-alternatives
 }
 
 do_install_append_class-target() {
