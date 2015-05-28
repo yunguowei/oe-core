@@ -1,0 +1,168 @@
+From df35cddbad55815fd6a3832e41a942da960c5fce Mon Sep 17 00:00:00 2001
+From: Emilia Kasper <emilia@openssl.org>
+Date: Tue, 19 May 2015 11:53:31 +0200
+Subject: [PATCH 6/6] client: reject handshakes with DH parameters < 768 bits.
+
+Commit 10a70da729948bb573d27cef4459077c49f3eb46 upstream.
+
+Since the client has no way of communicating her supported parameter
+range to the server, connections to servers that choose weak DH will
+simply fail.
+
+Reviewed-by: Kurt Roeckx <kurt@openssl.org>
+---
+ ssl/s3_clnt.c  | 58 ++++++++++++++++++++++++++++++++++++++++++++++------------
+ ssl/ssl.h      |  2 ++
+ ssl/ssl_err.c  |  2 ++
+ ssl/ssl_locl.h |  1 +
+ 4 files changed, 51 insertions(+), 12 deletions(-)
+
+diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
+index 3579c05..d0c4655 100644
+--- a/ssl/s3_clnt.c
++++ b/ssl/s3_clnt.c
+@@ -2366,6 +2366,25 @@ int ssl3_get_server_done(SSL *s)
+ 	}
+ 
+ 
++#ifndef OPENSSL_NO_DH
++static DH *get_server_static_dh_key(SESS_CERT *scert)
++{
++    DH *dh_srvr = NULL;
++    EVP_PKEY *spkey = NULL;
++    int idx = scert->peer_cert_type;
++
++    if (idx >= 0)
++        spkey = X509_get_pubkey(scert->peer_pkeys[idx].x509);
++    if (spkey) {
++        dh_srvr = EVP_PKEY_get1_DH(spkey);
++        EVP_PKEY_free(spkey);
++    }
++    if (dh_srvr == NULL)
++        SSLerr(SSL_F_GET_SERVER_STATIC_DH_KEY, ERR_R_INTERNAL_ERROR);
++    return dh_srvr;
++}
++#endif
++
+ int ssl3_send_client_key_exchange(SSL *s)
+ 	{
+ 	unsigned char *p,*d;
+@@ -2612,10 +2631,9 @@ int ssl3_send_client_key_exchange(SSL *s)
+ 				dh_srvr=s->session->sess_cert->peer_dh_tmp;
+ 			else
+ 				{
+-				/* we get them from the cert */
+-				ssl3_send_alert(s,SSL3_AL_FATAL,SSL_AD_HANDSHAKE_FAILURE);
+-				SSLerr(SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE,SSL_R_UNABLE_TO_FIND_DH_PARAMETERS);
+-				goto err;
++				dh_srvr = get_server_static_dh_key(s->session->sess_cert);
++				if (dh_srvr == NULL)
++					goto err;
+ 				}
+ 			
+ 			/* generate a new random key */
+@@ -3416,25 +3434,41 @@ int ssl3_check_cert_and_algorithm(SSL *s)
+ 		}
+ #endif
+ #ifndef OPENSSL_NO_DH
+-	if ((alg_k & SSL_kEDH) &&
+-		!(has_bits(i,EVP_PK_DH|EVP_PKT_EXCH) || (dh != NULL)))
+-		{
+-		SSLerr(SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM,SSL_R_MISSING_DH_KEY);
++	if ((alg_k & SSL_kEDH) && dh == NULL) {
++		SSLerr(SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM, ERR_R_INTERNAL_ERROR);
+ 		goto f_err;
+-		}
+-	else if ((alg_k & SSL_kDHr) && !has_bits(i,EVP_PK_DH|EVP_PKS_RSA))
++	}
++	if ((alg_k & SSL_kDHr) && !has_bits(i,EVP_PK_DH|EVP_PKS_RSA))
+ 		{
+ 		SSLerr(SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM,SSL_R_MISSING_DH_RSA_CERT);
+ 		goto f_err;
+ 		}
+ #ifndef OPENSSL_NO_DSA
+-	else if ((alg_k & SSL_kDHd) && !has_bits(i,EVP_PK_DH|EVP_PKS_DSA))
++	if ((alg_k & SSL_kDHd) && !has_bits(i, EVP_PK_DH | EVP_PKS_DSA))
+ 		{
+ 		SSLerr(SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM,SSL_R_MISSING_DH_DSA_CERT);
+ 		goto f_err;
+ 		}
+ #endif
+-#endif
++	if (alg_k & (SSL_kDHE | SSL_kDHr | SSL_kDHd)) {
++		int dh_size;
++		if (alg_k & SSL_kDHE) {
++			dh_size = BN_num_bits(dh->p);
++		} else {
++			DH *dh_srvr = get_server_static_dh_key(sc);
++			if (dh_srvr == NULL)
++				goto f_err;
++			dh_size = BN_num_bits(dh_srvr->p);
++			DH_free(dh_srvr);
++		}
++
++		if ((!SSL_C_IS_EXPORT(s->s3->tmp.new_cipher) && dh_size < 768)
++		    || (SSL_C_IS_EXPORT(s->s3->tmp.new_cipher) && dh_size < 512)) {
++			SSLerr(SSL_F_SSL3_CHECK_CERT_AND_ALGORITHM, SSL_R_DH_KEY_TOO_SMALL);
++			goto f_err;
++		}
++	}
++#endif /* !OPENSSL_NO_DH */
+ 
+ 	if (SSL_C_IS_EXPORT(s->s3->tmp.new_cipher) && !has_bits(i,EVP_PKT_EXP))
+ 		{
+diff --git a/ssl/ssl.h b/ssl/ssl.h
+index 66a6174..b6570f8 100644
+--- a/ssl/ssl.h
++++ b/ssl/ssl.h
+@@ -2115,6 +2115,7 @@ void ERR_load_SSL_strings(void);
+ #define SSL_F_GET_CLIENT_MASTER_KEY			 107
+ #define SSL_F_GET_SERVER_FINISHED			 108
+ #define SSL_F_GET_SERVER_HELLO				 109
++#define SSL_F_GET_SERVER_STATIC_DH_KEY			 340
+ #define SSL_F_GET_SERVER_VERIFY				 110
+ #define SSL_F_I2D_SSL_SESSION				 111
+ #define SSL_F_READ_N					 112
+@@ -2364,6 +2365,7 @@ void ERR_load_SSL_strings(void);
+ #define SSL_R_DATA_LENGTH_TOO_LONG			 146
+ #define SSL_R_DECRYPTION_FAILED				 147
+ #define SSL_R_DECRYPTION_FAILED_OR_BAD_RECORD_MAC	 281
++#define SSL_R_DH_KEY_TOO_SMALL				 372
+ #define SSL_R_DH_PUBLIC_VALUE_LENGTH_IS_WRONG		 148
+ #define SSL_R_DIGEST_CHECK_FAILED			 149
+ #define SSL_R_DTLS_MESSAGE_TOO_BIG			 334
+diff --git a/ssl/ssl_err.c b/ssl/ssl_err.c
+index 1b7eb47..eb7e88f 100644
+--- a/ssl/ssl_err.c
++++ b/ssl/ssl_err.c
+@@ -110,6 +110,7 @@ static ERR_STRING_DATA SSL_str_functs[]=
+ {ERR_FUNC(SSL_F_GET_CLIENT_MASTER_KEY),	"GET_CLIENT_MASTER_KEY"},
+ {ERR_FUNC(SSL_F_GET_SERVER_FINISHED),	"GET_SERVER_FINISHED"},
+ {ERR_FUNC(SSL_F_GET_SERVER_HELLO),	"GET_SERVER_HELLO"},
++{ERR_FUNC(SSL_F_GET_SERVER_STATIC_DH_KEY), "GET_SERVER_STATIC_DH_KEY"},
+ {ERR_FUNC(SSL_F_GET_SERVER_VERIFY),	"GET_SERVER_VERIFY"},
+ {ERR_FUNC(SSL_F_I2D_SSL_SESSION),	"i2d_SSL_SESSION"},
+ {ERR_FUNC(SSL_F_READ_N),	"READ_N"},
+@@ -362,6 +363,7 @@ static ERR_STRING_DATA SSL_str_reasons[]=
+ {ERR_REASON(SSL_R_DATA_LENGTH_TOO_LONG)  ,"data length too long"},
+ {ERR_REASON(SSL_R_DECRYPTION_FAILED)     ,"decryption failed"},
+ {ERR_REASON(SSL_R_DECRYPTION_FAILED_OR_BAD_RECORD_MAC),"decryption failed or bad record mac"},
++{ERR_REASON(SSL_R_DH_KEY_TOO_SMALL), "dh key too small"},
+ {ERR_REASON(SSL_R_DH_PUBLIC_VALUE_LENGTH_IS_WRONG),"dh public value length is wrong"},
+ {ERR_REASON(SSL_R_DIGEST_CHECK_FAILED)   ,"digest check failed"},
+ {ERR_REASON(SSL_R_DTLS_MESSAGE_TOO_BIG)  ,"dtls message too big"},
+diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
+index 98888d2..e348afa 100644
+--- a/ssl/ssl_locl.h
++++ b/ssl/ssl_locl.h
+@@ -292,6 +292,7 @@
+ #define SSL_kDHr		0x00000002L /* DH cert, RSA CA cert */ /* no such ciphersuites supported! */
+ #define SSL_kDHd		0x00000004L /* DH cert, DSA CA cert */ /* no such ciphersuite supported! */
+ #define SSL_kEDH		0x00000008L /* tmp DH key no DH cert */
++#define SSL_kDHE		SSL_kEDH    /* forward-compatible synonym */
+ #define SSL_kKRB5		0x00000010L /* Kerberos5 key exchange */
+ #define SSL_kECDHr		0x00000020L /* ECDH cert, RSA CA cert */
+ #define SSL_kECDHe		0x00000040L /* ECDH cert, ECDSA CA cert */
+-- 
+1.8.5.2.233.g932f7e4
+

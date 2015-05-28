@@ -1,0 +1,56 @@
+From 7a4a85226972c66a6dfc09b6ad9846a3f3fd9174 Mon Sep 17 00:00:00 2001
+From: Emilia Kasper <emilia@openssl.org>
+Date: Wed, 13 May 2015 12:05:41 +0200
+Subject: [PATCH 4/6] dhparam: fix documentation
+
+Commit b32aa8e63eba643f9c510af2838f1534de70bd2e upstream.
+
+The default bitlength is now 2048. Also clarify that either the number
+of bits or the generator must be present:
+
+$ openssl dhparam -2
+and
+$ openssl dhparam 2048
+generate parameters but
+$ openssl dhparam
+does not.
+
+Reviewed-by: Matt Caswell <matt@openssl.org>
+---
+ doc/apps/dhparam.pod | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/doc/apps/dhparam.pod b/doc/apps/dhparam.pod
+index 6e27cf5..1cd4c76 100644
+--- a/doc/apps/dhparam.pod
++++ b/doc/apps/dhparam.pod
+@@ -71,8 +71,10 @@ check if the parameters are valid primes and generator.
+ 
+ =item B<-2>, B<-5>
+ 
+-The generator to use, either 2 or 5. 2 is the default. If present then the
+-input file is ignored and parameters are generated instead.
++The generator to use, either 2 or 5. If present then the
++input file is ignored and parameters are generated instead. If not
++present but B<numbits> is present, parameters are generated with the
++default generator 2.
+ 
+ =item B<-rand> I<file(s)>
+ 
+@@ -85,9 +87,10 @@ all others.
+ =item I<numbits>
+ 
+ this option specifies that a parameter set should be generated of size
+-I<numbits>. It must be the last option. If not present then a value of 512
+-is used. If this option is present then the input file is ignored and 
+-parameters are generated instead.
++I<numbits>. It must be the last option. If this option is present then
++the input file is ignored and parameters are generated instead. If
++this option is not present but a generator (B<-2> or B<-5>) is
++present, parameters are generated with a default length of 2048 bits.
+ 
+ =item B<-noout>
+ 
+-- 
+1.8.5.2.233.g932f7e4
+

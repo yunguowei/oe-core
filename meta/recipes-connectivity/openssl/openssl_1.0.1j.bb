@@ -56,6 +56,12 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-PKCS-7-avoid-NULL-pointer-dereferences-with-missing-.patch \
             file://0001-Free-up-ADB-and-CHOICE-if-already-initialised.patch \
             file://0001-Fix-ASN1_TYPE_cmp.patch \
+            file://0001-Remove-export-ciphers-from-the-DEFAULT-cipher-list.patch \
+            file://0002-s_server-Use-2048-bit-DH-parameters-by-default.patch \
+            file://0003-dhparam-set-the-default-to-2048-bits.patch \
+            file://0004-dhparam-fix-documentation.patch \
+            file://0005-Update-documentation-with-Diffie-Hellman-best-practi.patch \
+            file://0006-client-reject-handshakes-with-DH-parameters-768-bits.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"

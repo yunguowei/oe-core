@@ -1,0 +1,52 @@
+From 5a0b39fe394ad787967716ec08a247cfd48cc79a Mon Sep 17 00:00:00 2001
+From: Emilia Kasper <emilia@openssl.org>
+Date: Wed, 13 May 2015 11:57:55 +0200
+Subject: [PATCH 3/6] dhparam: set the default to 2048 bits
+
+Commit 8568170d774f02880eec6cad5512f555d0c83f65 upstream.
+
+Reviewed-by: Matt Caswell <matt@openssl.org>
+Reviewed-by: Kurt Roeckx <kurt@openssl.org>
+---
+ apps/dhparam.c | 4 ++--
+ apps/gendh.c   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/apps/dhparam.c b/apps/dhparam.c
+index 1297d6f..b0c05be 100644
+--- a/apps/dhparam.c
++++ b/apps/dhparam.c
+@@ -130,7 +130,7 @@
+ #undef PROG
+ #define PROG	dhparam_main
+ 
+-#define DEFBITS	512
++#define DEFBITS	2048
+ 
+ /* -inform arg	- input format - default PEM (DER or PEM)
+  * -outform arg - output format - default PEM
+@@ -253,7 +253,7 @@ bad:
+ 		BIO_printf(bio_err," -C            Output C code\n");
+ 		BIO_printf(bio_err," -2            generate parameters using  2 as the generator value\n");
+ 		BIO_printf(bio_err," -5            generate parameters using  5 as the generator value\n");
+-		BIO_printf(bio_err," numbits       number of bits in to generate (default 512)\n");
++		BIO_printf(bio_err," numbits       number of bits in to generate (default 2048)\n");
+ #ifndef OPENSSL_NO_ENGINE
+ 		BIO_printf(bio_err," -engine e     use engine e, possibly a hardware device.\n");
+ #endif
+diff --git a/apps/gendh.c b/apps/gendh.c
+index 4ec776b..8df8c62 100644
+--- a/apps/gendh.c
++++ b/apps/gendh.c
+@@ -78,7 +78,7 @@
+ #include <openssl/x509.h>
+ #include <openssl/pem.h>
+ 
+-#define DEFBITS	512
++#define DEFBITS	2048
+ #undef PROG
+ #define PROG gendh_main
+ 
+-- 
+1.8.5.2.233.g932f7e4
+
