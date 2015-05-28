@@ -12,6 +12,7 @@ SRC_URI = "${GNU_MIRROR}/libtasn1/libtasn1-${PV}.tar.gz \
            file://libtasn1_fix_for_automake_1.12.patch \
            file://dont-depend-on-help2man.patch \
            file://0001-_asn1_extract_der_octet-prevent-past-of-boundary-acc.patch \
+           file://0001-increased-size-of-LTOSTR_MAX_SIZE-to-account-for-sig.patch \
            "
 
 SRC_URI[md5sum] = "d3d2d9bce3b6668b9827a9df52635be1"
