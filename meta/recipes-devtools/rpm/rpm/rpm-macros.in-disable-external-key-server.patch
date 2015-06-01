@@ -1,0 +1,13 @@
+--- a/macros/macros.in
++++ b/macros/macros.in
+@@ -546,8 +546,8 @@ $_arbitrary_tags_tests	Foo:Bar
+ # Horowitz Key Protocol server configuration
+ #
+ #%_hkp_keyserver         hkp://keys.n3npq.net
+-%_hkp_keyserver         hkp://pool.sks-keyservers.net
+-%_hkp_keyserver_query   %{_hkp_keyserver}/pks/lookup?op=get&search=
++#%_hkp_keyserver         hkp://pool.sks-keyservers.net
++#%_hkp_keyserver_query   %{_hkp_keyserver}/pks/lookup?op=get&search=
+ 
+ 
+ %_nssdb_path	/etc/pki/nssdb
