@@ -98,6 +98,13 @@ ALTERNATIVE_TARGET[df] = "${bindir}/df.${BPN}"
 ALTERNATIVE_LINK_NAME[lbracket] = "${bindir}/["
 ALTERNATIVE_TARGET[lbracket] = "${bindir}/lbracket.${BPN}"
 
+ALTERNATIVE_${PN}-doc = "groups.1 mktemp.1 kill.1 uptime.1 stat.1"
+ALTERNATIVE_LINK_NAME[groups.1] = "${mandir}/man1/groups.1"
+ALTERNATIVE_LINK_NAME[mktemp.1] = "${mandir}/man1/mktemp.1"
+ALTERNATIVE_LINK_NAME[uptime.1] = "${mandir}/man1/uptime.1"
+ALTERNATIVE_LINK_NAME[kill.1] = "${mandir}/man1/kill.1"
+ALTERNATIVE_LINK_NAME[stat.1] = "${mandir}/man1/stat.1"
+
 python __anonymous() {
 	for prog in d.getVar('base_bindir_progs', True).split():
 		d.setVarFlag('ALTERNATIVE_LINK_NAME', prog, '%s/%s' % (d.getVar('base_bindir', True), prog))

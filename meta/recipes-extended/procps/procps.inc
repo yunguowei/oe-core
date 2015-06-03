@@ -29,3 +29,7 @@ ALTERNATIVE_LINK_NAME[ps] = "${base_bindir}/ps"
 ALTERNATIVE_LINK_NAME[watch] = "${base_bindir}/watch"
 ALTERNATIVE_TARGET[watch] = "${bindir}/watch.${BPN}"
 ALTERNATIVE_PRIORITY = "110"
+
+ALTERNATIVE_${PN}-doc = "kill.1 uptime.1"
+ALTERNATIVE_LINK_NAME[kill.1] = "${mandir}/man1/kill.1"
+ALTERNATIVE_LINK_NAME[uptime.1] = "${mandir}/man1/uptime.1"
