@@ -54,8 +54,6 @@ do_configure_prepend_darwin () {
 	sed -i -e '/version-script=openssl\.ld/d' Configure
 }
 
-do_configure[vardeps] += "${libdir}"
-
 do_configure () {
 	cd util
 	perl perlpath.pl ${STAGING_BINDIR_NATIVE}
