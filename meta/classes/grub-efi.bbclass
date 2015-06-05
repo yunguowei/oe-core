@@ -40,6 +40,7 @@ efi_populate() {
 	install -m 0644 ${DEPLOY_DIR_IMAGE}/${GRUB_IMAGE} ${DEST}${EFIDIR}
 
 	install -m 0644 ${GRUBCFG} ${DEST}${EFIDIR}
+	cd ${DEST}${EFIDIR} && echo "wrlinux-installer" > ./wrlinux-installer.version
 }
 
 efi_iso_populate() {

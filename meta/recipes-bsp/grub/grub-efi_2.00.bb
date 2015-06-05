@@ -20,6 +20,7 @@ PR = "r2"
 
 SRC_URI = "ftp://ftp.gnu.org/gnu/grub/grub-${PV}.tar.gz \
            file://cfg \
+           file://cfg-installer \
            file://grub-2.00-fpmath-sse-387-fix.patch \
            file://grub-2.00-fix-enable_execute_stack-check.patch \
            file://check-if-liblzma-is-disabled.patch \
@@ -74,9 +75,15 @@ GRUB_BUILDIN ?= "boot linux ext2 fat serial part_msdos part_gpt normal efi_gop i
 do_deploy() {
 	# Search for the grub.cfg on the local boot media by using the
 	# built in cfg file provided via this recipe
-	grub-mkimage -c ../cfg -p /EFI/BOOT -d ./grub-core/ \
-	               -O ${GRUB_TARGET}-efi -o ./${GRUB_IMAGE} \
-	               ${GRUB_BUILDIN}
+	if [ X"${DEFAULT_IMAGE}" = X"wrlinux-image-installer" ]; then
+		grub-mkimage -c ../cfg-installer -p /EFI/BOOT -d ./grub-core/ \
+			-O ${GRUB_TARGET}-efi -o ./${GRUB_IMAGE} \
+			${GRUB_BUILDIN}
+	else
+		grub-mkimage -c ../cfg -p /EFI/BOOT -d ./grub-core/ \
+			-O ${GRUB_TARGET}-efi -o ./${GRUB_IMAGE} \
+			${GRUB_BUILDIN}
+	fi
 	install -m 644 ${B}/${GRUB_IMAGE} ${DEPLOYDIR}
 }
 
