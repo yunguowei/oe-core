@@ -43,15 +43,6 @@ index d9b784b..c5614ea 100755
      lib_path.extend([a.replace("/lib/", "/" + libdir + "/") for a in default_lib_path])
  
  if libc_extras_dir_default:
-@@ -430,6 +436,8 @@ if not ldlib:
- if not ldlib:
-     sys.exit("E: Dynamic linker not found, aborting.")
- 
-+ldlib = sysroot + ldlib
-+
- debug(DEBUG_NORMAL, "I: Using", ldlib, "as dynamic linker.")
- 
- # Check for rpaths
 @@ -661,16 +669,16 @@ ld_path_name = os.path.dirname(ldlib)
  ld_full_path = "../" + ldlib
  ld_file = find_lib(ld_file_name)
