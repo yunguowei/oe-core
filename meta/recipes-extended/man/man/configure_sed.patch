@@ -1,0 +1,13 @@
+diff --git a/configure.old b/configure
+index 9f62cf9..b439055 100755
+--- a/configure.old
++++ b/configure
+@@ -1321,7 +1321,7 @@ do
+   echo "Creating $infile from $infile.in"
+   sed -e '
+ s,@version@,$version,
+-s,@CC@,$CC,
++s#@CC@#$CC#
+ s,@EXEEXT@,$EXEEXT,
+ s,@BUILD_CC@,$BUILD_CC,
+ s,@INSTALL@,$INSTALL,

@@ -52,6 +52,7 @@ SRC_URI = "http://primates.ximian.com/~flucifredi/${BPN}/${BPN}-${PV}.tar.gz \
            file://man.conf \
            file://manpath.5.gz;unpack=false \
            file://man-1.6g-whatis3.patch \
+           file://configure_sed.patch \
 "
 
 SRC_URI[md5sum] = "ba154d5796928b841c9c69f0ae376660"
