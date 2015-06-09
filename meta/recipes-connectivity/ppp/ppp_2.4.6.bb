@@ -30,6 +30,7 @@ SRC_URI = "http://ppp.samba.org/ftp/ppp/ppp-${PV}.tar.gz \
            file://0001-ppp-Fix-compilation-errors-in-Makefile.patch \
            file://ppp@.service \
            file://0001-pppd-Eliminate-potential-integer-overflow-in-option-.patch \
+           file://ppp-CVE-2015-3310.patch \
 "
 
 SRC_URI[md5sum] = "3434d2cc9327167a0723aaaa8670083b"
