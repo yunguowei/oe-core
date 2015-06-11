@@ -31,6 +31,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git \
     file://0001-Realtime-tests-Fix-bad-priority-inheritance-conditio.patch \
     file://0001-Realtime-tests-Fix-robust-mutex-conditionals.patch \
     file://0001-syscalls-sync_file_range01-fix-argument-passing-for-.patch \
+    file://0001-ltp-vma03-fix-the-alginment-of-page-size.patch \
 "
 
 S = "${WORKDIR}/git"
