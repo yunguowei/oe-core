@@ -1,0 +1,53 @@
+Summary:rpm: check if the argument(rootpath) exists or be unwritable
+
+if the path(--root=) doesn't exist or be unwritable, print warning
+info then exit. 
+
+Upstream-Status: pending
+
+Signed-off-by: Zhixiong Chi <zchi@windriver.com>
+
+Index: rpm-5.4.14/rpmqv.c
+===================================================================
+--- rpm-5.4.14.orig/rpmqv.c	2013-09-04 23:32:32.000000000 +0800
++++ rpm-5.4.14/rpmqv.c	2015-06-11 09:57:58.210375658 +0800
+@@ -426,6 +426,28 @@
+     return;
+ }
+ #endif
++/*check if the rootdir is writable or exists */
++int access_file(const char *rootdir)
++{
++    int ret,rootdir_len;
++
++    if(rootdir == NULL){
++        return;
++    } 
++
++    rootdir_len = strlen(rootdir);
++    /*make sure that dirent argument trailing is "/" */
++    if(!(rootdir_len && rootdir[rootdir_len - 1] == '/')){
++        char *t = (char *)malloc(rootdir_len + 2);
++        *t = '\0';
++        (void)stpcpy(stpcpy(t,rootdir),"/");
++        ret = access(t,F_OK|W_OK);
++        free(t);
++    }else{                
++        ret = access(rootdir,F_OK|W_OK);
++									        } 
++    return ret;                                                                       
++}
+ 
+ /*@-bounds@*/ /* LCL: segfault */
+ /*@-mods@*/ /* FIX: shrug */
+@@ -715,6 +737,10 @@
+ 		argerror(_("arguments to --root (-r) must begin with a /"));
+ 	    break;
+ 	}
++        if(access_file(rpmioRootDir)){
++            fprintf(stderr, _("Invalid directory:%s, make sure it exists or be writable\n"),rpmioRootDir);
++            exit(EXIT_FAILURE);
++        }
+     }
+ 
+ #if defined(RPM_VENDOR_OPENPKG) /* integrity-checking */

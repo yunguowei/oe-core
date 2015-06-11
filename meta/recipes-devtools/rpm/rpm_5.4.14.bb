@@ -96,6 +96,7 @@ SRC_URI = "http://www.rpm5.org/files/rpm/rpm-5.4/rpm-5.4.14-0.20131024.src.rpm;e
 	   file://0001-using-poptParseArgvString-to-parse-the-_gpg_check_pa.patch \
 	   file://rpm-realpath.patch \
 	   file://rpm-macros.in-disable-external-key-server.patch \
+           file://rpm-check-if-argument-rootpath-exists-or-be-writable.patch \
 	  "
 
 # Uncomment the following line to enable platform score debugging
