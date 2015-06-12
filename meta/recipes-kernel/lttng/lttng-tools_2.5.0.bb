@@ -25,6 +25,7 @@ PACKAGECONFIG[lttng-ust] = ", --disable-lttng-ust, lttng-ust"
 
 SRC_URI = "git://git.lttng.org/lttng-tools.git;branch=stable-2.5 \
            file://Allow-multiple-attempts-to-connect-to-relayd.patch \
+           file://lttng-tools-Live-timer-uses-micro-seconds-as-nano-se.patch \
            file://runtest-2.4.0.patch \
            file://run-ptest \
 	  "
