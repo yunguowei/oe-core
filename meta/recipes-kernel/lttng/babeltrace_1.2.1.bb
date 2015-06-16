@@ -17,6 +17,7 @@ SRC_URI = "git://git.efficios.com/babeltrace.git;branch=stable-1.2 \
            file://0001-Fix-Support-out-of-tree-builds-in-babeltrace.patch \
            file://Fix-Align-buffers-from-objstack_alloc-on-sizeof-void.patch \
            file://0001-Fix-don-t-perform-unaligned-integer-read-writes.patch \
+           file://0001-Fix-invalid-pointer-free-with-trace-collection.patch \
 "
 
 S = "${WORKDIR}/git"
