@@ -1,0 +1,79 @@
+Index: rpm-5.4.14/rpmqv.c
+===================================================================
+--- rpm-5.4.14.orig/rpmqv.c	2015-06-17 10:49:44.533746150 +0800
++++ rpm-5.4.14/rpmqv.c	2015-06-17 11:10:03.061743111 +0800
+@@ -206,6 +206,8 @@
+    POPT_TABLEEND
+ };
+ 
++static int _rpmqv_rootpath_state = 0;
++
+ #ifdef __MINT__
+ /* MiNT cannot dynamically increase the stack.  */
+ long _stksize = 64 * 1024L;
+@@ -427,6 +429,41 @@
+ }
+ #endif
+ 
++/*check if the rootdir is writable or exists */
++int access_file(const char *rootdir)
++{
++    int ret,rootdir_len;
++
++    if(rootdir == NULL) {
++	return;
++    } 
++
++    rootdir_len = strlen(rootdir);
++    /*make sure that dirent argument trailing is "/" */
++    if(!(rootdir_len && rootdir[rootdir_len - 1] == '/')){
++	char *t = (char *)malloc(rootdir_len + 2);
++	*t = '\0';
++	(void)stpcpy(stpcpy(t,rootdir),"/");
++	ret = access(t,F_OK|W_OK);
++	free(t);
++    }else{
++	ret = access(rootdir,F_OK|W_OK);
++    } 
++    return ret;                                                                         
++}
++
++/*check if input the argument "--root/-r"  */
++void check_argument_root(int argc,char * const argv[])
++{
++    int i;
++    for (i = 0; i < argc; i++) {
++	if(strncmp(argv[i],"--root=",7) == 0 || strncmp(argv[i],"-r=",3) == 0) {
++	    _rpmqv_rootpath_state = 1;
++	    break;
++        }
++    }
++}
++
+ /*@-bounds@*/ /* LCL: segfault */
+ /*@-mods@*/ /* FIX: shrug */
+ #if !defined(__GLIBC__) && !defined(__LCLINT__)
+@@ -475,7 +512,9 @@
+ #ifdef	IAM_RPMEIU
+     int xx;
+ #endif
+-	
++
++    check_argument_root(argc,(char *const *)argv);
++
+ #if !defined(__GLIBC__) && !defined(__LCLINT__)
+     environ = envp;
+ #else
+@@ -715,6 +754,12 @@
+ 		argerror(_("arguments to --root (-r) must begin with a /"));
+ 	    break;
+ 	}
++	if (_rpmqv_rootpath_state) {
++	    if (access_file(rpmioRootDir)) {
++		fprintf(stderr, _("Invalid directory:%s, ensure it exists or be writable\n"),rpmioRootDir);
++		exit(EXIT_FAILURE);
++	    }
++	}
+     }
+ 
+ #if defined(RPM_VENDOR_OPENPKG) /* integrity-checking */
