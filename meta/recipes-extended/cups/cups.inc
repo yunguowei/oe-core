@@ -12,6 +12,7 @@ SRC_URI = "http://www.cups.org/software/${PV}/${BP}-source.tar.bz2 \
            file://cups.path \
            file://cups.service \
            file://cups-CVE-2014-9679.patch \
+           file://cups-CVE-2015-1158-CVE-2015-1159.patch \
 	  "
 
 LEAD_SONAME = "libcupsdriver.so"
