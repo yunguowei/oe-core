@@ -64,6 +64,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0006-client-reject-handshakes-with-DH-parameters-768-bits.patch \
             file://0001-openssl-CVE-2015-1789.patch \
             file://0002-openssl-CVE-2015-1790.patch \
+            file://0003-openssl-CVE-2015-1788.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
