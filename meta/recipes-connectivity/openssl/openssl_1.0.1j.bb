@@ -66,6 +66,9 @@ SRC_URI += "file://configure-targets.patch \
             file://0002-openssl-CVE-2015-1790.patch \
             file://0003-openssl-CVE-2015-1788.patch \
             file://0004-openssl-CVE-2015-1792.patch \
+            file://0005-openssl-CVE-2015-1791.patch \
+            file://0006-openssl-bug-fix-for-commit-introduced-for-CVE-2015-1.patch \
+            file://0007-openssl-More-ssl_session_dup-fixes-based-on-commit-f.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
