@@ -1,0 +1,155 @@
+From aea291e3db1ac0414dcf005a0a607e78bdd77a5e Mon Sep 17 00:00:00 2001
+From: Guillem Jover <guillem@debian.org>
+Date: Thu, 19 Mar 2015 22:51:46 +0100
+Subject: [PATCH] Dpkg::Control::HashCore: Fix OpenPGP Armor Header Line
+ parsing
+
+Cherry picked from commit b4ccfe4982161b8beb44f1d0c98f791c4f238edd.
+
+We should only accept [\r\t ] as trailing whitespace, although RFC4880
+does not clarify what whitespace really maps to, we should really match
+the GnuPG implementation anyway, as that is what we use to verify the
+signatures.
+
+Fixes: CVE-2015-0840
+Reported-by: Jann Horn <jann@thejh.net>
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ scripts/Dpkg/Control/HashCore.pm                |   21 ++++++++++++---------
+ scripts/Makefile.am                             |    1 +
+ scripts/t/Dpkg_Control.t                        |    5 ++++-
+ scripts/t/Dpkg_Control/bogus-armor-formfeed.dsc |   19 +++++++++++++++++++
+ 5 files changed, 41 insertions(+), 10 deletions(-)
+ create mode 100644 scripts/t/Dpkg_Control/bogus-armor-formfeed.dsc
+
+diff --git a/scripts/Dpkg/Control/HashCore.pm b/scripts/Dpkg/Control/HashCore.pm
+index 2646ade..4162ad9 100644
+--- a/scripts/Dpkg/Control/HashCore.pm
++++ b/scripts/Dpkg/Control/HashCore.pm
+@@ -188,8 +188,8 @@ sub parse {
+     my $expect_pgp_sig = 0;
+ 
+     while (<$fh>) {
+-	s/\s*\n$//;
+-	next if (m/^$/ and $paraborder);
++	chomp;
++	next if m/^\s*$/ and $paraborder;
+ 	next if (m/^#/);
+ 	$paraborder = 0;
+ 	if (m/^(\S+?)\s*:\s*(.*)$/) {
+@@ -202,6 +202,7 @@ sub parse {
+ 		    $self->parse_error($desc, _g('duplicate field %s found'), $1);
+ 		}
+ 	    }
++	    $2 =~ s/\s*$//;
+ 	    $self->{$1} = $2;
+ 	    $cf = $1;
+ 	} elsif (m/^\s(\s*\S.*)$/) {
+@@ -212,8 +213,9 @@ sub parse {
+ 	    if ($line =~ /^\.+$/) {
+ 		$line = substr $line, 1;
+ 	    }
++	    $line =~ s/\s*$//;
+ 	    $self->{$cf} .= "\n$line";
+-	} elsif (m/^-----BEGIN PGP SIGNED MESSAGE-----$/) {
++	} elsif (m/^-----BEGIN PGP SIGNED MESSAGE-----[\r\t ]*$/) {
+ 	    $expect_pgp_sig = 1;
+ 	    if ($$self->{allow_pgp} and not $parabody) {
+ 		# Skip PGP headers
+@@ -223,7 +225,8 @@ sub parse {
+ 	    } else {
+ 		$self->parse_error($desc, _g('PGP signature not allowed here'));
+ 	    }
+-	} elsif (m/^$/ || ($expect_pgp_sig && m/^-----BEGIN PGP SIGNATURE-----$/)) {
++	} elsif (m/^\s*$/ ||
++	         ($expect_pgp_sig && m/^-----BEGIN PGP SIGNATURE-----[\r\t ]*$/)) {
+ 	    if ($expect_pgp_sig) {
+ 		# Skip empty lines
+ 		$_ = <$fh> while defined($_) && $_ =~ /^\s*$/;
+@@ -231,15 +234,15 @@ sub parse {
+ 		    $self->parse_error($desc, _g('expected PGP signature, ' .
+ 		                                 'found EOF after blank line'));
+ 		}
+-		s/\s*\n$//;
+-		unless (m/^-----BEGIN PGP SIGNATURE-----$/) {
++		chomp;
++		unless (m/^-----BEGIN PGP SIGNATURE-----[\r\t ]*$/) {
+ 		    $self->parse_error($desc, _g('expected PGP signature, ' .
+ 		                                 "found something else \`%s'"), $_);
+                 }
+ 		# Skip PGP signature
+ 		while (<$fh>) {
+-		    s/\s*\n$//;
+-		    last if m/^-----END PGP SIGNATURE-----$/;
++		    chomp;
++		    last if m/^-----END PGP SIGNATURE-----[\r\t ]*$/;
+ 		}
+ 		unless (defined($_)) {
+ 		    $self->parse_error($desc, _g('unfinished PGP signature'));
+diff --git a/scripts/Makefile.am b/scripts/Makefile.am
+index 2231f3d..d876bc3 100644
+--- a/scripts/Makefile.am
++++ b/scripts/Makefile.am
+@@ -236,6 +236,7 @@ test_data = \
+ 	t/700_Dpkg_Control/control-1 \
+ 	t/700_Dpkg_Control/bogus-unsigned.dsc \
+ 	t/700_Dpkg_Control/bogus-armor-double.dsc \
++	t/700_Dpkg_Control/bogus-armor-formfeed.dsc \
+ 	t/700_Dpkg_Control/bogus-armor-no-sig.dsc \
+ 	t/700_Dpkg_Control/bogus-armor-trail.dsc \
+ 	t/700_Dpkg_Control/bogus-armor-inline.dsc \
+diff --git a/scripts/t/700_Dpkg_Control.t b/scripts/t/700_Dpkg_Control.t
+index a64e311..e73f8ec 100644
+--- a/scripts/t/700_Dpkg_Control.t
++++ b/scripts/t/700_Dpkg_Control.t
+@@ -16,7 +16,7 @@
+ use strict;
+ use warnings;
+ 
+-use Test::More tests => 22;
++use Test::More tests => 23;
+ use IO::String;
+ 
+ BEGIN {
+@@ -118,6 +118,9 @@ is($dsc, undef, 'Signed .dsc w/ bogus OpenPGP armor trailer');
+ $dsc = parse_dsc("$datadir/bogus-armor-inline.dsc");
+ is($dsc, undef, 'Signed .dsc w/ bogus OpenPGP inline armor');
+ 
++$dsc = parse_dsc("$datadir/bogus-armor-formfeed.dsc");
++is($dsc, undef, 'Signed .dsc w/ bogus OpenPGP armor line');
++
+ $dsc = parse_dsc("$datadir/bogus-armor-double.dsc");
+ ok(defined $dsc, 'Signed .dsc w/ two OpenPGP armor signatures');
+ is($dsc->{Source}, 'pass', 'Signed spaced .dsc package name');
+diff --git a/scripts/t/700_Dpkg_Control/bogus-armor-formfeed.dsc b/scripts/t/700_Dpkg_Control/bogus-armor-formfeed.dsc
+new file mode 100644
+index 0000000..70aab18
+--- /dev/null
++++ b/scripts/t/700_Dpkg_Control/bogus-armor-formfeed.dsc
+@@ -0,0 +1,19 @@
++-----BEGIN PGP SIGNED MESSAGE-----
++
++Source: fail
++
++-----BEGIN PGP SIGNATURE-----
++Version: vim v7.3.547 (GNU/Linux)
++
++Fake signature here.
++-----END PGP SIGNATURE-----
++-----BEGIN PGP SIGNED MESSAGE-----
++Hash: SHA1
++
++Source: pass
++
++-----BEGIN PGP SIGNATURE
++Version: GnuPG v1.4.12 (GNU/Linux)
++
++Valid signature here.
++-----END PGP SIGNATURE-----
+-- 
+1.7.9.5
+
