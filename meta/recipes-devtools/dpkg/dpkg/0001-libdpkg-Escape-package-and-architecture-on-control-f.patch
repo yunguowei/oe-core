@@ -1,0 +1,50 @@
+From 446f11df6302716c2a1f993761ee54ecb44d42bb Mon Sep 17 00:00:00 2001
+From: Guillem Jover <guillem@debian.org>
+Date: Fri, 7 Nov 2014 20:49:26 +0100
+Subject: [PATCH] libdpkg: Escape package and architecture on control file
+ parsing warning
+
+The package and architecture names are injected into a variable that is
+used as a format string. Because these are user controlled, we need to
+format-escape them so that they become inert.
+
+Regression introduced in commmit 3be2cf607868adb9a2c0e5af06f20168a072eeb6.
+
+Fixes: CVE-2014-8625
+Closes: #768485
+Reporteb-by: Joshua Rogers <megamansec@gmail.com>
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ lib/dpkg/parsehelp.c |   11 +++++++----
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/lib/dpkg/parsehelp.c b/lib/dpkg/parsehelp.c
+index e091f67..3537de1 100644
+--- a/lib/dpkg/parsehelp.c
++++ b/lib/dpkg/parsehelp.c
+@@ -44,11 +44,14 @@ parse_error_msg(struct parsedb_state *ps, const char *fmt)
+ 
+   str_escape_fmt(filename, ps->filename, sizeof(filename));
+ 
+-  if (ps->pkg && ps->pkg->set->name)
++  if (ps->pkg && ps->pkg->set->name) {
++    char pkgname[256];
++
++    str_escape_fmt(pkgname, pkgbin_name(ps->pkg, ps->pkgbin, pnaw_nonambig),
++                   sizeof(pkgname));
+     sprintf(msg, _("parsing file '%.255s' near line %d package '%.255s':\n"
+-                   " %.255s"), filename, ps->lno,
+-                   pkgbin_name(ps->pkg, ps->pkgbin, pnaw_nonambig), fmt);
+-  else
++                   " %.255s"), filename, ps->lno, pkgname, fmt);
++  } else
+     sprintf(msg, _("parsing file '%.255s' near line %d:\n"
+                    " %.255s"), filename, ps->lno, fmt);
+ 
+-- 
+1.7.9.5
+
