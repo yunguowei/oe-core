@@ -11,6 +11,7 @@ MODIFYTOS = "0"
 REAL_MULTIMACH_TARGET_SYS = "${TUNE_PKGARCH}${TARGET_VENDOR}-${TARGET_OS}"
 
 inherit toolchain-scripts
+TOOLCHAIN_CONFIGSITE_NOCACHE := "${@siteinfo_get_files(d, True)}"
 TOOLCHAIN_NEED_CONFIGSITE_CACHE += "zlib"
 
 SDK_DIR = "${WORKDIR}/sdk"
