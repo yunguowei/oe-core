@@ -10,10 +10,10 @@ SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz \
 	file://avoid-strip.patch \
 	file://define-ldflags.patch \
 	file://06-unzip60-alt-iconv-utf8.patch \
-	file://09-cve-2014-8139-crc-overflow \
-	file://10-cve-2014-8140-test-compr-eb \
-	file://11-cve-2014-8141-getzip64data \
-	file://12-cve-2014-9636-test-compr-eb \
+	file://09-cve-2014-8139-crc-overflow.patch \
+	file://10-cve-2014-8140-test-compr-eb.patch \
+	file://11-cve-2014-8141-getzip64data.patch \
+	file://12-cve-2014-9636-test-compr-eb.patch \
 "
 
 SRC_URI[md5sum] = "62b490407489521db863b523a7f86375"
