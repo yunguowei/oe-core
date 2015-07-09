@@ -1,0 +1,23 @@
+rpcbind: add the -p statement in usage
+
+"-p" option is to fix random port in windriver product,
+it need show in usage.
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ src/rpcbind.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/rpcbind.c b/src/rpcbind.c
+index d05e6f2..9a03d47 100644
+--- a/src/rpcbind.c
++++ b/src/rpcbind.c
+@@ -788,7 +788,7 @@ parseargs(int argc, char *argv[])
+ 			break;
+ #endif
+ 		default:	/* error */
+-			fprintf(stderr,	"usage: rpcbind [-adhilswf]\n");
++			fprintf(stderr,	"usage: rpcbind [-adhpilswf]\n");
+ 			exit (1);
+ 		}
+ 	}
