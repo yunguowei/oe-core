@@ -28,6 +28,7 @@ SRC_URI = "http://download.qt-project.org/official_releases/qt/4.8/${PV}/qt-ever
            file://0032-aarch64_add_header.patch \
            file://0001-Fix-a-division-by-zero-when-processing-malformed-BMP.patch \
            file://0001-Fixes-crash-in-gif-image-decoder.patch \
+           file://0001-Fixes-crash-in-bmp-and-ico-image-decoding.patch \
            file://g++.conf \
            file://linux.conf \
            "
