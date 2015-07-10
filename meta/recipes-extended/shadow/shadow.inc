@@ -63,18 +63,24 @@ NSCDOPT_class-nativesdk = "--without-nscd"
 NSCDOPT_libc-uclibc = " --without-nscd"
 NSCDOPT_libc-glibc = "${@bb.utils.contains('DISTRO_FEATURES', 'libc-spawn', '--with-nscd', '--without-nscd', d)}"
           
-PAM_PLUGINS = "libpam-runtime \
-               pam-plugin-faildelay \
-               pam-plugin-securetty \
-               pam-plugin-nologin \
-               pam-plugin-env \
-               pam-plugin-group \
-               pam-plugin-limits \
-               pam-plugin-lastlog \
-               pam-plugin-motd \
-               pam-plugin-mail \
-               pam-plugin-shells \
-               pam-plugin-rootok"
+def get_multilib_bit(d):
+    baselib = d.getVar('baselib', True) or ''
+    return baselib.replace('lib', '')
+
+libpam_suffix = "suffix${@get_multilib_bit(d)}"
+
+PAM_PLUGINS = "libpam-runtime-${libpam_suffix} \
+               pam-plugin-faildelay-${libpam_suffix} \
+               pam-plugin-securetty-${libpam_suffix} \
+               pam-plugin-nologin-${libpam_suffix} \
+               pam-plugin-env-${libpam_suffix} \
+               pam-plugin-group-${libpam_suffix} \
+               pam-plugin-limits-${libpam_suffix} \
+               pam-plugin-lastlog-${libpam_suffix} \
+               pam-plugin-motd-${libpam_suffix} \
+               pam-plugin-mail-${libpam_suffix} \
+               pam-plugin-shells-${libpam_suffix} \
+               pam-plugin-rootok-${libpam_suffix}"
 
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam', '', d)}"
 PACKAGECONFIG_class-native = ""
