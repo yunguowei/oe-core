@@ -16,6 +16,7 @@ SRC_URI += "file://noman.patch \
             file://dpkg-1.17.4-CVE-2014-0471-CVE-2014-3127.patch \
             file://0001-libdpkg-Escape-package-and-architecture-on-control-f.patch \
             file://0001-Dpkg-Control-HashCore-Fix-OpenPGP-Armor-Header-Line-.patch \
+            file://tarfix.patch \
            "
 
 SRC_URI[md5sum] = "cc25086e1e3bd9512a95f14cfe9002e1"
