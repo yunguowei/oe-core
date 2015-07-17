@@ -7,6 +7,7 @@ SRC_URI += "file://dhcp-3.0.3-dhclient-dbus.patch;striplevel=0 \
             file://dhclient-script-drop-resolv.conf.dhclient.patch \
             file://replace-ifconfig-route.patch \
             file://dhcp-add-exec-script-function.patch \
+            file://dhcp-define-SAVEDIR-in-dhclient-script.patch \
            "
 
 SRC_URI[md5sum] = "1020d77e1a4c1f01b76279caff9beb80"
