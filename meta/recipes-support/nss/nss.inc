@@ -26,6 +26,7 @@ SRC_URI = "\
     file://nss-CVE-2014-1568.patch \
     file://nss-CVE-2014-1569.patch \
     file://Using-correct-macro-for-x86.patch \
+    file://nss-CVE-2015-2721.patch \
 "
 SRC_URI_append = "\
     file://nss.pc.in \
