@@ -27,6 +27,7 @@ SRC_URI = "http://hostap.epitest.fi/releases/wpa_supplicant-${PV}.tar.gz \
            file://fix-libnl3-host-contamination.patch \
            file://0001-P2P-Validate-SSID-element-length-before-copying-it-C.patch \
            file://0001-WPS-Fix-HTTP-chunked-transfer-encoding-parser.patch \
+           file://0001-AP-WMM-Fix-integer-underflow-in-WMM-Action-frame-par.patch \
           "
 SRC_URI[md5sum] = "238e8e888bbd558e1a57e3eb28d1dd07"
 SRC_URI[sha256sum] = "e0d8b8fd68a659636eaba246bb2caacbf53d22d53b2b6b90eb4b4fef0993c8ed"
