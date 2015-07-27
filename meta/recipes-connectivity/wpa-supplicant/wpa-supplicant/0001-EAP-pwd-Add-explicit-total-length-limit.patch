@@ -1,0 +1,52 @@
+From ee352f1e5a4957d06adb9a6ba560677dc6dfecb2 Mon Sep 17 00:00:00 2001
+From: Jouni Malinen <j@w1.fi>
+Date: Sun, 29 Jun 2014 18:52:09 +0300
+Subject: [PATCH] EAP-pwd: Add explicit total length limit
+
+Instead of using implicit limit based on 16-bit unsigned integer having
+a maximum value of 65535, limit the maximum length of a fragmented
+EAP-pwd message explicitly to 15000 bytes. None of the supported groups
+use longer messages, so it is fine to reject any longer message without
+even trying to reassemble it. This will hopefully also help in reducing
+false warnings from static analyzers (CID 68124).
+
+Signed-off-by: Jouni Malinen <j@w1.fi>
+
+Upstream-Status: Backport
+
+Signed-off-by: Yue Tao <yue.tao@windriver.com>
+
+---
+ src/eap_peer/eap_pwd.c          |    2 ++
+ src/eap_server/eap_server_pwd.c |    2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/eap_peer/eap_pwd.c b/src/eap_peer/eap_pwd.c
+index 2aa7ba5..fec3224 100644
+--- a/src/eap_peer/eap_pwd.c
++++ b/src/eap_peer/eap_pwd.c
+@@ -782,6 +782,8 @@ eap_pwd_process(struct eap_sm *sm, void *priv, struct eap_method_ret *ret,
+ 		tot_len = WPA_GET_BE16(pos);
+ 		wpa_printf(MSG_DEBUG, "EAP-pwd: Incoming fragments whose "
+ 			   "total length = %d", tot_len);
++		if (tot_len > 15000)
++			return NULL;
+ 		data->inbuf = wpabuf_alloc(tot_len);
+ 		if (data->inbuf == NULL) {
+ 			wpa_printf(MSG_INFO, "Out of memory to buffer "
+diff --git a/src/eap_server/eap_server_pwd.c b/src/eap_server/eap_server_pwd.c
+index ec53481..846ac1f 100644
+--- a/src/eap_server/eap_server_pwd.c
++++ b/src/eap_server/eap_server_pwd.c
+@@ -900,6 +900,8 @@ static void eap_pwd_process(struct eap_sm *sm, void *priv,
+ 		tot_len = WPA_GET_BE16(pos);
+ 		wpa_printf(MSG_DEBUG, "EAP-pwd: Incoming fragments, total "
+ 			   "length = %d", tot_len);
++		if (tot_len > 15000)
++			return;
+ 		data->inbuf = wpabuf_alloc(tot_len);
+ 		if (data->inbuf == NULL) {
+ 			wpa_printf(MSG_INFO, "EAP-pwd: Out of memory to "
+-- 
+1.7.9.5
+

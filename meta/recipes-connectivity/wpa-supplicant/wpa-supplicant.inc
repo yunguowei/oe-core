@@ -30,6 +30,9 @@ SRC_URI = "http://hostap.epitest.fi/releases/wpa_supplicant-${PV}.tar.gz \
            file://0001-AP-WMM-Fix-integer-underflow-in-WMM-Action-frame-par.patch \
            file://0001-EAP-pwd-peer-Fix-payload-length-validation-for-Commi.patch  \
            file://0002-EAP-pwd-server-Fix-payload-length-validation-for-Com.patch  \
+           file://0001-EAP-pwd-Add-explicit-total-length-limit.patch  \
+           file://0001-EAP-pwd-peer-Fix-Total-Length-parsing-for-fragment-r.patch  \
+           file://0002-EAP-pwd-server-Fix-Total-Length-parsing-for-fragment.patch \
           "
 SRC_URI[md5sum] = "238e8e888bbd558e1a57e3eb28d1dd07"
 SRC_URI[sha256sum] = "e0d8b8fd68a659636eaba246bb2caacbf53d22d53b2b6b90eb4b4fef0993c8ed"
