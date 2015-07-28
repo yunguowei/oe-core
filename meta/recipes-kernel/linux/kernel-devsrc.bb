@@ -74,3 +74,9 @@ do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 PACKAGES = "kernel-devsrc"
 FILES_${PN} = "${KERNEL_SRC_PATH}"
 RDEPENDS_${PN} = "bc"
+
+# For backwards compatibility after rename
+RPROVIDES_${PN} = "kernel-dev"
+RREPLACES_${PN} = "kernel-dev"
+RCONFLICTS_${PN} = "kernel-dev"
+PROVIDES += "kernel-dev"
