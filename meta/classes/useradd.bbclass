@@ -48,6 +48,8 @@ if test "x$UA_SYSROOT" = "x"; then
 	GROUPMEMS_PARAM="${GROUPMEMS_PARAM}"
 fi
 
+mkdir -p $SYSROOT/tmp
+
 # Perform group additions first, since user additions may depend
 # on these groups existing
 if test "x$GROUPADD_PARAM" != "x"; then
@@ -57,7 +59,7 @@ if test "x$GROUPADD_PARAM" != "x"; then
 	opts=`echo "$GROUPADD_PARAM" | cut -d ';' -f 1`
 	remaining=`echo "$GROUPADD_PARAM" | cut -d ';' -f 2-`
 	while test "x$opts" != "x"; do
-		perform_groupadd "$SYSROOT" "$OPT $opts" 10
+		perform_groupadd "$SYSROOT" "$OPT $opts"
 		if test "x$opts" = "x$remaining"; then
 			break
 		fi
@@ -73,7 +75,7 @@ if test "x$USERADD_PARAM" != "x"; then
 	opts=`echo "$USERADD_PARAM" | cut -d ';' -f 1`
 	remaining=`echo "$USERADD_PARAM" | cut -d ';' -f 2-`
 	while test "x$opts" != "x"; do
-		perform_useradd "$SYSROOT" "$OPT $opts" 10
+		perform_useradd "$SYSROOT" "$OPT $opts"
 		if test "x$opts" = "x$remaining"; then
 			break
 		fi
@@ -89,7 +91,7 @@ if test "x$GROUPMEMS_PARAM" != "x"; then
 	opts=`echo "$GROUPMEMS_PARAM" | cut -d ';' -f 1`
 	remaining=`echo "$GROUPMEMS_PARAM" | cut -d ';' -f 2-`
 	while test "x$opts" != "x"; do
-		perform_groupmems "$SYSROOT" "$OPT $opts" 10
+		perform_groupmems "$SYSROOT" "$OPT $opts"
 		if test "x$opts" = "x$remaining"; then
 			break
 		fi
