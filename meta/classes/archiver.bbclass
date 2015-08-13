@@ -73,8 +73,13 @@ python () {
         # We can't use "addtask do_ar_configured after do_configure" since it
         # will cause the deptask of do_populate_sysroot to run not matter what
         # archives we need, so we add the depends here.
-        d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_configure' % pn)
-        d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_configured' % pn)
+        ##
+        # For some specific packages like gcc-source, do_configure may be deleted.
+        if 'do_configure' in (d.getVar('__BBDELTASKS', False) or []) or d.getVarFlag('do_configure', 'noexec') == '1':
+            pass
+        else:
+            d.appendVarFlag('do_ar_configured', 'depends', ' %s:do_configure' % pn)
+            d.appendVarFlag('do_deploy_archives', 'depends', ' %s:do_ar_configured' % pn)
     elif ar_src:
         bb.fatal("Invalid ARCHIVER_MODE[src]: %s" % ar_src)
 
@@ -132,6 +137,9 @@ python do_ar_original() {
     if d.getVarFlag('ARCHIVER_MODE', 'src', True) != "original":
         return
 
+    if not check_task(d, 'do_unpack'):
+        return
+
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     bb.note('Archiving the original source...')
     fetch = bb.fetch2.Fetch([], d)
@@ -175,6 +183,9 @@ python do_ar_patched() {
     if d.getVarFlag('ARCHIVER_MODE', 'src', True) != 'patched':
         return
 
+    if not check_task(d, 'do_patch'):
+        return
+
     # Get the ARCHIVER_OUTDIR before we reset the WORKDIR
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     bb.note('Archiving the patched source...')
@@ -189,6 +200,9 @@ python do_ar_patched() {
 
 python do_ar_configured() {
     import shutil
+
+    if not check_task(d, 'do_configure'):
+        return
 
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
     if d.getVarFlag('ARCHIVER_MODE', 'src', True) == 'configured':
@@ -221,6 +235,15 @@ python do_ar_configured() {
                     'build.%s.ar_configured' % d.getVar('PF', True)))
         create_tarball(d, srcdir, 'configured', ar_outdir)
 }
+
+def check_task(d, task):
+    pn = d.getVar("PN",True)
+    mode = d.getVarFlag('ARCHIVER_MODE', 'src', True)
+    if task in (d.getVar('__BBDELTASKS', False) or []) or d.getVarFlag(task, 'noexec') == '1':
+        bb.warn('ARCHIVER_MODE[src] = "%s" does not take effect for %s since it doesn\'t have %s' %(mode,pn,task))
+        return False
+
+    return True
 
 def create_tarball(d, srcdir, suffix, ar_outdir, pf=None):
     """
@@ -288,6 +311,11 @@ python do_unpack_and_patch() {
     if d.getVarFlag('ARCHIVER_MODE', 'src', True) not in \
             [ 'patched', 'configured'] and \
             d.getVarFlag('ARCHIVER_MODE', 'diff', True) != '1':
+        return
+
+    if not check_task(d, 'do_unpack'):
+        return
+    if not check_task(d, 'do_patch'):
         return
 
     ar_outdir = d.getVar('ARCHIVER_OUTDIR', True)
