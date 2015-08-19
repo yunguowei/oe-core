@@ -1,0 +1,34 @@
+From 89d26797f56ec52dae14f9c47b445c9a39e8ce56 Mon Sep 17 00:00:00 2001
+From: "Ronald S. Bultje" <rsbultje@gmail.com>
+Date: Tue, 3 Jan 2012 20:41:18 -0800
+Subject: [PATCH] ulti: convert to new bytestream API.
+
+---
+ libavcodec/bytestream.h |    6 +++-
+ libavcodec/ulti.c       |   72 ++++++++++++++++++++++-------------------------
+ 2 files changed, 38 insertions(+), 40 deletions(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/bytestream.h b/gst-libs/ext/libav/libavcodec/bytestream.h
+index ba3e4e8..8fbceac 100644
+--- a/gst-libs/ext/libav/libavcodec/bytestream.h
++++ b/gst-libs/ext/libav/libavcodec/bytestream.h
+@@ -39,11 +39,15 @@ static av_always_inline void bytestream_put_ ##name(uint8_t **b, const type valu
+     write(*b, value);\
+     (*b) += bytes;\
+ }\
++static av_always_inline type bytestream2_get_ ## name ## u(GetByteContext *g)\
++{\
++    return bytestream_get_ ## name(&g->buffer);\
++}\
+ static av_always_inline type bytestream2_get_ ## name(GetByteContext *g)\
+ {\
+     if (g->buffer_end - g->buffer < bytes)\
+         return 0;\
+-    return bytestream_get_ ## name(&g->buffer);\
++    return bytestream2_get_ ## name ## u(g);\
+ }\
+ static av_always_inline type bytestream2_peek_ ## name(GetByteContext *g)\
+ {\
+-- 
+1.7.9.5
+
