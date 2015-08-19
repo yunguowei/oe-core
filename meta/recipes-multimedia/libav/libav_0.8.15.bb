@@ -1,7 +1,8 @@
 require libav.inc
 
 SRC_URI = "http://libav.org/releases/${BP}.tar.xz \
-           file://0001-configure-enable-pic-for-AArch64.patch"
+           file://0001-configure-enable-pic-for-AArch64.patch \
+           file://0001-avcodec-msrledec-restructure-msrle_decode_pal4-based.patch"
 
 SRC_URI[md5sum] = "e483ea8f482b5ecd65ee1d09251b0a5b"
 SRC_URI[sha256sum] = "495789ec547e93632937f0f36b06f4dd3180bc61518181f124af6746c6218710"

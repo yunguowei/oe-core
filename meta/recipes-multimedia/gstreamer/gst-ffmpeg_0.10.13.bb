@@ -71,6 +71,8 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-vorbisdec-propagate-errors-from-setup_classifs.patch \
            file://0001-avcodec-vorbisdec-Fix-off-by-1-error-in-ptns_to_read.patch \
            file://0001-matroskadec-Fix-read-after-free-in-matroska_read_see.patch \
+           file://0001-msrle-convert-MS-RLE-decoding-function-to-bytestream.patch \
+           file://0001-avcodec-msrledec-restructure-msrle_decode_pal4-based.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
