@@ -25,6 +25,7 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://qemu-CVE-2015-4106-8.patch \
             file://qemu-CVE-2015-3209-1.patch \
             file://qemu-CVE-2015-3209-2.patch \
+            file://0001-ide-Check-array-bounds-before-writing-to-io_buffer-C.patch \
             "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "0ff197c4ed4b695620bc4734e77c888f"
