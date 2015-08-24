@@ -26,6 +26,13 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://qemu-CVE-2015-3209-1.patch \
             file://qemu-CVE-2015-3209-2.patch \
             file://0001-ide-Check-array-bounds-before-writing-to-io_buffer-C.patch \
+            file://0001-rtl8139-avoid-nested-ifs-in-IP-header-parsing-CVE-20.patch \
+            file://0002-rtl8139-drop-tautologous-if-ip-.-statement-CVE-2015-.patch \
+            file://0003-rtl8139-skip-offload-on-short-Ethernet-IP-header-CVE.patch \
+            file://0004-rtl8139-check-IP-Header-Length-field-CVE-2015-5165.patch \
+            file://0005-rtl8139-check-IP-Total-Length-field-CVE-2015-5165.patch \
+            file://0006-rtl8139-skip-offload-on-short-TCP-header-CVE-2015-51.patch \
+            file://0007-rtl8139-check-TCP-Data-Offset-field-CVE-2015-5165.patch \
             "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "0ff197c4ed4b695620bc4734e77c888f"
