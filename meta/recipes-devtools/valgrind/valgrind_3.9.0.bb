@@ -23,6 +23,7 @@ SRC_URI = "http://www.valgrind.org/downloads/valgrind-${PV}.tar.bz2 \
            file://add-ptest.patch \
            file://pass-maltivec-only-if-it-supported.patch \
            file://run-ptest \
+           file://0001-valgrind-Enable-rt_sigpending-syscall-on-ppc64-linux.patch \
           "
 
 SRC_URI[md5sum] = "0947de8112f946b9ce64764af7be6df2"
