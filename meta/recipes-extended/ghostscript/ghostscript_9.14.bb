@@ -24,6 +24,7 @@ SRC_URI = "${SRC_URI_BASE} \
            file://objarch.h \
            file://ghostscript-9.02-parallel-make.patch \
            file://cups-no-gcrypt.patch \
+           file://0001-Bug-696041-sanity-check-for-memory-allocation.patch \
            "
 
 SRC_URI_class-native = "${SRC_URI_BASE} \
