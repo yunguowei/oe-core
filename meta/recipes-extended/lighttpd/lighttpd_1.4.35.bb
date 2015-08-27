@@ -24,6 +24,7 @@ SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.t
         file://lighttpd \
         file://lighttpd.service \
         file://pkgconfig.patch \
+        file://0001-escape-all-strings-for-logging-fixes-2646-log-file-i.patch \
         "
 
 SRC_URI[md5sum] = "f7a88130ee9984b421ad8aa80629750a"
