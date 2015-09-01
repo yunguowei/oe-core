@@ -17,6 +17,7 @@ SRC_URI = "${GNU_MIRROR}/libidn/${BPN}-${PV}.tar.gz \
            file://libidn_fix_for_automake-1.12.patch \
            file://avoid_AM_PROG_MKDIR_P_warning_error_with_automake_1.12.patch \
            file://dont-depend-on-help2man.patch \
+           file://0001-libidn-stringprep_utf8_to_ucs4-now-rejects-invalid-U.patch \
 "
 
 SRC_URI[md5sum] = "2b67bb507207af379f9461e1307dc84b"
@@ -28,6 +29,17 @@ PACKAGES =+ "idn"
 FILES_idn = "${bindir}/*"
 
 EXTRA_OECONF = "--disable-csharp"
+
+do_configure_append() {
+	cd ${S}/doc/texi
+	for i in `ls *`; do
+		touch $i
+	done
+}
+
+do_configure_append() {
+	cp ${S}/doc/gdoc ${B}/doc
+}
 
 do_install_append() {
 	rm -rf ${D}${datadir}/emacs
