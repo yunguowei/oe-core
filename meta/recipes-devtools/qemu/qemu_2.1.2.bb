@@ -25,6 +25,7 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://qemu-CVE-2015-4106-8.patch \
             file://qemu-CVE-2015-3209-1.patch \
             file://qemu-CVE-2015-3209-2.patch \
+            file://qemu-CVE-2015-4037.patch \
             file://0001-ide-Check-array-bounds-before-writing-to-io_buffer-C.patch \
             file://0001-rtl8139-avoid-nested-ifs-in-IP-header-parsing-CVE-20.patch \
             file://0002-rtl8139-drop-tautologous-if-ip-.-statement-CVE-2015-.patch \
