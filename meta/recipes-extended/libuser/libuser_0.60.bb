@@ -12,7 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
 SECTION = "base"
 
 SRC_URI = "https://fedorahosted.org/releases/l/i/libuser/libuser-${PV}.tar.xz \
-           file://fixsepbuild.patch"
+           file://fixsepbuild.patch \
+           file://libuser-CVE-2015-3245-CVE-2015-3246.patch"
 
 SRC_URI[md5sum] = "5c549724999ccca65ceaaecc4eb8cb98"
 SRC_URI[sha256sum] = "b1f73408ebfee79eb01a47c5879a2cdef6a00b75ee24870de7df1b816ff483eb"
