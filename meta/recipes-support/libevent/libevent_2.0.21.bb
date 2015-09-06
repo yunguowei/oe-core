@@ -11,6 +11,7 @@ PR = "r1"
 SRC_URI = "http://github.com/downloads/libevent/libevent/${BPN}-${PV}-stable.tar.gz \
            file://obsolete_automake_macros.patch \
            file://disable_tests.patch \
+           file://0001-Fix-CVE-2014-6272-in-Libevent-2.0.patch \
 "
 
 SRC_URI[md5sum] = "b2405cc9ebf264aa47ff615d9de527a2"
