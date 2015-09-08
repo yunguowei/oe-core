@@ -1,0 +1,58 @@
+From f1e9c46689f75b8bbcc5b7b98f7c8268dfde1ce2 Mon Sep 17 00:00:00 2001
+From: Joshua Judson Rosen <jrosen@harvestai.com>
+Date: Thu, 3 Jul 2014 14:51:47 +0200
+Subject: [PATCH] syslogd: make "reopen log file every second" logic work for
+ multiple logs
+
+Move last_log_time from a single global to *each logFile_t*
+so that we can actually apply the logic to every log-file
+in multi-file configurations, rather than working only
+for the first file written in each 1-second interval
+and then leaving the others connected to possibly wrong files.
+
+Upstrem-Status: Backport
+
+Signed-off-by: Joshua Judson Rosen <jrosen@harvestai.com>
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+Signed-off-by: Par Olsson <par.olsson@windriver.com>
+Signed-off-by: Zhixiong Chi <zhixiong.chi@windriver.com>
+--- busybox-1.22.1/sysklogd/syslogd.c	2014-01-10 02:15:44.000000000 +0800
++++ busybox-1.22.1-new/sysklogd/syslogd.c	2015-09-07 18:09:09.893211107 +0800
+@@ -110,6 +110,7 @@
+ typedef struct logFile_t {
+ 	const char *path;
+ 	int fd;
++	time_t last_log_time;
+ #if ENABLE_FEATURE_ROTATE_LOGFILE
+ 	unsigned size;
+ 	uint8_t isRegular;
+@@ -165,7 +166,6 @@
+ #if ENABLE_FEATURE_IPC_SYSLOG
+ 	struct shbuf_ds *shbuf;
+ #endif
+-	time_t last_log_time;
+ 	/* localhost's name. We print only first 64 chars */
+ 	char *hostname;
+ 
+@@ -586,15 +586,16 @@
+ 	int len = strlen(msg);
+ 
+ 	if (log_file->fd >= 0) {
+-		/* Reopen log file every second. This allows admin
+-		 * to delete the file and not worry about restarting us.
++		/* Reopen log files every second. This allows admin
++		 * to delete the files and not worry about restarting us.
+ 		 * This costs almost nothing since it happens
+-		 * _at most_ once a second.
++		 * _at most_ once a second for each file, and happens
++		 * only when each file is actually written.
+ 		 */
+ 		if (!now)
+ 			now = time(NULL);
+-		if (G.last_log_time != now) {
+-			G.last_log_time = now;
++		if (log_file->last_log_time != now) {
++			log_file->last_log_time = now;
+ 			close(log_file->fd);
+ 			goto reopen;
+ 		}
