@@ -1,6 +1,7 @@
 require gnutls.inc
 
 SRC_URI += "file://correct_rpl_gettimeofday_signature.patch \
+            file://0001-Reset-the-output-value-on-error-in-_gnutls_x509_dn_t.patch \
            "
 
 SRC_URI[md5sum] = "1f396dcf3c14ea67de7243821006d1a2"
