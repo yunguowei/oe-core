@@ -63,6 +63,7 @@ SRC_URI += " \
         file://ext-ODBM_File-t-odbm.t-fix-the-path-of-dbmt_common.p.patch \
         file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
         file://perl-errno-generation-gcc5.patch \
+        file://fix-improper-use-of-reference-in-IO-Socket.patch \
 "
 
 # Fix test case issues
