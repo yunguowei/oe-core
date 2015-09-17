@@ -28,6 +28,7 @@ SRC_URI = "git://git.lttng.org/lttng-tools.git;branch=stable-2.5 \
            file://lttng-tools-Live-timer-uses-micro-seconds-as-nano-se.patch \
            file://runtest-2.4.0.patch \
            file://run-ptest \
+           file://0001-Fix-sessiond-disable-match-app-event-by-name.patch \
 	  "
 
 S = "${WORKDIR}/git"
