@@ -1,6 +1,6 @@
 require procps.inc
 
-PR = "r12"
+PR = "r13"
 
 SRC_URI += "file://procmodule.patch \
             file://psmodule.patch \
@@ -13,6 +13,9 @@ SRC_URI += "file://procmodule.patch \
             file://procps-3.2.8-ps-cgroup.patch \
             file://detect_bitness.patch \
             file://0001-Fix-musl-build-failure.patch \
+            file://library-cached-slabs-used-cached-buffers.patch \
+            file://free-support-for-MemAvailable.patch \
+            file://library-fallback-MemAvailable-evaluation-if-missing.patch \
            "
 
 SRC_URI[md5sum] = "9532714b6846013ca9898984ba4cd7e0"

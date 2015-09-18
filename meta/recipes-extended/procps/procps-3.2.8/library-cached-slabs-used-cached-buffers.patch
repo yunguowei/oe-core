@@ -1,0 +1,74 @@
+cached += slabs, used -= cached + buffers
+
+the patch comes from:
+https://gitlab.com/procps-ng/procps.git
+commit 6cb75efef85f735b72e6c96f197f358f511f8ed9
+
+From now we include slabs in cached
+and exclude buffers and cached from used.
+
+Jaromir Capik <jcapik@redhat.com>
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ free.c         |    2 +-
+ proc/sysinfo.c |    8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/free.c b/free.c
+index bd78f02..cb24765 100644
+--- a/free.c
++++ b/free.c
+@@ -93,7 +93,7 @@ int main(int argc, char *argv[]){
+             unsigned KLONG buffers_plus_cached = kb_main_buffers + kb_main_cached;
+             printf(
+                 "-/+ buffers/cache: %10Lu %10Lu\n", 
+-                S(kb_main_used - buffers_plus_cached),
++                S(kb_main_used),
+                 S(kb_main_free + buffers_plus_cached)
+             );
+         }
+diff --git a/proc/sysinfo.c b/proc/sysinfo.c
+index a16a11e..5ad9591 100644
+--- a/proc/sysinfo.c
++++ b/proc/sysinfo.c
+@@ -500,8 +500,8 @@ static int compare_mem_table_structs(const void *a, const void *b){
+ /* obsolete */
+ unsigned long kb_main_shared;
+ /* old but still kicking -- the important stuff */
++static unsigned long kb_page_cache;
+ unsigned long kb_main_buffers;
+-unsigned long kb_main_cached;
+ unsigned long kb_main_free;
+ unsigned long kb_main_total;
+ unsigned long kb_swap_free;
+@@ -519,6 +519,7 @@ unsigned long kb_inact_clean;
+ unsigned long kb_inact_target;
+ unsigned long kb_swap_cached;  /* late 2.4 and 2.6+ only */
+ /* derived values */
++unsigned long kb_main_cached;
+ unsigned long kb_swap_used;
+ unsigned long kb_main_used;
+ /* 2.5.41+ */
+@@ -553,7 +554,7 @@ void meminfo(void){
+   {"AnonPages",    &kb_anon_pages},
+   {"Bounce",       &kb_bounce},
+   {"Buffers",      &kb_main_buffers}, // important
+-  {"Cached",       &kb_main_cached},  // important
++  {"Cached",       &kb_page_cache},  // important
+   {"CommitLimit",  &kb_commit_limit},
+   {"Committed_AS", &kb_committed_as},
+   {"Dirty",        &kb_dirty},        // kB version of vmstat nr_dirty
+@@ -618,8 +619,9 @@ nextline:
+   if(kb_inactive==~0UL){
+     kb_inactive = kb_inact_dirty + kb_inact_clean + kb_inact_laundry;
+   }
++  kb_main_cached = kb_page_cache + kb_slab;
+   kb_swap_used = kb_swap_total - kb_swap_free;
+-  kb_main_used = kb_main_total - kb_main_free;
++  kb_main_used = kb_main_total - kb_main_free - kb_main_cached - kb_main_buffers;
+ }
+ 
+ /*****************************************************************/
+-- 
+1.7.9.5
+

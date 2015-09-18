@@ -1,0 +1,128 @@
+free: support for MemAvailable
+
+the patch comes from procps upstream:
+https://gitlab.com/procps-ng/procps.git
+commit ba6396f886f1a9911221e1c7c4b66dc75acb6948
+
+This commit adds a new switch -a/--available that
+appends a new column called 'available' to the
+output. The column displays an estimation
+of how much memory is available for starting
+new applications, without swapping. Unlike the data
+provided by the 'cached' or 'free' fields, this
+field takes into account page cache and also that
+not all reclaimable memory slabs will be reclaimed
+due to items being in use.
+
+Signed-off-by: Jaromir Capik <jcapik@redhat.com>
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ free.c           |   13 ++++++++++---
+ proc/library.map |    2 +-
+ proc/sysinfo.c   |    2 ++
+ proc/sysinfo.h   |    1 +
+ 4 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/free.c b/free.c
+index cb24765..c87efc7 100644
+--- a/free.c
++++ b/free.c
+@@ -27,6 +27,7 @@ const char help_message[] =
+ "  -l show detailed low and high memory statistics\n"
+ "  -o use old format (no -/+buffers/cache line)\n"
+ "  -t display total for RAM + swap\n"
++"  -a show available memory\n"
+ "  -s update every [delay] seconds\n"
+ "  -c update [count] times\n"
+ "  -V display version information and exit\n"
+@@ -40,9 +41,10 @@ int main(int argc, char *argv[]){
+     int show_high = 0;
+     int show_total = 0;
+     int old_fmt = 0;
++    int free_available = 0;
+ 
+     /* check startup flags */
+-    while( (i = getopt(argc, argv, "bkmglotc:s:V") ) != -1 )
++    while( (i = getopt(argc, argv, "bkmglotc:as:V") ) != -1 )
+         switch (i) {
+         case 'b': shift = 0;  break;
+         case 'k': shift = 10; break;
+@@ -51,6 +53,7 @@ int main(int argc, char *argv[]){
+         case 'l': show_high = 1; break;
+         case 'o': old_fmt = 1; break;
+         case 't': show_total = 1; break;
++        case 'a': free_available = 1; break;
+         case 's': pause_length = 1000000 * atof(optarg); break;
+         case 'c': count = strtoul(optarg, NULL, 10); break;
+ 	case 'V': display_version(); exit(0);
+@@ -61,9 +64,11 @@ int main(int argc, char *argv[]){
+ 
+     do {
+         meminfo();
+-        printf("             total       used       free     shared    buffers     cached\n");
++        printf("             total       used       free     shared    buffers     cached");
++        if (free_available) printf("  available");
++        printf("\n");
+         printf(
+-            "%-7s %10Lu %10Lu %10Lu %10Lu %10Lu %10Lu\n", "Mem:",
++            "%-7s %10Lu %10Lu %10Lu %10Lu %10Lu %10Lu", "Mem:",
+             S(kb_main_total),
+             S(kb_main_used),
+             S(kb_main_free),
+@@ -71,6 +76,8 @@ int main(int argc, char *argv[]){
+             S(kb_main_buffers),
+             S(kb_main_cached)
+         );
++        if (free_available) printf(" %10Lu", S(kb_main_available));
++        printf("\n");
+         // Print low vs. high information, if the user requested it.
+         // Note we check if low_total==0: if so, then this kernel does
+         // not export the low and high stats.  Note we still want to
+diff --git a/proc/library.map b/proc/library.map
+index a38627b..0da8e93 100644
+--- a/proc/library.map
++++ b/proc/library.map
+@@ -14,7 +14,7 @@ global:
+   sprint_uptime; uptime; user_from_uid; print_uptime; loadavg;
+   pretty_print_signals; print_given_signals; unix_print_signals; signal_name_to_number; signal_number_to_name;
+   meminfo; vminfo; getstat; getdiskstat; getpartitions_num; getslabinfo; get_pid_digits;
+-  kb_active; kb_inactive; kb_main_buffers; kb_main_cached;
++  kb_active; kb_inactive; kb_main_buffers; kb_main_cached; kb_main_available;
+   kb_main_free; kb_main_total; kb_main_used; kb_swap_free;
+   kb_swap_total; kb_swap_used; kb_main_shared;
+   kb_low_total; kb_low_free; kb_high_total; kb_high_free;
+diff --git a/proc/sysinfo.c b/proc/sysinfo.c
+index 5ad9591..3ff8fc4 100644
+--- a/proc/sysinfo.c
++++ b/proc/sysinfo.c
+@@ -511,6 +511,7 @@ unsigned long kb_high_free;
+ unsigned long kb_high_total;
+ unsigned long kb_low_free;
+ unsigned long kb_low_total;
++unsigned long kb_main_available;
+ /* 2.4.xx era */
+ unsigned long kb_active;
+ unsigned long kb_inact_laundry;
+@@ -568,6 +569,7 @@ void meminfo(void){
+   {"LowFree",      &kb_low_free},
+   {"LowTotal",     &kb_low_total},
+   {"Mapped",       &kb_mapped},       // kB version of vmstat nr_mapped
++  {"MemAvailable", &kb_main_available}, // important
+   {"MemFree",      &kb_main_free},    // important
+   {"MemShared",    &kb_main_shared},  // important, but now gone!
+   {"MemTotal",     &kb_main_total},   // important
+diff --git a/proc/sysinfo.h b/proc/sysinfo.h
+index e30a38b..9aa93fb 100644
+--- a/proc/sysinfo.h
++++ b/proc/sysinfo.h
+@@ -34,6 +34,7 @@ extern unsigned long kb_high_free;
+ extern unsigned long kb_high_total;
+ extern unsigned long kb_low_free;
+ extern unsigned long kb_low_total;
++extern unsigned long kb_main_available;
+ /* 2.4.xx era */
+ extern unsigned long kb_active;
+ extern unsigned long kb_inact_laundry;  // grrr...
+-- 
+1.7.9.5
+
