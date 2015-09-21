@@ -1,0 +1,28 @@
+diff --git a/shell-ori/ash.c b/shell/ash.c
+index 71ef9a6..0c90bb3 100644
+--- a/shell-ori/ash.c
++++ b/shell/ash.c
+@@ -8350,6 +8350,7 @@ evaltree(union node *n, int flags)
+ 	void (*evalfn)(union node *, int);
+ 	int status;
+ 	int int_level;
++	struct stackmark smark;
+ 
+ 	SAVE_INT(int_level);
+ 
+@@ -8389,6 +8390,7 @@ evaltree(union node *n, int flags)
+ 		status = !exitstatus;
+ 		goto setstatus;
+ 	case NREDIR:
++		setstackmark(&smark);
+ 		expredir(n->nredir.redirect);
+ 		status = redirectsafe(n->nredir.redirect, REDIR_PUSH);
+ 		if (!status) {
+@@ -8396,6 +8398,7 @@ evaltree(union node *n, int flags)
+ 			status = exitstatus;
+ 		}
+ 		popredir(/*drop:*/ 0, /*restore:*/ 0 /* not sure */);
++		popstackmark(&smark);
+ 		goto setstatus;
+ 	case NCMD:
+ 		evalfn = evalcommand;

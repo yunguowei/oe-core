@@ -37,6 +37,7 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://lzop-add-overflow-check.patch \
            file://libarchive-open_zipped-does-not-need-to-check-extens.patch \
            file://unbreak_noncompressed_tar.patch \
+           file://fix-busybox-memleak.patch \
 "
 
 SRC_URI[tarball.md5sum] = "337d1a15ab1cb1d4ed423168b1eb7d7e"
