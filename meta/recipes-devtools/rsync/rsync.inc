@@ -12,7 +12,8 @@ DEPENDS = "popt"
 
 SRC_URI = "http://rsync.samba.org/ftp/rsync/src/rsync-${PV}.tar.gz \
            file://rsyncd.conf \
-           file://fix-cve-2014-8242.patch "
+           file://fix-cve-2014-8242.patch \
+           file://fix-msleep-function.patch "
 
 inherit autotools
 
