@@ -75,6 +75,12 @@ do_install_append () {
 	fi
 }
 
+do_install_append_class-target() {
+	# cleanup buildpaths from gio-2.0.pc, gobject-2.0.pc
+	sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/gio-2.0.pc
+	sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${libdir}/pkgconfig/gobject-2.0.pc
+}
+
 RDEPENDS_${PN}-ptest += "\
             gnome-desktop-testing \
             tzdata \
