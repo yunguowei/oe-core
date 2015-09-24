@@ -20,6 +20,7 @@ SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://Improve_the_regex_of_sed_command_of.patch \
            file://subversion-CVE-2015-0248.patch \
            file://subversion-CVE-2015-0251.patch \
+           file://subversion-CVE-2015-3187.patch \
 "
 SRC_URI[md5sum] = "bd495517a760ddd764ce449a891971db"
 SRC_URI[sha256sum] = "45d708a5c3ffbef4b2a1044c4716a053e680763743d1f7ba99d0369f6da49e33"
