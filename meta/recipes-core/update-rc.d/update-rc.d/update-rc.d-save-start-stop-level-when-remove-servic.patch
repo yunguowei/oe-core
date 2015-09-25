@@ -1,0 +1,74 @@
+update-rc.d: save start/stop level when remove service
+
+when remove service, save start/stop level to file.
+when add service, if has saving file, it will apply the saving file.
+for example:
+update-rc.d -f crond remove
+update-rc.d -f crond defaults
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ update-rc.d |   29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/update-rc.d b/update-rc.d
+index 86044b8..98696c0 100644
+--- a/update-rc.d
++++ b/update-rc.d
+@@ -16,6 +16,7 @@
+ 
+ initd="/etc/init.d"
+ etcd="/etc/rc"
++savedir="/var/lib/update-rc.d"
+ notreally=0
+ force=0
+ dostart=0
+@@ -58,10 +59,26 @@ checklinks()
+ 					continue
+ 				fi
+ 				rm $f
++				fname=`basename $f`
++				pref=${fname:0:1}
++				numf=${fname:1}
++				numf=${numf%${bn}}
++				if [ "x$pref" = "xS" ]; then
++					SSSstr="${SSSstr} ${i}/${numf}"
++				fi
++				if [ "x$pref" = "xK" ]; then
++					KKKstr="${KKKstr} ${i}/${numf}"
++				fi
+ 			fi
+ 		done
+ 	done
+ 
++	if [ $fname ]; then
++		[ -d $savedir ] || mkdir -p $savedir
++		echo "$KKKstr" > $savedir/${bn}
++		echo "$SSSstr" >> $savedir/${bn}
++	fi 
++
+ 	return 0
+ }
+ 
+@@ -212,6 +229,18 @@ case $1 in
+ 		stop=`printf %02d $stop`
+ 		stoplinks="0/$stop 1/$stop 6/$stop"
+ 		startlinks="2/$start 3/$start 4/$start 5/$start"
++		if [ $# -ne 0 ] && [ -f $savedir/${bn} ]; then
++			k=1
++			while read line
++			do
++				case $k in
++				1) stoplinks=$line ;;
++				2) startlinks=$line ;;
++				*) break
++				esac
++				((k++))
++			done < $savedir/${bn}
++		fi
+ 		makelinks
+ 		;;
+ 
+-- 
+1.7.9.5
+

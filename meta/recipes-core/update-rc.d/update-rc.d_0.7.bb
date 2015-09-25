@@ -14,6 +14,7 @@ SRC_URI = "git://github.com/philb/update-rc.d.git \
            file://add-verbose.patch \
            file://check-if-symlinks-are-valid.patch \
            file://fix-to-handle-priority-numbers-correctly.patch \
+           file://update-rc.d-save-start-stop-level-when-remove-servic.patch \
           "
 
 S = "${WORKDIR}/git"
