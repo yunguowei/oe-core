@@ -1,6 +1,8 @@
 PACKAGESPLITFUNCS_prepend = " split_gstreamer10_packages "
 PACKAGESPLITFUNCS_append = " set_metapkg_rdepends "
 
+PACKAGES_DYNAMIC += "libgst.*"
+
 python split_gstreamer10_packages () {
     gst_libdir = d.expand('${libdir}/gstreamer-${LIBV}')
     postinst = d.getVar('plugin_postinst', True)
