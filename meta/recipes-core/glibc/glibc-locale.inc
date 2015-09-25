@@ -33,7 +33,7 @@ PROVIDES = "virtual/libc-locale"
 
 PACKAGES = "localedef ${PN}-dbg"
 
-PACKAGES_DYNAMIC = "^locale-base-.* \
+PACKAGES_DYNAMIC = "^locale-base-.* ^glibc-gconv \
                     ^glibc-gconv-.* ^glibc-charmap-.* ^glibc-localedata-.* ^glibc-binary-localedata-.* \
                     ^glibc-gconv-.*  ^glibc-charmap-.*  ^glibc-localedata-.*  ^glibc-binary-localedata-.* \
                     ^${MLPREFIX}glibc-gconv$"
