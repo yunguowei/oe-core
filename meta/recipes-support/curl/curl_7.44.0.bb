@@ -43,7 +43,9 @@ EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'largefile', 'ac_cv_siz
 
 do_install_append() {
 	oe_multilib_header curl/curlbuild.h
+}
 
+do_install_append_class-target(){
 	# cleanup buildpaths from curl-config
 	sed -i -e 's#${STAGING_DIR_HOST}##g' ${D}${bindir}/curl-config
 }
