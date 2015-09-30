@@ -35,6 +35,7 @@ SRC_URI = "\
           file://smart-rpm4-fixes.patch \
           file://smart-add-for-rpm-ignoresize-check.patch \
           file://smart-set-noprogress-for-pycurl.patch \
+          file://smart-cache.py-getPackages-matches-name-version.patch \
          "
 
 SRC_URI[md5sum] = "573ef32ba177a6b3c4bf7ef04873fcb6"
