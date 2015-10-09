@@ -39,6 +39,7 @@ SRC_URI += "\
             file://avoid-ncursesw-include-path.patch \
             file://python3-use-CROSSPYTHONPATH-for-PYTHON_FOR_BUILD.patch \
             file://python3-setup.py-no-host-headers-libs.patch \
+            file://python-CVE-2014-4616.patch \
            "
 SRC_URI[md5sum] = "f3ebe34d4d8695bf889279b54673e10c"
 SRC_URI[sha256sum] = "e526e9b612f623888364d30cc9f3dfc34dcef39065c713bdbcddf47df84d8dcb"
