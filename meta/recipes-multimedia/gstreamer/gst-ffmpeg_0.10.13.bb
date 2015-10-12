@@ -78,6 +78,9 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0003-bytestream-Add-bytestream2-writing-API.patch \
            file://0004-ulti-convert-to-new-bytestream-API.patch \
            file://0005-bytestream-K-R-formatting-cosmetics.patch \
+           file://0001-aacsbr-use-a-swap-index-for-the-Y-matrix-rather-than.patch \
+           file://0001-aac-Reset-some-state-variables-when-turning-SBR-off.patch \
+           file://0001-avcodec-aacsbr-check-that-the-element-type-matches-b.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
