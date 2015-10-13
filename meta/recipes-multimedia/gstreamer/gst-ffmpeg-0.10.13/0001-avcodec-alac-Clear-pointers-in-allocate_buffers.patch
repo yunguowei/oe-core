@@ -22,10 +22,10 @@ index b0527f1..a5948bb 100644
          goto buf_alloc_fail;
      buf_size = alac->setinfo_max_samples_per_frame * sizeof(int32_t);
  
-+    for (chan = 0; chan < 2; ch++) {
-+        alac->predict_error_buffer[chan]  = NULL;
-+        alac->output_samples_buffer[chan] = NULL;
-+        alac->extra_bits_buffer[chan]     = NULL;
++    for (chan = 0; chan < 2; chan++) {
++        alac->predicterror_buffer[chan]  = NULL;
++        alac->outputsamples_buffer[chan] = NULL;
++        alac->wasted_bits_buffer[chan]     = NULL;
 +    }
 +
      for (chan = 0; chan < MAX_CHANNELS; chan++) {
