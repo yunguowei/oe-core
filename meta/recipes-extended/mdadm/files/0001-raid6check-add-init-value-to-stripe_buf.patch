@@ -1,0 +1,25 @@
+Upstream-Status: Pending
+
+Subject: raid6check: add init value to stripe_buf
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ raid6check.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/raid6check.c b/raid6check.c
+index cb8522e..e4a9ff0 100644
+--- a/raid6check.c
++++ b/raid6check.c
+@@ -312,7 +312,7 @@ int check_stripes(struct mdinfo *info, int *source, unsigned long long *offsets,
+ 	/* read the data and p and q blocks, and check we got them right */
+ 	int data_disks = raid_disks - 2;
+ 	int syndrome_disks = data_disks + is_ddf(layout) * 2;
+-	char *stripe_buf;
++	char *stripe_buf = NULL;
+ 
+ 	/* stripes[] is indexed by raid_disk and holds chunks from each device */
+ 	char **stripes = xmalloc(raid_disks * sizeof(char*));
+-- 
+2.0.1
+
