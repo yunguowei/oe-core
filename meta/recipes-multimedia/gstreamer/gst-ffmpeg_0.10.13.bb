@@ -81,6 +81,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-aacsbr-use-a-swap-index-for-the-Y-matrix-rather-than.patch \
            file://0001-aac-Reset-some-state-variables-when-turning-SBR-off.patch \
            file://0001-avcodec-aacsbr-check-that-the-element-type-matches-b.patch \
+           file://0001-avcodec-alac-Clear-pointers-in-allocate_buffers.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 

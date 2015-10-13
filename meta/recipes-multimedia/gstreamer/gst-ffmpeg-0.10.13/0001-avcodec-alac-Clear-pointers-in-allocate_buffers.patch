@@ -1,0 +1,36 @@
+From f7068bf277a37479aecde2832208d820682b35e6 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michael@niedermayer.cc>
+Date: Mon, 13 Jul 2015 15:46:10 +0200
+Subject: [PATCH] avcodec/alac: Clear pointers in allocate_buffers()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes: 06a4edb39ad8a9883175f9bd428334a2_signal_sigsegv_7ffff713351a_706_mov__alac__ALAC_6ch.mov
+
+Found-by: Samuel Groß, Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michael@niedermayer.cc>
+---
+ libavcodec/alac.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/gst-libs/ext/libav/libavcodec/alac.c b/gst-libs/ext/libav/libavcodec/alac.c
+index b0527f1..a5948bb 100644
+--- a/gst-libs/ext/libav/libavcodec/alac.c
++++ b/gst-libs/ext/libav/libavcodec/alac.c
+@@ -110,6 +110,12 @@ static int allocate_buffers(ALACContext *alac)
+         goto buf_alloc_fail;
+     buf_size = alac->setinfo_max_samples_per_frame * sizeof(int32_t);
+ 
++    for (chan = 0; chan < 2; ch++) {
++        alac->predict_error_buffer[chan]  = NULL;
++        alac->output_samples_buffer[chan] = NULL;
++        alac->extra_bits_buffer[chan]     = NULL;
++    }
++
+     for (chan = 0; chan < MAX_CHANNELS; chan++) {
+ 
+         FF_ALLOC_OR_GOTO(alac->avctx, alac->predicterror_buffer[chan],
+-- 
+1.7.9.5
+
