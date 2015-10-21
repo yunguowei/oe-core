@@ -1,0 +1,32 @@
+From d94cebeb75c61346d54c9c3c848060a09f01b51d Mon Sep 17 00:00:00 2001
+From: Jun Zhang <jun.zhang@windriver.com>
+Date: Wed, 21 Oct 2015 14:30:49 +0800
+Subject: [PATCH] glibc: Fix Filter out PTHREAD_MUTEX_NO_ELISION_NP bit in
+ pthread_mutexattr_gettype.
+
+Backport commit:
+https://sourceware.org/git/?p=glibc.git;a=commit;h=2868e0703d5b8c8e60c6f60de13e876c4d85daa0
+
+Upstream-Status: Backport
+
+Signed-off-by: Jun Zhang <jun.zhang@windriver.com>
+---
+ nptl/pthread_mutexattr_gettype.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nptl/pthread_mutexattr_gettype.c b/nptl/pthread_mutexattr_gettype.c
+index 4685da4..60fee93 100644
+--- a/nptl/pthread_mutexattr_gettype.c
++++ b/nptl/pthread_mutexattr_gettype.c
+@@ -28,7 +28,7 @@ pthread_mutexattr_gettype (attr, kind)
+ 
+   iattr = (const struct pthread_mutexattr *) attr;
+ 
+-  *kind = iattr->mutexkind & ~PTHREAD_MUTEXATTR_FLAG_BITS;
++  *kind = (iattr->mutexkind & ~PTHREAD_MUTEXATTR_FLAG_BITS & ~PTHREAD_MUTEX_NO_ELISION_NP);
+ 
+   return 0;
+ }
+-- 
+1.9.1
+

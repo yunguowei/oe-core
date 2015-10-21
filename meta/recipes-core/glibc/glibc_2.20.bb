@@ -24,6 +24,7 @@ SRC_URI = "git://sourceware.org/git/glibc.git;branch=release/${PV}/master \
            file://grok_gold.patch \
            file://fix_am_rootsbindir.patch \
            file://fix-infinite-loop-in-check_pf-BZ-12926.patch \
+           file://0001-glibc-Fix-Filter-out-PTHREAD_MUTEX_NO_ELISION_NP-bit.patch \   
            ${EGLIBCPATCHES} \
            ${CVEPATCHES} \
           "
