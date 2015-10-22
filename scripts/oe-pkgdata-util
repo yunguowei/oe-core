@@ -50,6 +50,7 @@ def glob(args, usage, debug=False, exclude=""):
         skipval += "|" + exclude
     skipregex = re.compile(skipval)
 
+    skippedpkgs = set()
     mappedpkgs = set()
     with open(pkglist_file, 'r') as f:
         for line in f:
@@ -64,6 +65,7 @@ def glob(args, usage, debug=False, exclude=""):
             if skipregex.search(pkg):
                 if debug:
                     print("%s -> !!" % pkg)
+                skippedpkgs.add(pkg)
                 continue
 
             # Skip packages that already match the globs, so if e.g. a dev package
@@ -75,6 +77,7 @@ def glob(args, usage, debug=False, exclude=""):
                     already = True
                     break
             if already:
+                skippedpkgs.add(pkg)
                 if debug:
                     print("%s -> !" % pkg)
                 continue
@@ -148,7 +151,7 @@ def glob(args, usage, debug=False, exclude=""):
     if debug:
         print "------"
 
-    print("\n".join(mappedpkgs))
+    print("\n".join(mappedpkgs - skippedpkgs))
 
 def read_value(args, usage, debug=False):
     if len(args) < 3:
