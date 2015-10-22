@@ -1,0 +1,36 @@
+From 6cdc55816048afb52f1c3a706c0ba99dfc069b89 Mon Sep 17 00:00:00 2001
+From: Wenzong Fan <wenzong.fan@windriver.com>
+Date: Thu, 22 Oct 2015 02:51:46 -0400
+Subject: [PATCH] gnupg: set development_version as no
+
+The development_version used to mark if gnupg is a beta version. The
+checking logic in autogen.sh always assume that gnupg is beta if below
+command is not run in gnupg's git-repo:
+
+  './autogen.sh --find-version 2 1 7'
+
+This does not work for integration.
+
+Upstream-Status: Inappropriate [configuration]
+
+Signed-off-by: Wenzong Fan <wenzong.fan@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index b38aa06..ea40c19 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,7 +70,7 @@ NEED_NPTH_VERSION=0.91
+ NEED_GNUTLS_VERSION=3.0
+ 
+ 
+-development_version=mym4_isbeta
++development_version=no
+ PACKAGE=$PACKAGE_NAME
+ PACKAGE_GT=${PACKAGE_NAME}2
+ VERSION=$PACKAGE_VERSION
+-- 
+1.9.1
+
