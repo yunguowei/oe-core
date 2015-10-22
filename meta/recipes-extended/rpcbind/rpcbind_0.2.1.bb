@@ -19,6 +19,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/rpcbind/rpcbind-${PV}.tar.bz2 \
            file://rpcbind.service \
            file://rpcbind_add_option_to_fix_port_number.patch \
            file://rpcbind-add-the-p-statement-in-usage.patch \
+           file://rpcbind_Fix_memory_corruption_in_PMAP_CALLIT_code.patch \
           "
 
 UCLIBCPATCHES_libc-uclibc = "file://0001-uclibc-nss.patch \
