@@ -21,6 +21,7 @@ SRC_URI = "http://download.oracle.com/berkeley-db/db-${PV}.tar.gz"
 SRC_URI += "file://arm-thumb-mutex_db5.patch;patchdir=.. \
             file://fix-parallel-build.patch \
             file://Makefile-let-libso_target-depend-on-bt_rec.patch \
+            file://db-add-debug-lock-option.patch;patchdir=.. \
            "
 
 SRC_URI[md5sum] = "ad28eb86ad3203b5422844db179c585b"
