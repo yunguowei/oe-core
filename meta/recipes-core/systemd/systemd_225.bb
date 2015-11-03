@@ -342,6 +342,8 @@ RRECOMMENDS_${PN} += "systemd-vconsole-setup \
                       os-release \
 "
 
+INSANE_SKIP_${PN}-doc += " libdir"
+
 PACKAGES =+ "udev-dbg udev udev-hwdb"
 
 FILES_udev-dbg += "${nonarch_base_libdir}/udev/.debug"
