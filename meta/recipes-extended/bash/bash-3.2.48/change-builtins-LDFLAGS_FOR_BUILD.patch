@@ -1,0 +1,39 @@
+change builtins LDFLAGS_FOR_BUILD
+
+builtins is compiled by host gcc.
+host gcc maybe different with cross gcc,
+so, the LDFLAGS_FOR_BUILD should be different with LDFLAGS.
+
+for the issue, LDFLAGS_FOR_BUILD includes some flags which
+host gcc can not recognize:
+CFLAGS =  -O2 -pipe -g  -fopt-array-offset -fuse-load-updates -maltivec2 -misel -mopt-memset
+and happen the follow error:
+gcc -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -rdynamic -O2 -pipe -g -fopt-array-offset -fuse-load-updates -maltivec2 -misel -mopt-memset -o mkbuiltins mkbuiltins.o -ldl
+gcc: error: unrecognized command line option '-fopt-array-offset'
+gcc: error: unrecognized command line option '-fuse-load-updates'
+gcc: error: unrecognized command line option '-maltivec2'
+gcc: error: unrecognized command line option '-misel'
+gcc: error: unrecognized command line option '-mopt-memset'
+Makefile:196: recipe for target 'mkbuiltins' failed
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ builtins/Makefile.in |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/builtins/Makefile.in b/builtins/Makefile.in
+index e027f7a..03a3939 100644
+--- a/builtins/Makefile.in
++++ b/builtins/Makefile.in
+@@ -63,7 +63,7 @@ LOCAL_DEFS = @LOCAL_DEFS@
+ 
+ LIBS = @LIBS@
+ LDFLAGS = @LDFLAGS@ $(LOCAL_LDFLAGS) $(CFLAGS)
+-LDFLAGS_FOR_BUILD = $(LDFLAGS)
++LDFLAGS_FOR_BUILD = @LDFLAGS@ $(LOCAL_LDFLAGS) $(CFLAGS_FOR_BUILD)
+ LOCAL_LDFLAGS = @LOCAL_LDFLAGS@
+ #LIBS_FOR_BUILD = @LIBS_FOR_BUILD@
+ LIBS_FOR_BUILD = $(LIBS)
+-- 
+1.7.9.5
+
