@@ -205,6 +205,7 @@ do_bundle_initramfs () {
 				mv -f $realpath $realpath.bak
 				tmp_path=$tmp_path" "$type"#"$linkpath"#"$realpath
 			elif [ -f ${KERNEL_OUTPUT}/$type ]; then
+				tmp_path=$tmp_path" "$type"##"
 				mv -f ${KERNEL_OUTPUT}/$type ${KERNEL_OUTPUT}/$type.bak
 			fi
 		done
