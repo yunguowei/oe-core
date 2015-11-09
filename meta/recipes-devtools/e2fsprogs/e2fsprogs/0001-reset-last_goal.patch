@@ -1,0 +1,51 @@
+reset last_goal when ext2fs_extent_node_split is called.
+
+Upstream-Status: Inappropriate
+
+cache_inode.patch speeds up the making ext* filesystem, but it leads
+to the m_bigjournal ptest failure; In fact, when ext2fs_extent_node_split 
+is called, the cache goal should be reset
+
+the patch fixes the m_bigjournal ptest failure, and does not lost the
+speed.
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ lib/ext2fs/alloc.c  | 2 +-
+ lib/ext2fs/extent.c | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lib/ext2fs/alloc.c b/lib/ext2fs/alloc.c
+index 830fc22..5bab9db 100644
+--- a/lib/ext2fs/alloc.c
++++ b/lib/ext2fs/alloc.c
+@@ -160,7 +160,7 @@ errcode_t ext2fs_new_inode(ext2_filsys fs, ext2_ino_t dir,
+ 	return 0;
+ }
+ 
+-static blk64_t last_goal = 0;
++blk64_t last_goal = 0;
+ 
+ /*
+  * Stupid algorithm --- we now just search forward starting from the
+diff --git a/lib/ext2fs/extent.c b/lib/ext2fs/extent.c
+index 5cdc2e4..044a17a 100644
+--- a/lib/ext2fs/extent.c
++++ b/lib/ext2fs/extent.c
+@@ -819,6 +819,8 @@ errcode_t ext2fs_extent_replace(ext2_extent_handle_t handle,
+  *
+  * handle will be left pointing at original record.
+  */
++extern blk64_t last_goal;
++
+ errcode_t ext2fs_extent_node_split(ext2_extent_handle_t handle)
+ {
+ 	errcode_t			retval = 0;
+@@ -936,6 +938,7 @@ errcode_t ext2fs_extent_node_split(ext2_extent_handle_t handle)
+ 			group = group & ~((1 << (log_flex)) - 1);
+ 		goal_blk = ext2fs_group_first_block2(handle->fs, group);
+ 	}
++	last_goal = goal_blk;
+ 	retval = ext2fs_alloc_block2(handle->fs, goal_blk, block_buf,
+ 				    &new_node_pblk);
+ 	if (retval)

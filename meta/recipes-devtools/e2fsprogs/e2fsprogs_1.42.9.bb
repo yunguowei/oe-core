@@ -24,6 +24,7 @@ SRC_URI += "file://acinclude.m4 \
             file://CVE-2015-0247.patch \
             file://0001-libext2fs-fix-potential-buffer-overflow-in-closefs.patch \
             file://copy-in-create-hardlinks-with-the-correct-directory-.patch \
+            file://0001-reset-last_goal.patch \
 "
 
 SRC_URI[md5sum] = "3f8e41e63b432ba114b33f58674563f7"
@@ -114,4 +115,5 @@ do_install_ptest() {
 	cp -a ${B}/tests ${D}${PTEST_PATH}/test
 	cp -a ${S}/tests/* ${D}${PTEST_PATH}/test
 	sed -e 's!../e2fsck/e2fsck!e2fsck!g' -i ${D}${PTEST_PATH}/test/*/expect*
+	sed -e 's!/usr/lib/e2fsprogs/ptest!${PTEST_PATH}!g' -i ${D}${PTEST_PATH}/test/test_*
 }
