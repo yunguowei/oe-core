@@ -6,13 +6,26 @@ inherit clutter distro_features_check
 # depends on clutter-1.0 which depends on cogl-1.0
 REQUIRED_DISTRO_FEATURES ?= "opengl"
 
-SRC_URI += "file://0001-Install-example-binary-needed-for-core-image-clutter.patch"
+SRC_URI += "file://0001-Install-example-binary-needed-for-core-image-clutter.patch \
+            file://0001-configure.ac-add-enable-gudev.patch \
+            "
+
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[gudev] = "--enable-gudev,--disable-gudev,udev"
 
 DEPENDS = "gstreamer1.0-plugins-base gstreamer1.0-plugins-bad clutter-1.0"
 RDEPENDS_${PN} += "gstreamer1.0-meta-base"
 PACKAGES  =+ "${PN}-examples"
 
 EXTRA_OECONF += "--disable-introspection"
+
+python () {
+    if bb.utils.contains('EXTRA_OECONF', '--enable-gudev', True, False, d) and \
+        bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
+            bb.warn("%s: gudev can't be enabled since systemd doesn't provide libgudev" % \
+                    d.getVar("PN", True))
+            d.appendVar('EXTRA_OECONF', ' --disable-gudev')
+}
 
 FILES_${PN}          += "${libdir}/gstreamer-1.0/lib*.so"
 FILES_${PN}-dev      += "${libdir}/gstreamer-1.0/*.la"
