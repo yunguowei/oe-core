@@ -7,4 +7,5 @@ SRC_URI += "file://libav-fix-CVE-2014-9676.patch \
             file://libav-fix-CVE-2015-1872.patch \
             file://libav-fix-CVE-2015-3395.patch \
             file://libav-fix-CVE-2015-6820.patch \
+            file://libav-fix-CVE-2015-6823.patch \
            "
