@@ -20,7 +20,8 @@ PACKAGECONFIG ??= " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'wayland', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'directfb', 'directfb', '', d)} \
-    orc curl uvch264 neon sndfile \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'uvch264', d)} \
+    orc curl neon sndfile \
     hls sbc dash bz2 smoothstreaming \
     "
 
