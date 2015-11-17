@@ -48,6 +48,7 @@ do_install() {
         # artifacts afterwards, and the extra i/o is not significant
         #
         cd ${B}
+        cp System.map* Module.symvers* .config* ${D}
         find . -type d -name '.git*' -prune -o -path '.debug' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
         cd ${S}
         find . -type d -name '.git*' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
@@ -72,8 +73,8 @@ do_install() {
 do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 
 PACKAGES = "kernel-devsrc"
-FILES_${PN} = "${KERNEL_SRC_PATH}"
-RDEPENDS_${PN} = "bc"
+FILES_${PN} = "${KERNEL_SRC_PATH} System.map* Module.symvers* .config*"
+RDEPENDS_${PN} = "bc bash perl"
 
 # For backwards compatibility after rename
 RPROVIDES_${PN} = "kernel-dev"
