@@ -36,6 +36,7 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://0007-rtl8139-check-TCP-Data-Offset-field-CVE-2015-5165.patch \
             file://0001-Fix-release_drive-on-unplugged-devices-pci_piix3_xen.patch \
             file://qemu-CVE-2015-5279.patch \
+            file://ide-fix-ATAPI-command-permissions.patch \
             "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "0ff197c4ed4b695620bc4734e77c888f"
