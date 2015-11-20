@@ -40,6 +40,7 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://0001-virtio-introduce-virtqueue_unmap_sg.patch \
             file://0002-virtio-introduce-virtqueue_discard.patch \
             file://0003-virtio-net-correctly-drop-truncated-packets.patch \
+            file://vnc-fix-memory-corruption-CVE-2015-5225.patch \
             "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "0ff197c4ed4b695620bc4734e77c888f"
