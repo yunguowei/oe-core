@@ -22,6 +22,7 @@ SRC_URI += "file://util-linux-ng-replace-siginterrupt.patch \
             ${OLDHOST} \
             file://runuser-l.pamd \
             file://runuser.pamd \
+            file://Fix-CVE-2015-5218.patch \
 "
 
 SRC_URI[md5sum] = "3f191727a0d28f7204b755cf1b6ea0aa"
