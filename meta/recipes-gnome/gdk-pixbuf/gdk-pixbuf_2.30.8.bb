@@ -50,7 +50,7 @@ PACKAGES =+ "${PN}-xlib"
 FILES_${PN}-xlib = "${libdir}/*pixbuf_xlib*${SOLIBS}"
 ALLOW_EMPTY_${PN}-xlib = "1"
 
-FILES_${PN} = "${bindir}/gdk-pixbuf-query-loaders \
+FILES_${PN} = "${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders \
 	${bindir}/gdk-pixbuf-pixdata \
 	${libdir}/lib*.so.*"
 
@@ -62,6 +62,7 @@ FILES_${PN}-dev += " \
 
 FILES_${PN}-dbg += " \
         ${libdir}/.debug/* \
+        ${libdir}/gdk-pixbuf-2.0/.debug/* \
 	${libdir}/gdk-pixbuf-2.0/${LIBV}/loaders/.debug/* \
 "
 
@@ -81,6 +82,12 @@ python populate_packages_prepend () {
     d.appendVar("RDEPENDS_gdk-pixbuf-ptest", " " + packages)
 }
 
+do_install_append() {
+	# Move gdk-pixbuf-query-loaders into libdir so it is always available
+	# in multilib builds.
+	mv ${D}/${bindir}/gdk-pixbuf-query-loaders ${D}/${libdir}/gdk-pixbuf-2.0/
+}
+
 do_install_append_class-native() {
 	find ${D}${libdir} -name "libpixbufloader-*.la" -exec rm \{\} \;
 
@@ -90,7 +97,7 @@ do_install_append_class-native() {
 	create_wrapper ${D}/${bindir}/gdk-pixbuf-pixdata \
 		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache
 
-	create_wrapper ${D}/${bindir}/gdk-pixbuf-query-loaders \
+	create_wrapper ${D}/${libdir}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders \
 		GDK_PIXBUF_MODULE_FILE=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders.cache \
 		GDK_PIXBUF_MODULEDIR=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/${LIBV}/loaders
 }
