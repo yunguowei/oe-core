@@ -34,7 +34,7 @@ KERNEL_SRC_PATH = "/usr/src/kernel"
 S = "${STAGING_KERNEL_DIR}"
 B = "${STAGING_KERNEL_BUILDDIR}"
 
-KERNEL_VERSION = "${@get_kernelversion_headers('${S}')}"
+KERNEL_VERSION = "${@get_kernelversion_headers('${B}')}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -48,6 +48,10 @@ do_install() {
         # artifacts afterwards, and the extra i/o is not significant
         #
         cd ${B}
+        install -d ${D}/boot
+        install -m 0644 System.map-${KERNEL_VERSION} ${D}/boot
+        [ -e Module.symvers ] && install -m 0644 Module.symvers ${D}/boot/Module.symvers-${KERNEL_VERSION}
+        install -m 0644 .config ${D}/boot/config-${KERNEL_VERSION}
         find . -type d -name '.git*' -prune -o -path '.debug' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
         cd ${S}
         find . -type d -name '.git*' -prune -o -type f -print0 | cpio --null -pdlu $kerneldir
@@ -72,8 +76,8 @@ do_install() {
 do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 
 PACKAGES = "kernel-devsrc"
-FILES_${PN} = "${KERNEL_SRC_PATH}"
-RDEPENDS_${PN} = "bc"
+FILES_${PN} = "${KERNEL_SRC_PATH} /boot/System.map* /boot/Module.symvers* /boot/config*"
+RDEPENDS_${PN} = "bc bash perl"
 
 # For backwards compatibility after rename
 RPROVIDES_${PN} = "kernel-dev"

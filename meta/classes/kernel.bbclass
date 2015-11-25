@@ -308,10 +308,7 @@ kernel_do_install() {
 	for type in ${KERNEL_IMAGETYPES} ; do
 		install -m 0644 ${KERNEL_OUTPUT}/${type} ${D}/${KERNEL_IMAGEDEST}/${type}-${KERNEL_VERSION}
 	done
-	install -m 0644 System.map ${D}/boot/System.map-${KERNEL_VERSION}
-	install -m 0644 .config ${D}/boot/config-${KERNEL_VERSION}
 	install -m 0644 vmlinux ${D}/boot/vmlinux-${KERNEL_VERSION}
-	[ -e Module.symvers ] && install -m 0644 Module.symvers ${D}/boot/Module.symvers-${KERNEL_VERSION}
 	install -d ${D}${sysconfdir}/modules-load.d
 	install -d ${D}${sysconfdir}/modprobe.d
 }
@@ -522,9 +519,9 @@ kernel_do_deploy() {
 	if [ ${MODULE_TARBALL_DEPLOY} = "1" ] && (grep -q -i -e '^CONFIG_MODULES=y$' .config); then
 		# Generate modules.* files in order to adding the modules.* into kernel module tar ball
 		# after making the tar ball, remove the modules.* files to avoid unnecessary QA warnings.
-		mkdir -p ${D}/lib
+		mkdir -p ${D}/lib ${DEPLOYDIR}/boot
 		cp -r ${D}/lib ${DEPLOYDIR}
-		(cd ${D}; cp --parent boot/System.map-${KERNEL_VERSION} ${DEPLOYDIR})
+		cp ${STAGING_KERNEL_BUILDDIR}/System.map-${KERNEL_VERSION} ${DEPLOYDIR}/boot
 		depmodwrapper -a -b ${DEPLOYDIR} ${KERNEL_VERSION}
 		tar -cvzf ${DEPLOYDIR}/${MODULE_TARBALL_BASE_NAME} -C ${DEPLOYDIR} lib boot/System.map-${KERNEL_VERSION}
 		ln -sf ${MODULE_TARBALL_BASE_NAME} ${DEPLOYDIR}/${MODULE_TARBALL_SYMLINK_NAME}
