@@ -20,6 +20,7 @@ SRC_URI = "http://www.infodrom.org/projects/sysklogd/download/sysklogd-${PV}.tar
            file://syslog.conf \
            file://sysklogd.service \
            file://klogd.service \
+           file://0001-Bugfix-against-minor-vulnerability-caused-by-invalid.patch \
            "
 
 SRC_URI_append_e500v2 = " file://no-vectorization.patch"
