@@ -28,6 +28,11 @@ python () {
         d.setVar("SDK_ARCH", "none")
         d.setVar("SDK_CC_ARCH", "none")
 
+        # In a multilib configuration baselib can change, but we shouldn't be
+        # using it anyway.  All packages should use nonarch_base_libdir or 
+        # nonarch_libdir.
+        d.setVar("baselib", "none")
+
         # Avoid this being unnecessarily different due to nuances of
         # the target machine that aren't important for "all" arch
         # packages.
