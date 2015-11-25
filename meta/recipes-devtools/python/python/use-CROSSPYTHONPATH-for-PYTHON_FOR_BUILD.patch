@@ -1,0 +1,23 @@
+configure.ac: use CROSSPYTHONPATH instead of a static list
+
+When building x86->x86 the system will try to execute .so and related items
+from the default PYTHONPATH.  This will fail if the target CPU contains
+instructions that the host CPU does not have.
+
+Upstream-Status: Inappropriate [OE-Core integration specific]
+
+Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
+
+Index: Python-2.7.9/configure.ac
+===================================================================
+--- Python-2.7.9.orig/configure.ac
++++ Python-2.7.9/configure.ac
+@@ -33,7 +33,7 @@ if test "$cross_compiling" = yes; then
+ 	    AC_MSG_ERROR([python$PACKAGE_VERSION interpreter not found])
+ 	fi
+         AC_MSG_RESULT($interp)
+-	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(shell test -f pybuilddir.txt && echo $(abs_builddir)/`cat pybuilddir.txt`:)$(srcdir)/Lib:$(srcdir)/Lib/plat-$(MACHDEP) '$interp
++	PYTHON_FOR_BUILD='_PYTHON_PROJECT_BASE=$(abs_builddir) _PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) PYTHONPATH=$(CROSSPYTHONPATH) '$interp
+     fi
+ elif test "$cross_compiling" = maybe; then
+     AC_MSG_ERROR([Cross compiling required --host=HOST-TUPLE and --build=ARCH])
