@@ -20,6 +20,8 @@ SRC_URI += "file://gtk-option.patch \
 SRC_URI[archive.md5sum] = "acdecdb9f08f3bf662a68bf7dafb8b82"
 SRC_URI[archive.sha256sum] = "48049b643294636df7de1a4b997414d699666f5dc44776945c218a257d2a291c"
 
+CACHED_CONFIGUREVARS = "ac_cv_path_GDK_PIXBUF_QUERYLOADERS=${STAGING_LIBDIR_NATIVE}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders"
+
 EXTRA_OECONF = "--disable-introspection --disable-vala"
 
 # The older ld (2.22) on the host (Centos 6.5) doesn't have the
