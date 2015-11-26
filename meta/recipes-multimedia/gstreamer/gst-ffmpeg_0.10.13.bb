@@ -84,6 +84,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-avcodec-alac-Clear-pointers-in-allocate_buffers.patch \
            file://0001-swscale-utils-Clear-pix-buffers.patch \
            file://0001-avcodec-mjpegdec-Fix-context-fields-becoming-inconsi.patch \
+           file://0001-avcodec-pngdec-Check-IHDR-IDAT-order.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
