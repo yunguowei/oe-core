@@ -29,12 +29,12 @@ python __anonymous () {
 		fi
 
 		# Rename old kernel if it conflicts with new kernel name.
-		if grep -q "/KERNEL_IMAGETYPE-KERNEL_VERSION \+root=" $grubcfg; then
-			if [ -f "$D/boot/KERNEL_IMAGETYPE-KERNEL_VERSION" ]; then
+		if grep -q "/KERNEL_IMAGETYPE-${KERNEL_VERSION} \+root=" $grubcfg; then
+			if [ -f "$D/boot/KERNEL_IMAGETYPE-${KERNEL_VERSION}" ]; then
 				timestamp=`date +%s`
-				kimage="$D/boot/KERNEL_IMAGETYPE-KERNEL_VERSION-$timestamp-back"
-				sed -i "s:KERNEL_IMAGETYPE-KERNEL_VERSION \+root=:${kimage##*/} root=:" $grubcfg
-				mv "$D/boot/KERNEL_IMAGETYPE-KERNEL_VERSION" "$kimage"
+				kimage="$D/boot/KERNEL_IMAGETYPE-${KERNEL_VERSION}-$timestamp-back"
+				sed -i "s:KERNEL_IMAGETYPE-${KERNEL_VERSION} \+root=:${kimage##*/} root=:" $grubcfg
+				mv "$D/boot/KERNEL_IMAGETYPE-${KERNEL_VERSION}" "$kimage"
 			fi
 		fi
 	fi
@@ -44,10 +44,10 @@ python __anonymous () {
 	get_new_grub_cfg() {
 		grubcfg="$1"
 		old_image="$2"
-		title="Update KERNEL_IMAGETYPE-KERNEL_VERSION-PV"
+		title="Update KERNEL_IMAGETYPE-${KERNEL_VERSION}-${PV}"
 		if [ "${grubcfg##*/}" = "grub.cfg" ]; then
 			rootfs=`grep " *linux \+[^ ]\+ \+root=" $grubcfg -m 1 | \
-				 sed "s#${old_image}#${old_image%/*}/KERNEL_IMAGETYPE-KERNEL_VERSION#"`
+				 sed "s#${old_image}#${old_image%/*}/KERNEL_IMAGETYPE-${KERNEL_VERSION}#"`
 
 			echo "menuentry \"$title\" {"
 			echo "    set root=(hd0,1)"
@@ -55,7 +55,7 @@ python __anonymous () {
 			echo "}"
 		elif [ "${grubcfg##*/}" = "menu.list" ]; then
 			rootfs=`grep "kernel \+[^ ]\+ \+root=" $grubcfg -m 1 | \
-				 sed "s#${old_image}#${old_image%/*}/KERNEL_IMAGETYPE-KERNEL_VERSION#"`
+				 sed "s#${old_image}#${old_image%/*}/KERNEL_IMAGETYPE-${KERNEL_VERSION}#"`
 
 			echo "default 0"
 			echo "timeout 30"
@@ -94,13 +94,11 @@ python __anonymous () {
 
     imagetypes = d.getVar('KERNEL_IMAGETYPES', True)
     imagetypes = re.sub(r'\.gz$', '', imagetypes)
-    version = d.getVar('KERNEL_VERSION', True)
-    pv = d.getVar('PV', True)
 
     for type in imagetypes.split():
-	typelower = type.lower()
-        preinst_append = preinst.replace('KERNEL_IMAGETYPE', type).replace('KERNEL_VERSION', version).replace('PV', pv)
-        postinst_prepend = postinst.replace('KERNEL_IMAGETYPE', type).replace('KERNEL_VERSION', version).replace('PV', pv)
+        typelower = type.lower()
+        preinst_append = preinst.replace('KERNEL_IMAGETYPE', type)
+        postinst_prepend = postinst.replace('KERNEL_IMAGETYPE', type)
         d.setVar('pkg_preinst_kernel-image-' + typelower + '_append', preinst_append)
         d.setVar('pkg_postinst_kernel-image-' + typelower + '_prepend', postinst_prepend)
 }
