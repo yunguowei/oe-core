@@ -199,6 +199,11 @@ do_install() {
 	install -Dm 0755 ${S}/src/systemctl/systemd-sysv-install.SKELETON ${D}${systemd_unitdir}/systemd-sysv-install
 	# Enable syslog.socket by default, this is specific to our system
 	ln -sf ../syslog.socket ${D}${systemd_unitdir}/system/sockets.target.wants/syslog.socket
+
+	# Enable all sysrq functions
+	if ${@bb.utils.contains('DISTRO_FEATURES','sysrq','true','false',d)}; then
+		sed -i -e 's/^kernel\.sysrq *=.*/kernel\.sysrq = 1/' ${D}/${exec_prefix}/lib/sysctl.d/50-default.conf
+	fi
 }
 
 do_install_ptest () {
