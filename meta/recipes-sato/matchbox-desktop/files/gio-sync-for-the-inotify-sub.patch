@@ -1,0 +1,112 @@
+From 84b7272c446cea5c6ae185548de0c6cad3a42355 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Sat, 28 Nov 2015 07:53:38 +0000
+Subject: [PATCH] gio: sync for the inotify-sub
+
+This only sync for the inotify-sub with glib-2.44
+to keep _ih_sub_new consistent.
+
+Upstream-Status: Pending
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ libtaku/inotify/inotify-sub.c | 15 +++++++++------
+ libtaku/inotify/inotify-sub.h | 13 +++++++++----
+ libtaku/taku-menu-desktop.c   |  2 +-
+ 3 files changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/libtaku/inotify/inotify-sub.c b/libtaku/inotify/inotify-sub.c
+index 404dc20..85b3411 100644
+--- a/libtaku/inotify/inotify-sub.c
++++ b/libtaku/inotify/inotify-sub.c
+@@ -16,8 +16,7 @@
+ 
+    You should have received a copy of the GNU Library General Public
+    License along with the Gnome Library; see the file COPYING.LIB.  If not,
+-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+-   Boston, MA 02111-1307, USA.
++   see <http://www.gnu.org/licenses/>.
+ 
+    Authors: 
+ 		 John McCutchan <john@johnmccutchan.com>
+@@ -38,15 +37,17 @@ dup_dirname (const gchar *dirname)
+   gchar *d_dirname = g_strdup (dirname);
+   size_t len = strlen (d_dirname);
+   
+-  if (d_dirname[len] == '/')
+-    d_dirname[len] = '\0';
++  if (len && d_dirname[len - 1] == '/')
++    d_dirname[len - 1] = '\0';
+   
+   return d_dirname;
+ }
+ 
+ inotify_sub*
+ _ih_sub_new (const gchar *dirname, 
+-             const gchar *filename, 
++             const gchar *filename,
++             gboolean     pair_moves,
++             gboolean     watch_hardlinks,
+              gpointer     user_data)
+ {
+   inotify_sub *sub = NULL;
+@@ -54,8 +55,10 @@ _ih_sub_new (const gchar *dirname,
+   sub = g_new0 (inotify_sub, 1);
+   sub->dirname = dup_dirname (dirname);
+   sub->filename = g_strdup (filename);
++  sub->pair_moves = pair_moves;
++  sub->hardlinks = watch_hardlinks;
+   sub->user_data = user_data;
+-  
++
+   IS_W ("new subscription for %s being setup\n", sub->dirname);
+   
+   return sub;
+diff --git a/libtaku/inotify/inotify-sub.h b/libtaku/inotify/inotify-sub.h
+index 36561e7..ff37567 100644
+--- a/libtaku/inotify/inotify-sub.h
++++ b/libtaku/inotify/inotify-sub.h
+@@ -14,8 +14,7 @@
+ 
+    You should have received a copy of the GNU Library General Public
+    License along with the Gnome Library; see the file COPYING.LIB.  If not,
+-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+-   Boston, MA 02111-1307, USA.
++   see <http://www.gnu.org/licenses/>.
+ 
+    Author: John McCutchan <john@johnmccutchan.com>
+ */
+@@ -30,9 +29,15 @@ typedef struct
+ 	gchar*   filename;
+ 	gboolean cancelled;
+ 	gpointer user_data;
++	gboolean pair_moves;
++	gboolean hardlinks;
+ } inotify_sub;
+ 
+-inotify_sub* _ih_sub_new (const gchar* dirname, const gchar* filename, gpointer user_data);
+-void         _ih_sub_free (inotify_sub* sub);
++inotify_sub *_ih_sub_new (const gchar  *dirname,
++			  const gchar  *filename,
++			  gboolean      pair_moves,
++			  gboolean      watch_hardlinks,
++			  gpointer      user_data);
++void         _ih_sub_free (inotify_sub *sub);
+ 
+ #endif /* __INOTIFY_SUB_H */
+diff --git a/libtaku/taku-menu-desktop.c b/libtaku/taku-menu-desktop.c
+index 34b10d9..ef88421 100644
+--- a/libtaku/taku-menu-desktop.c
++++ b/libtaku/taku-menu-desktop.c
+@@ -415,7 +415,7 @@ monitor (const char *directory)
+   if (!with_inotify)
+     return;
+ 
+-  sub = _ih_sub_new (directory, NULL, NULL);
++  sub = _ih_sub_new (directory, NULL, FALSE, FALSE, NULL);
+   _ip_start_watching (sub);
+ }
+ 
+-- 
+2.5.0
+
