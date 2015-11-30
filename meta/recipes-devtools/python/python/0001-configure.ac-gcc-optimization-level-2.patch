@@ -1,0 +1,40 @@
+From 55520995fa6c72f6a93a7ccc8503167f359bc63d Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 30 Nov 2015 06:25:08 -0500
+Subject: [PATCH] configure.ac: gcc optimization level 2
+
+The qemu didn't support '-march=corei7 -mtune=corei7' and
+gcc optimization level 3 '-O3' very well, in which the
+/usr/lib64/python2.7/test/test_md5.py and
+/usr/lib64/python2.7/test/test_sha.py failed.
+
+So we use gcc optimization level 2 to instead.
+
+Upstream-Status: Inappropriate [qemu corei7 specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 87a4f02..d3ad673 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1076,11 +1076,11 @@ then
+ 		# debug builds.
+ 		OPT="-g -O0 -Wall $STRICT_PROTO"
+ 	    else
+-		OPT="-g $WRAP -O3 -Wall $STRICT_PROTO"
++		OPT="-g $WRAP -O2 -Wall $STRICT_PROTO"
+ 	    fi
+ 	    ;;
+ 	*)
+-	    OPT="-O3 -Wall $STRICT_PROTO"
++	    OPT="-O2 -Wall $STRICT_PROTO"
+ 	    ;;
+ 	esac
+ 	case $ac_sys_system in
+-- 
+1.9.1
+
