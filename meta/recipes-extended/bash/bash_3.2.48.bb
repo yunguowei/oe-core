@@ -18,7 +18,6 @@ SRC_URI = "${GNU_MIRROR}/bash/bash-${PV}.tar.gz;name=tarball \
            file://mkbuiltins_have_stringize.patch \
            file://build-tests.patch \
            file://test-output.patch \
-           file://bash-fix-SIGWINCH-issue.patch \
            file://run-ptest \
            file://dont-include-target-CFLAGS-in-host-LDFLAGS.patch \
           "
