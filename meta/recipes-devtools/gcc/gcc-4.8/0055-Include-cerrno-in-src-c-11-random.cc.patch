@@ -1,0 +1,46 @@
+From 036e9d604c2b207f98267ec5a4aa7a315bec4a99 Mon Sep 17 00:00:00 2001
+From: redi <redi@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 17 Sep 2015 21:28:00 +0000
+Subject: [PATCH 4/4] Include <cerrno> in src/c++11/random.cc
+
+2015-09-17  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* src/c++11/random.cc: Include <cerrno>.
+
+git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/trunk@227887 138bc75d-0d04-0410-961f-82ee72b054a4
+
+Upstream-Status: Backport [trunk]
+
+Signed-off-by: Yuanjie Huang <Yuanjie.Huang@windriver.com>
+---
+ libstdc++-v3/ChangeLog           | 4 ++++
+ libstdc++-v3/src/c++11/random.cc | 1 +
+ 2 files changed, 5 insertions(+)
+
+diff --git a/libstdc++-v3/ChangeLog b/libstdc++-v3/ChangeLog
+index f4c9dcb..28fd768 100644
+--- a/libstdc++-v3/ChangeLog
++++ b/libstdc++-v3/ChangeLog
+@@ -1,3 +1,7 @@
++2015-09-17  Gerald Pfeifer  <gerald@pfeifer.com>
++
++	* src/c++11/random.cc: Include <cerrno>.
++
+ 2015-09-17  Jonathan Wakely  <jwakely@redhat.com>
+ 
+ 	PR libstdc++/65142
+diff --git a/libstdc++-v3/src/c++11/random.cc b/libstdc++-v3/src/c++11/random.cc
+index 2ab5955..bf91426 100644
+--- a/libstdc++-v3/src/c++11/random.cc
++++ b/libstdc++-v3/src/c++11/random.cc
+@@ -30,6 +30,7 @@
+ # include <cpuid.h>
+ #endif
+ 
++#include <cerrno>
+ #include <cstdio>
+ 
+ #ifdef _GLIBCXX_HAVE_UNISTD_H
+-- 
+1.9.1
+
