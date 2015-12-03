@@ -76,6 +76,9 @@ SRC_URI = "\
     file://0059-gcc-PR-rtl-optimization-63348.patch \
     file://target-gcc-includedir.patch \
     file://PR-target-49423.patch \
+    file://0067-Check-read-result-in-std-random_device.patch \
+    file://0068-Make-std-random_device-retry-after-short-reads.patch \
+    file://0069-Include-cerrno-in-src-c-11-random.cc.patch \
 "
 SRC_URI[md5sum] = "fddf71348546af523353bd43d34919c1"
 SRC_URI[sha256sum] = "d334781a124ada6f38e63b545e2a3b8c2183049515a1abab6d513f109f1d717e"
