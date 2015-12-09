@@ -1,0 +1,56 @@
+From 891918431db628db17885ed947ee387b29826a64 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michaelni@gmx.at>
+Date: Sat, 24 Mar 2012 17:43:55 +0100
+Subject: [PATCH] indeo5dec: Make sure we have had a valid gop header.
+
+This prevents decoding happening on a half initialized context.
+
+Fixes CVE-2012-2779
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Anton Khirnov <anton@khirnov.net>
+---
+ libavcodec/indeo5.c     |    8 ++++++--
+ 3 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/indeo5.c b/gst-libs/ext/libav/libavcodec/indeo5.c
+index 47437ae..4f8e0d8 100644
+--- a/gst-libs/ext/libav/libavcodec/indeo5.c
++++ b/gst-libs/ext/libav/libavcodec/indeo5.c
+@@ -76,6 +76,8 @@ typedef struct {
+     int             is_scalable;
+     uint32_t        lock_word;
+     IVIPicConfig    pic_conf;
++
++    int gop_invalid;
+ } IVI5DecContext;
+ 
+ 
+@@ -335,8 +337,12 @@ static int decode_pic_hdr(IVI5DecContext *ctx, AVCodecContext *avctx)
+     ctx->frame_num = get_bits(&ctx->gb, 8);
+ 
+     if (ctx->frame_type == FRAMETYPE_INTRA) {
+-        if (decode_gop_header(ctx, avctx))
+-            return -1;
++        ctx->gop_invalid = 1;
++        if (decode_gop_header(ctx, avctx)) {
++            av_log(avctx, AV_LOG_ERROR, "Invalid GOP header, skipping frames.\n");
++            return AVERROR_INVALIDDATA;
++        }
++        ctx->gop_invalid = 0;
+     }
+ 
+     if (ctx->frame_type != FRAMETYPE_NULL) {
+@@ -750,6 +756,9 @@ static int decode_frame(AVCodecContext *avctx, void *data, int *data_size,
+         return -1;
+     }
+ 
++    if (ctx->gop_invalid)
++        return AVERROR_INVALIDDATA;
++
+     if (ctx->gop_flags & IVI5_IS_PROTECTED) {
+         av_log(avctx, AV_LOG_ERROR, "Password-protected clip!\n");
+         return -1;
+-- 
+1.7.9.5
+

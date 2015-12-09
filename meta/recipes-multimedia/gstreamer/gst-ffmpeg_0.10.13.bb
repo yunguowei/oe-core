@@ -89,6 +89,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-jpegdec-9-16-bit-yuv-gray-ljpeg-support.patch \
            file://0001-avcodec-mjpegdec-change-error-return-value-to-be-out.patch \
            file://0001-avcodec-mjpegdec-Check-index-in-ljpeg_decode_yuv_sca.patch \
+           file://0001-indeo5dec-Make-sure-we-have-had-a-valid-gop-header.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
