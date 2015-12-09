@@ -25,6 +25,7 @@ SRC_URI = "http://dbus.freedesktop.org/releases/dbus/dbus-${PV}.tar.gz \
            file://dbus-CVE-2014-3637-01.patch \
            file://dbus-CVE-2014-3637-02.patch \
            file://dbus-CVE-2014-3637-03.patch \
+           file://dbus-CVE-2014-3638.patch \
 "
 
 inherit useradd autotools pkgconfig gettext update-rc.d
