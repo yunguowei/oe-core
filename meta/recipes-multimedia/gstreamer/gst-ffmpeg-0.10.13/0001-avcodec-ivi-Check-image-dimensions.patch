@@ -1,0 +1,38 @@
+From df91aa034b82b77a3c4e01791f4a2b2ff6c82066 Mon Sep 17 00:00:00 2001
+From: Michael Niedermayer <michael@niedermayer.cc>
+Date: Sat, 14 Nov 2015 02:36:22 +0100
+Subject: [PATCH] avcodec/ivi: Check image dimensions
+
+Fixes integer overflow
+Fixes: 1e32c6c591d940337c20b197ec1c4d3d/asan_heap-oob_4a52e5_8946_0bb0d9e863def56005e49f1d89bdc94d.avi
+
+Found-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+Signed-off-by: Michael Niedermayer <michael@niedermayer.cc>
+---
+ libavcodec/ivi.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/ivi_common.c b/gst-libs/ext/libav/libavcodec/ivi_common.c
+index 4525ff4..eab42bb 100644
+--- a/gst-libs/ext/libav/libavcodec/ivi_common.c
++++ b/gst-libs/ext/libav/libavcodec/ivi_common.c
+@@ -31,6 +31,7 @@
+ #include "get_bits.h"
+ #include "ivi_common.h"
+ #include "libavutil/common.h"
++#include "libavutil/imgutils.h"
+ #include "ivi_dsp.h"
+ 
+ extern const IVIHuffDesc ff_ivi_mb_huff_desc[8];  ///< static macroblock huffman tables
+@@ -172,7 +173,7 @@ int av_cold ff_ivi_init_planes(IVIPlaneDesc *planes, const IVIPicConfig *cfg)
+ 
+     ff_ivi_free_buffers(planes);
+ 
+-    if (cfg->pic_width < 1 || cfg->pic_height < 1 ||
++    if (av_image_check_size(cfg->pic_width, cfg->pic_height, 0, NULL) < 0 ||
+         cfg->luma_bands < 1 || cfg->chroma_bands < 1)
+         return AVERROR_INVALIDDATA;
+ 
+-- 
+1.7.9.5
+

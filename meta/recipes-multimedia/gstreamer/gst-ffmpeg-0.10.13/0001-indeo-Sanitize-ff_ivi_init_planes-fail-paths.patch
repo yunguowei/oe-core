@@ -1,0 +1,62 @@
+From 28dda8a691f1c723a4a9365ab85f9625f1330096 Mon Sep 17 00:00:00 2001
+From: Luca Barbato <lu_zero@gentoo.org>
+Date: Sun, 14 Jul 2013 15:48:17 +0200
+Subject: [PATCH] indeo: Sanitize ff_ivi_init_planes fail paths
+
+Reported-by: Mateusz "j00ru" Jurczyk and Gynvael Coldwind
+CC: libav-stable@libav.org
+---
+ libavcodec/indeo5.c     |    4 ++--
+ libavcodec/ivi_common.c |    5 +++++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/gst-libs/ext/libav/libavcodec/indeo5.c b/gst-libs/ext/libav/libavcodec/indeo5.c
+index cedf647..481a4a6 100644
+--- a/gst-libs/ext/libav/libavcodec/indeo5.c
++++ b/gst-libs/ext/libav/libavcodec/indeo5.c
+@@ -146,7 +146,7 @@ static int decode_gop_header(IVI5DecContext *ctx, AVCodecContext *avctx)
+     }
+ 
+     /* check if picture layout was changed and reallocate buffers */
+-    if (ivi_pic_config_cmp(&pic_conf, &ctx->pic_conf)) {
++    if (ivi_pic_config_cmp(&pic_conf, &ctx->pic_conf) || ctx->gop_invalid) {
+         result = ff_ivi_init_planes(ctx->planes, &pic_conf);
+         if (result) {
+             av_log(avctx, AV_LOG_ERROR, "Couldn't reallocate color planes!\n");
+@@ -337,9 +337,9 @@ static int decode_pic_hdr(IVI5DecContext *ctx, AVCodecContext *avctx)
+     ctx->frame_num = get_bits(&ctx->gb, 8);
+ 
+     if (ctx->frame_type == FRAMETYPE_INTRA) {
+-        ctx->gop_invalid = 1;
+         if (decode_gop_header(ctx, avctx)) {
+             av_log(avctx, AV_LOG_ERROR, "Invalid GOP header, skipping frames.\n");
++            ctx->gop_invalid = 1;
+             return AVERROR_INVALIDDATA;
+         }
+         ctx->gop_invalid = 0;
+diff --git a/gst-libs/ext/libav/libavcodec/ivi_common.c b/gst-libs/ext/libav/libavcodec/ivi_common.c
+index 1aa47fc..6436cd3 100644
+--- a/gst-libs/ext/libav/libavcodec/ivi_common.c
++++ b/gst-libs/ext/libav/libavcodec/ivi_common.c
+@@ -172,6 +172,10 @@ int av_cold ff_ivi_init_planes(IVIPlaneDesc *planes, const IVIPicConfig *cfg)
+ 
+     ff_ivi_free_buffers(planes);
+ 
++    if (cfg->pic_width < 1 || cfg->pic_height < 1 ||
++        cfg->luma_bands < 1 || cfg->chroma_bands < 1)
++        return AVERROR_INVALIDDATA;
++
+     /* fill in the descriptor of the luminance plane */
+     planes[0].width     = cfg->pic_width;
+     planes[0].height    = cfg->pic_height;
+@@ -243,6 +247,7 @@ void av_cold ff_ivi_free_buffers(IVIPlaneDesc *planes)
+             av_freep(&planes[p].bands[b].tiles);
+         }
+         av_freep(&planes[p].bands);
++        planes[p].num_bands = 0;
+     }
+ }
+ 
+-- 
+1.7.9.5
+
