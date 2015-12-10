@@ -92,6 +92,7 @@ SRC_URI = "http://gstreamer.freedesktop.org/src/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0001-indeo5dec-Make-sure-we-have-had-a-valid-gop-header.patch \
            file://0001-indeo-Sanitize-ff_ivi_init_planes-fail-paths.patch \
            file://0001-avcodec-ivi-Check-image-dimensions.patch \
+           file://0001-avcodec-smacker-Check-that-the-data-size-is-a-multip.patch \
            ${@bb.utils.contains('PACKAGECONFIG', 'libav9', 'file://libav-9.patch', '', d)} \ 
 "
 
