@@ -19,6 +19,9 @@ SRC_URI = "${GNOME_MIRROR}/${BPN}/${MAJ_VER}/${BPN}-${PV}.tar.xz \
            file://run-ptest \
            file://fatal-loader.patch \
            file://0001-pixops-Be-more-careful-about-integer-overflow.patch \
+           file://0001-pixops-Fail-make_weights-functions-on-OOM.patch \
+           file://0001-tga-Wrap-TGAColormap-struct-in-its-own-API.patch \
+           file://0001-io-tga-Colormaps-are-always-present-so-always-parse-.patch \
            "
 
 SRC_URI[md5sum] = "4fed0d54432f1b69fc6e66e608bd5542"
