@@ -11,6 +11,11 @@ LIBV = "16"
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/${PV}/libpng-${PV}.tar.xz \
            file://0001-libpng16-Fixed-an-overflow-in-png_combine_row-with-v.patch \
            file://0001-libpng16-Imported-from-libpng-1.6.16rc01.tar.patch \
+           file://libpng-CVE-2015-8126-1.patch \
+           file://libpng-CVE-2015-8126-2.patch \
+           file://libpng-CVE-2015-8126-3.patch \
+           file://libpng-CVE-2015-8126-4.patch \
+           file://libpng-CVE-2015-8126-5.patch \
           "
 
 SRC_URI[md5sum] = "9822c25466f060142359f80ed142c9e5"
