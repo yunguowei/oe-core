@@ -10,6 +10,7 @@ SRC_URI = "http://www.mega-nerd.com/libsndfile/files/libsndfile-${PV}.tar.gz \
            file://0001-src-sd2.c-Fix-segfault-in-SD2-RSRC-parser.patch \
            file://0001-src-sd2.c-Fix-two-potential-buffer-read-overflows.patch \
            file://0001-src-common.c-Pull-fix-from-1.0.25.patch \
+           file://0001-src-file_io.c-Prevent-potential-divide-by-zero.patch \
 "
 
 SRC_URI[md5sum] = "e2b7bb637e01022c7d20f95f9c3990a2"
