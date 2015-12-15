@@ -16,6 +16,8 @@ INITRAMFS_IMAGE ?= ""
 INITRAMFS_TASK ?= ""
 INITRAMFS_IMAGE_BUNDLE ?= ""
 
+KERNEL_VERSION_NAME = "${@d.getVar('KERNEL_VERSION', True) or ""}"
+KERNEL_VERSION_NAME[vardepvalue] = "${LINUX_VERSION}"
 KERNEL_VERSION_PKG_NAME = "${@legitimize_package_name(d.getVar('KERNEL_VERSION', True))}"
 KERNEL_VERSION_PKG_NAME[vardepvalue] = "${LINUX_VERSION}"
 
@@ -45,10 +47,10 @@ python __anonymous () {
 
         imagedest = d.getVar('KERNEL_IMAGEDEST', True)
         priority = d.getVar('KERNEL_PRIORITY', True)
-        postinst = '#!/bin/sh\n' + 'update-alternatives --install /' + imagedest + '/' + type + ' ' + type + ' ' + '/' + imagedest + '/' + type + '-${KERNEL_VERSION_PKG_NAME} ' + priority + ' || true' + '\n'
+        postinst = '#!/bin/sh\n' + 'update-alternatives --install /' + imagedest + '/' + type + ' ' + type + ' ' + '/' + imagedest + '/' + type + '-${KERNEL_VERSION_NAME} ' + priority + ' || true' + '\n'
         d.setVar('pkg_postinst_kernel-image-' + typelower, postinst)
 
-        postrm = '#!/bin/sh\n' + 'update-alternatives --remove' + ' ' + type + ' ' + type + '-${KERNEL_VERSION_PKG_NAME} || true' + '\n'
+        postrm = '#!/bin/sh\n' + 'update-alternatives --remove' + ' ' + type + ' ' + type + '-${KERNEL_VERSION_NAME} || true' + '\n'
         d.setVar('pkg_postrm_kernel-image-' + typelower, postrm)
 
     image = d.getVar('INITRAMFS_IMAGE', True)
