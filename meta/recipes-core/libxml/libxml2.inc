@@ -23,6 +23,8 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://0001-Fix-missing-entities-after-CVE-2014-3660-fix.patch \
            file://0001-CVE-2015-1819-Enforce-the-reader-to-run-in-constant-.patch \
            file://0003-fix-unterminated-comment-bug.patch \
+           file://0001-Cleanup-conditional-section-error-handling.patch \
+           file://0001-Stop-parsing-on-entities-boundaries-errors.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
