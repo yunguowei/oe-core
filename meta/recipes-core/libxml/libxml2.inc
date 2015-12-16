@@ -21,6 +21,8 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://libxml-m4-use-pkgconfig.patch \
            file://configure.ac-fix-cross-compiling-warning.patch \
            file://0001-CVE-2015-1819-Enforce-the-reader-to-run-in-constant-.patch \
+           file://0001-Cleanup-conditional-section-error-handling.patch \
+           file://0001-Stop-parsing-on-entities-boundaries-errors.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
