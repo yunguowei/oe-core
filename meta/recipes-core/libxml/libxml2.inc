@@ -27,6 +27,7 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://0001-Stop-parsing-on-entities-boundaries-errors.patch \
            file://0001-Another-variation-of-overflow-in-Conditional-section.patch \
            file://0002-Fix-an-error-in-previous-Conditional-section-patch.patch \
+           file://0001-CVE-2015-8035-Fix-XZ-compression-support-loop.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
