@@ -29,6 +29,7 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://0001-Reenable-xz-support-by-default.patch \
            file://0001-CVE-2015-8242-Buffer-overead-with-HTML-parser-in-pus.patch \
            file://0001-CVE-2015-7497-Avoid-an-heap-buffer-overflow-in-xmlDi.patch \
+           file://0001-CVE-2015-5312-Another-entity-expansion-issue.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
