@@ -53,7 +53,6 @@ SRC_URI += " \
         file://Makefile.patch \
         file://Makefile.SH.patch \
         file://installperl.patch \
-        file://perl-dynloader.patch \
         file://perl-moreconfig.patch \
         file://letgcc-find-errno.patch \
         file://generate-sh.patch \
@@ -62,7 +61,6 @@ SRC_URI += " \
         file://cross-generate_uudmap.patch \
 	file://fix_bad_rpath.patch \
 	file://perl-archlib-exp.patch \
-	file://dynaloaderhack.patch \
 	file://fix-FF_MORE-crash.patch \
 	\
         \
