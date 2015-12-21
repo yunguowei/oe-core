@@ -71,6 +71,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0007-openssl-More-ssl_session_dup-fixes-based-on-commit-f.patch \
             file://0001-Fix-PSK-handling.patch \
             file://0002-Fix-leak-with-ASN.1-combine.patch \
+            file://0003-Add-PSS-parameter-check.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
