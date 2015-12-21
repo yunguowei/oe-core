@@ -1,0 +1,80 @@
+From af1a125c7d316eb85a7acabdd8e912d73edef89e Mon Sep 17 00:00:00 2001
+From: "Dr. Stephen Henson" <steve@openssl.org>
+Date: Wed, 1 Jul 2015 23:40:03 +0100
+Subject: [PATCH 1/3] Fix PSK handling.
+
+commit 3c66a669dfc7b3792f7af0758ea26fe8502ce70c upstream
+https://github.com/openssl/openssl.git
+
+The PSK identity hint should be stored in the SSL_SESSION structure
+and not in the parent context (which will overwrite values used
+by other SSL structures with the same SSL_CTX).
+
+Use BUF_strndup when copying identity as it may not be null terminated.
+
+Upstream-Status: Backport
+
+Reviewed-by: Tim Hudson <tjh@openssl.org>
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
+---
+ ssl/s3_clnt.c | 16 +++-------------
+ ssl/s3_srvr.c |  2 +-
+ 2 files changed, 4 insertions(+), 14 deletions(-)
+
+diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
+index 2598f8a..1c89a85 100644
+--- a/ssl/s3_clnt.c
++++ b/ssl/s3_clnt.c
+@@ -1378,8 +1378,6 @@ int ssl3_get_key_exchange(SSL *s)
+ #ifndef OPENSSL_NO_PSK
+ 	if (alg_k & SSL_kPSK)
+ 		{
+-		char tmp_id_hint[PSK_MAX_IDENTITY_LEN+1];
+-
+ 		param_len = 2;
+ 		if (param_len > n)
+ 			{
+@@ -1408,16 +1406,8 @@ int ssl3_get_key_exchange(SSL *s)
+ 			}
+ 		param_len += i;
+ 
+-		/* If received PSK identity hint contains NULL
+-		 * characters, the hint is truncated from the first
+-		 * NULL. p may not be ending with NULL, so create a
+-		 * NULL-terminated string. */
+-		memcpy(tmp_id_hint, p, i);
+-		memset(tmp_id_hint+i, 0, PSK_MAX_IDENTITY_LEN+1-i);
+-		if (s->ctx->psk_identity_hint != NULL)
+-			OPENSSL_free(s->ctx->psk_identity_hint);
+-		s->ctx->psk_identity_hint = BUF_strdup(tmp_id_hint);
+-		if (s->ctx->psk_identity_hint == NULL)
++		s->session->psk_identity_hint = BUF_strndup((char *)p, i);
++		if (s->session->psk_identity_hint == NULL)
+ 			{
+ 			al=SSL_AD_HANDSHAKE_FAILURE;
+ 			SSLerr(SSL_F_SSL3_GET_KEY_EXCHANGE, ERR_R_MALLOC_FAILURE);
+@@ -3047,7 +3037,7 @@ int ssl3_send_client_key_exchange(SSL *s)
+ 				}
+ 
+ 			memset(identity, 0, sizeof(identity));
+-			psk_len = s->psk_client_callback(s, s->ctx->psk_identity_hint,
++			psk_len = s->psk_client_callback(s, s->session->psk_identity_hint,
+ 				identity, sizeof(identity) - 1,
+ 				psk_or_pre_ms, sizeof(psk_or_pre_ms));
+ 			if (psk_len > PSK_MAX_PSK_LEN)
+diff --git a/ssl/s3_srvr.c b/ssl/s3_srvr.c
+index acdd510..9a70a43 100644
+--- a/ssl/s3_srvr.c
++++ b/ssl/s3_srvr.c
+@@ -2751,7 +2751,7 @@ int ssl3_get_client_key_exchange(SSL *s)
+ 
+ 			if (s->session->psk_identity != NULL)
+ 				OPENSSL_free(s->session->psk_identity);
+-			s->session->psk_identity = BUF_strdup((char *)p);
++			s->session->psk_identity = BUF_strndup((char *)p, i);
+ 			if (s->session->psk_identity == NULL)
+ 				{
+ 				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,
+-- 
+1.8.5.2.233.g932f7e4
+
