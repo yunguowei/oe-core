@@ -38,6 +38,7 @@ SRC_URI += "file://configure-targets.patch \
             file://openssl-1.0.2a-x32-asm.patch \
             file://ptest_makefile_deps.patch  \
             file://0001-Fix-seg-fault-with-0-p-val-in-SKE.patch  \
+            file://0002-Fix-leak-with-ASN.1-combine.patch  \
            "
 
 SRC_URI[md5sum] = "38dd619b2e77cbac69b99f52a053d25a"
