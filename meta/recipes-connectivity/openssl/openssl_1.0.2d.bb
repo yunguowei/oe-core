@@ -40,6 +40,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Fix-seg-fault-with-0-p-val-in-SKE.patch  \
             file://0002-Fix-leak-with-ASN.1-combine.patch  \
             file://0003-bn-asm-x86_64-mont5.pl-fix-carry-propagating-bug-CVE.patch  \
+            file://0004-Add-PSS-parameter-check.patch  \
            "
 
 SRC_URI[md5sum] = "38dd619b2e77cbac69b99f52a053d25a"
