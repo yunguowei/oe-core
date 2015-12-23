@@ -25,6 +25,8 @@ SRC_URI += "file://acinclude.m4 \
             file://0001-e2fsprogs-add-expansion-of-mkdir_p-to-configure.in.patch \
 "
 
+SRC_URI_append_class-native = " file://fix-missing-check-for-permission-denied.patch"
+
 SRC_URI[md5sum] = "3f8e41e63b432ba114b33f58674563f7"
 SRC_URI[sha256sum] = "2f92ac06e92fa00f2ada3ee67dad012d74d685537527ad1241d82f2d041f2802"
 
