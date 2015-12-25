@@ -7,7 +7,10 @@ DEPENDS = "openssl curl zlib expat"
 PROVIDES_append_class-native = " git-replacement-native"
 
 SRC_URI = "${KERNELORG_MIRROR}/software/scm/git/git-${PV}.tar.gz;name=tarball \
-           ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages"
+           ${KERNELORG_MIRROR}/software/scm/git/git-manpages-${PV}.tar.gz;name=manpages \
+           file://0001-transport-add-a-protocol-whitelist-environment-varia.patch \
+           file://0002-submodule-allow-only-certain-protocols-for-submodule.patch \
+           file://0003-transport-refactor-protocol-whitelist-code.patch "
 
 S = "${WORKDIR}/git-${PV}"
 
