@@ -28,6 +28,14 @@ LICENSE = "GPLv2"
 # one.
 #
 # -- RP
+#
+## Note:
+# Please do not add linux-libc-headers into rootfs, for example
+#     IMAGE_INSTALL += "linux-libc-headers"
+#     or make linux-libc-headers.addpkg
+# Please add linux-libc-headers-dev into rootfs if needed
+#     IMAGE_INSTALL += "linux-libc-headers-dev"
+#     or make linux-libc-headers-dev.addpkg
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
