@@ -94,6 +94,8 @@ do_install () {
 		install $i ${D}${libdir}/perl/${PV}/CORE
 	done
 
+	ln -s Config_heavy.pl ${D}${libdir}/perl/${PV}/Config_heavy-target.pl
+
 	# Those wrappers mean that perl installed from sstate (which may change
 	# path location) works and that in the nativesdk case, the SDK can be
 	# installed to a different location from the one it was built for.
