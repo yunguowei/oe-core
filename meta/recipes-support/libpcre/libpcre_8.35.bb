@@ -21,6 +21,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/pcre/pcre/${PV}/pcre-${PV}.tar.bz2 \
            file://pcre-8.35-Fix-duplicate-names-memory-calculation-error.patch \
            file://pcre-8.35-Fix-named-forward-reference-to-duplicate-group-numbe.patch \
            file://pcre-CVE-2015-8386.patch \
+           file://pcre-CVE-2015-8387.patch \
 "
 
 SRC_URI[md5sum] = "6aacb23986adccd9b3bc626c00979958"
