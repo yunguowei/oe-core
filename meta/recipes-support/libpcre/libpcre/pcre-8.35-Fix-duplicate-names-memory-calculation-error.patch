@@ -1,0 +1,123 @@
+From ca19bae7e907e13071f49b08d7de255b3a27f7e8 Mon Sep 17 00:00:00 2001
+From: ph10 <ph10@2f5784b3-3f2a-0410-8824-cb99058d5e15>
+Date: Sun, 8 Feb 2015 16:43:13 +0000
+Subject: [PATCH] Fix duplicate names memory calculation error.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ported to 8.35:
+
+commit 46465068f53358d3ae6cca4d9db8d1ed3b9f1928
+Author: ph10 <ph10@2f5784b3-3f2a-0410-8824-cb99058d5e15>
+Date:   Sun Feb 8 16:43:13 2015 +0000
+
+    Fix duplicate names memory calculation error.
+
+    git-svn-id: svn://vcs.exim.org/pcre/code/trunk@1521 2f5784b3-3f2a-0410-8824-cb99058d5e15
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ pcre_compile.c           | 13 ++++++-------
+ testdata/testinput2      |  2 ++
+ testdata/testoutput11-16 |  2 +-
+ testdata/testoutput11-32 |  2 +-
+ testdata/testoutput11-8  |  2 +-
+ testdata/testoutput2     |  2 ++
+ 6 files changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/pcre_compile.c b/pcre_compile.c
+index ba3c260..119881c 100644
+--- a/pcre_compile.c
++++ b/pcre_compile.c
+@@ -7146,6 +7146,12 @@ for (;; ptr++)
+           /* Count named back references. */
+ 
+           if (!is_recurse) cd->namedrefcount++;
++
++          /* We have to allow for a named reference to a duplicated name (this
++          cannot be determined until the second pass). This needs an extra
++          16-bit data item. */
++
++          *lengthptr += IMM2_SIZE;
+           }
+ 
+         /* In the real compile, search the name table. We check the name
+@@ -9143,13 +9149,6 @@ if (length > MAX_PATTERN_SIZE)
+   goto PCRE_EARLY_ERROR_RETURN;
+   }
+ 
+-/* If there are groups with duplicate names and there are also references by
+-name, we must allow for the possibility of named references to duplicated
+-groups. These require an extra data item each. */
+-
+-if (cd->dupnames && cd->namedrefcount > 0)
+-  length += cd->namedrefcount * IMM2_SIZE * sizeof(pcre_uchar);
+-
+ /* Compute the size of the data block for storing the compiled pattern. Integer
+ overflow should no longer be possible because nowadays we limit the maximum
+ value of cd->names_found and cd->name_entry_size. */
+diff --git a/testdata/testinput2 b/testdata/testinput2
+index b94f5cb..6821ced 100644
+--- a/testdata/testinput2
++++ b/testdata/testinput2
+@@ -4084,4 +4084,6 @@ backtracking verbs. --/
+ 
+ /(?=di(?<=(?1))|(?=(.))))/
+ 
++/(?<N111>(?J)(?<N111>1(111111)11|)1|1|)(?(<N111>)1)/
++
+ /-- End of testinput2 --/
+diff --git a/testdata/testoutput11-16 b/testdata/testoutput11-16
+index a1db3f3..294da12 100644
+--- a/testdata/testoutput11-16
++++ b/testdata/testoutput11-16
+@@ -231,7 +231,7 @@ Memory allocation (code space): 73
+ ------------------------------------------------------------------
+ 
+ /(?P<a>a)...(?P=a)bbb(?P>a)d/BM
+-Memory allocation (code space): 57
++Memory allocation (code space): 61
+ ------------------------------------------------------------------
+   0  24 Bra
+   2   5 CBra 1
+diff --git a/testdata/testoutput11-32 b/testdata/testoutput11-32
+index 7b7b030..5e082e8 100644
+--- a/testdata/testoutput11-32
++++ b/testdata/testoutput11-32
+@@ -231,7 +231,7 @@ Memory allocation (code space): 155
+ ------------------------------------------------------------------
+ 
+ /(?P<a>a)...(?P=a)bbb(?P>a)d/BM
+-Memory allocation (code space): 117
++Memory allocation (code space): 125
+ ------------------------------------------------------------------
+   0  24 Bra
+   2   5 CBra 1
+diff --git a/testdata/testoutput11-8 b/testdata/testoutput11-8
+index f5ec652..6957f15 100644
+--- a/testdata/testoutput11-8
++++ b/testdata/testoutput11-8
+@@ -231,7 +231,7 @@ Memory allocation (code space): 45
+ ------------------------------------------------------------------
+ 
+ /(?P<a>a)...(?P=a)bbb(?P>a)d/BM
+-Memory allocation (code space): 34
++Memory allocation (code space): 38
+ ------------------------------------------------------------------
+   0  30 Bra
+   3   7 CBra 1
+diff --git a/testdata/testoutput2 b/testdata/testoutput2
+index f3e8158..fed7163 100644
+--- a/testdata/testoutput2
++++ b/testdata/testoutput2
+@@ -14221,4 +14221,6 @@ Failed: lookbehind assertion is not fixed length at offset 17
+ /(?=di(?<=(?1))|(?=(.))))/
+ Failed: unmatched parentheses at offset 23
+ 
++/(?<N111>(?J)(?<N111>1(111111)11|)1|1|)(?(<N111>)1)/
++
+ /-- End of testinput2 --/
+-- 
+2.4.3
+
