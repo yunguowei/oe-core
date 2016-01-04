@@ -241,7 +241,10 @@ do_install() {
 
         # target config, used by cpan.bbclass to extract version information
         install config.sh ${D}${libdir}/perl
+
+        ln -s Config_heavy.pl ${D}${libdir}/perl/${PV}/Config_heavy-target.pl
 }
+
 do_install_append_class-nativesdk () {
         create_wrapper ${D}${bindir}/perl \
             PERL5LIB='$PERL5LIB:$OECORE_NATIVE_SYSROOT/${libdir_nativesdk}/perl/site_perl/${PV}:$OECORE_NATIVE_SYSROOT/${libdir_nativesdk}/perl/vendor_perl/${PV}:$OECORE_NATIVE_SYSROOT/${libdir_nativesdk}/perl/${PV}'
@@ -295,7 +298,8 @@ FILES_${PN}-dev = "${libdir}/perl/${PV}/CORE"
 FILES_${PN}-lib = "${libdir}/libperl.so* \
                    ${libdir}/perl5 \
                    ${libdir}/perl/config.sh \
-                   ${libdir}/perl/${PV}/Config_heavy.pl"
+                   ${libdir}/perl/${PV}/Config_heavy.pl \
+                   ${libdir}/perl/${PV}/Config_heavy-target.pl"
 FILES_${PN}-pod = "${libdir}/perl/${PV}/pod \
 		   ${libdir}/perl/${PV}/*.pod \
                    ${libdir}/perl/${PV}/*/*.pod \
