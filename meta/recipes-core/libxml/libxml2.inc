@@ -31,6 +31,7 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://0001-CVE-2015-7497-Avoid-an-heap-buffer-overflow-in-xmlDi.patch \
            file://0001-CVE-2015-5312-Another-entity-expansion-issue.patch \
            file://0001-CVE-2015-7500-Fix-memory-access-error-due-to-incorre.patch \
+           file://0001-Avoid-extra-processing-of-MarkupDecl-when-EOF.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
