@@ -1,0 +1,79 @@
+Index: pcre_compile.c
+===================================================================
+--- a/pcre_compile.c	(revision 1561)
++++ b/pcre_compile.c	(revision 1562)
+@@ -7214,7 +7214,12 @@
+           real compile this will be picked up and the reference wrapped with
+           OP_ONCE to make it atomic, so we must space in case this occurs. */
+ 
+-          if (recno == 0) *lengthptr += 2 + 2*LINK_SIZE;
++          /* In fact, this can happen for a non-forward reference because
++          another group with the same number might be created later. This
++          issue is fixed "properly" in PCRE2. As PCRE1 is now in maintenance
++          only mode, we finesse the bug by allowing more memory always. */
++
++          /* if (recno == 0) */ *lengthptr += 2 + 2*LINK_SIZE;
+           }
+ 
+         /* In the real compile, search the name table. We check the name
+Index: testdata/testoutput2
+===================================================================
+--- a/testdata/testoutput2	(revision 1561)
++++ b/testdata/testoutput2	(revision 1562)
+@@ -14459,4 +14459,6 @@
+ ".*?\h.+.\.+\R*?\xd(?i)(?=!(?=b`b`b`\`b\xa9b!)`\a`bbbbbbbbbbbbb`bbbbbbbbbbbb*R\x85bbbbbbb\C?{((?2)(?))((
+ \H){8(?<=(?1){29}\xa8bbbb\x16\xd\xc6^($(?<! )(\xa9H4){4}h}1)B))\x15')"
+ 
++"(?J:(?|(?'R')(\k'R')|((?'R'))))"
++
+ /-- End of testinput2 --/
+Index: testdata/testoutput11-16
+===================================================================
+--- a/testdata/testoutput11-16	(revision 1561)
++++ b/testdata/testoutput11-16	(revision 1562)
+@@ -231,7 +231,7 @@
+ ------------------------------------------------------------------
+ 
+ /(?P<a>a)...(?P=a)bbb(?P>a)d/BM
+-Memory allocation (code space): 61
++Memory allocation (code space): 77
+ ------------------------------------------------------------------
+   0  24 Bra
+   2   5 CBra 1
+Index: testdata/testoutput11-8
+===================================================================
+--- a/testdata/testoutput11-8	(revision 1561)
++++ b/testdata/testoutput11-8	(revision 1562)
+@@ -231,7 +231,7 @@
+ ------------------------------------------------------------------
+ 
+ /(?P<a>a)...(?P=a)bbb(?P>a)d/BM
+-Memory allocation (code space): 38
++Memory allocation (code space): 50
+ ------------------------------------------------------------------
+   0  30 Bra
+   3   7 CBra 1
+Index: testdata/testinput2
+===================================================================
+--- a/testdata/testinput2	(revision 1561)
++++ b/testdata/testinput2	(revision 1562)
+@@ -4171,4 +4171,6 @@
+ ".*?\h.+.\.+\R*?\xd(?i)(?=!(?=b`b`b`\`b\xa9b!)`\a`bbbbbbbbbbbbb`bbbbbbbbbbbb*R\x85bbbbbbb\C?{((?2)(?))((
+ \H){8(?<=(?1){29}\xa8bbbb\x16\xd\xc6^($(?<! )(\xa9H4){4}h}1)B))\x15')"
+ 
++"(?J:(?|(?'R')(\k'R')|((?'R'))))"
++
+ /-- End of testinput2 --/
+Index: testdata/testoutput11-32
+===================================================================
+--- a/testdata/testoutput11-32	(revision 1561)
++++ b/testdata/testoutput11-32	(revision 1562)
+@@ -231,7 +231,7 @@
+ ------------------------------------------------------------------
+ 
+ /(?P<a>a)...(?P=a)bbb(?P>a)d/BM
+-Memory allocation (code space): 125
++Memory allocation (code space): 157
+ ------------------------------------------------------------------
+   0  24 Bra
+   2   5 CBra 1
