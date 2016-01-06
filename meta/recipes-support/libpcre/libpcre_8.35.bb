@@ -30,6 +30,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/pcre/pcre/${PV}/pcre-${PV}.tar.bz2 \
            file://pcre-CVE-2015-8392.patch \
            file://pcre-CVE-2015-8393.patch \
            file://pcre-CVE-2015-8394.patch \
+           file://pcre-CVE-2015-8381-CVE-2015-8395.patch \
 "
 
 SRC_URI[md5sum] = "6aacb23986adccd9b3bc626c00979958"
