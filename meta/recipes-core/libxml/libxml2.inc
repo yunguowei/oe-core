@@ -35,6 +35,8 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://0001-Add-xmlHaltParser-to-stop-the-parser.patch \
            file://0001-Detect-incoherency-on-GROW.patch \
            file://0001-Avoid-processing-entities-after-encoding-conversion-.patch \
+           file://0001-Fail-parsing-early-on-if-encoding-conversion-failed.patch \
+           file://0001-Do-not-process-encoding-values-if-the-declaration-if.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
