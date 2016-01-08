@@ -41,6 +41,7 @@ SRC_URI = "git://anongit.freedesktop.org/systemd/systemd;branch=master;protocol=
            file://0001-build-sys-configure-the-list-of-system-users-files-a.patch \
            file://touchscreen.rules \
            file://00-create-volatile.conf \
+           file://comment-the-oe-release-linkfile.patch \
            file://init \
            file://run-ptest \
           "
