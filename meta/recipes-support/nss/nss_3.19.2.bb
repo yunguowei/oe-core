@@ -23,6 +23,7 @@ SRC_URI = "\
     file://nss.pc.in \
     file://signlibs.sh \
     file://nss-CVE-2015-7181.patch \
+    file://nss-CVE-2015-7182.patch \
 "
 
 SRC_URI[md5sum] = "b02ffd1e8e8ef5f8512fa02d8ca9db3d"
