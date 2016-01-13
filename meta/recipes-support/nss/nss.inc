@@ -29,6 +29,7 @@ SRC_URI = "\
     file://nss-CVE-2015-2721.patch \
     file://nss-CVE-2015-2730-1.patch \
     file://nss-CVE-2015-2730-2.patch \
+    file://nss-CVE-2015-7575.patch \
 "
 SRC_URI_append = "\
     file://nss.pc.in \
