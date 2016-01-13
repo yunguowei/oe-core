@@ -4,6 +4,9 @@ SRC_URI += "file://correct_rpl_gettimeofday_signature.patch \
             file://0001-Reset-the-output-value-on-error-in-_gnutls_x509_dn_t.patch \
             file://0001-Better-fix-for-the-double-free-in-dist-point-parsing.patch \
             file://0001-eliminated-double-free-in-the-parsing-of-dist-points.patch \
+            file://gnutls-CVE-2015-7575.patch \
+            file://gnutls-CVE-2015-7575-2.patch \
+            file://gnutls-CVE-2015-7575-3.patch \
            "
 
 SRC_URI[md5sum] = "1f396dcf3c14ea67de7243821006d1a2"
