@@ -46,6 +46,7 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://init \
            file://run-ptest \
            file://rules-whitelist-hd-devices.patch \
+           file://0001-make-test-dir-configurable.patch \
           "
 SRC_URI_append_qemuall = " file://qemuall_io_latency-core-device.c-Change-the-default-device-timeout-to-2.patch"
 
@@ -123,6 +124,7 @@ EXTRA_OECONF = " --with-rootprefix=${rootprefix} \
                  --without-python \
                  --with-sysvrcnd-path=${sysconfdir} \
                  --with-firmware-path=/lib/firmware \
+                 --with-testdir=${PTEST_PATH} \
                "
 # uclibc does not have NSS
 EXTRA_OECONF_append_libc-uclibc = " --disable-myhostname "
@@ -208,7 +210,7 @@ do_install() {
 
 do_install_ptest () {
        install -d ${D}${PTEST_PATH}/test
-       cp -rf ${S}/test/* ${D}${PTEST_PATH}/test
+       cp -rfL ${S}/test/* ${D}${PTEST_PATH}/test
        install -m 0755  ${B}/test-udev ${D}${PTEST_PATH}/
        install -d ${D}${PTEST_PATH}/build-aux
        cp ${S}/build-aux/test-driver ${D}${PTEST_PATH}/build-aux/
