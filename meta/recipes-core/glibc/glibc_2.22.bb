@@ -49,6 +49,7 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0031-Fix-catopen-multiple-unbounded-stack-allocations-BZ-.patch \
            file://CVE-2015-9761_1.patch \
            file://CVE-2015-9761_2.patch \
+           file://CVE-2015-8776.patch \
 "
 
 SRC_URI += "\
