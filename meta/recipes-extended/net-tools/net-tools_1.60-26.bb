@@ -11,7 +11,10 @@ SRC_URI = "http://snapshot.debian.org/archive/debian/20050312T000000Z/pool/main/
            file://net-tools-config.h \
            file://net-tools-config.make \
            file://ifconfig-interface-0-del-IP-will-remove-the-aliased-.patch \
-	   "
+           file://net-tools-1.60-sctp1.patch \
+           file://net-tools-1.60-sctp2-quiet.patch \
+           file://net-tools-1.60-sctp3-addrs.patch \
+          "
 
 S = "${WORKDIR}/net-tools-1.60"
 
