@@ -42,6 +42,9 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0028-Clear-ELF_RTYPE_CLASS_EXTERN_PROTECTED_DATA-for-prel.patch \
            file://0029-fix-getmntent-empty-lines.patch \
            file://strcoll-Remove-incorrect-STRDIFF-based-optimization-.patch \
+           file://0030-malloc-Rewrite-with-explicit-TLS-access-using-__thre.patch \
+           file://0031-malloc-Prevent-arena-free_list-from-turning-cyclic-B.patch \
+           file://0032-malloc-Fix-attached-thread-reference-count-handling-.patch \
 "
 
 SRC_URI += "\
