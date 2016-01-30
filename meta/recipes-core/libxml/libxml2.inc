@@ -37,6 +37,7 @@ SRC_URI = "ftp://xmlsoft.org/libxml2/libxml2-${PV}.tar.gz;name=libtar \
            file://0001-Avoid-processing-entities-after-encoding-conversion-.patch \
            file://0001-Fail-parsing-early-on-if-encoding-conversion-failed.patch \
            file://0001-Do-not-process-encoding-values-if-the-declaration-if.patch \
+           file://CVE-2015-8710.patch \
           "
 
 BINCONFIG = "${bindir}/xml2-config"
