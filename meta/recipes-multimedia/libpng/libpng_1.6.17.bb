@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b9b75399b72e4a8656cf3a6ddfc86d9a \
 DEPENDS = "zlib"
 LIBV = "16"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/${PV}/libpng-${PV}.tar.xz \
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/libpng/libpng${LIBV}/older-releases/${PV}/libpng-${PV}.tar.xz \
            file://libpng-CVE-2015-8472.patch \
            file://libpng-CVE-2015-8472-2.patch \
            file://libpng-CVE-2015-8472-3.patch \
