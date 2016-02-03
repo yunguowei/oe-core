@@ -45,6 +45,8 @@ SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            file://0030-malloc-Rewrite-with-explicit-TLS-access-using-__thre.patch \
            file://0031-malloc-Prevent-arena-free_list-from-turning-cyclic-B.patch \
            file://0032-malloc-Fix-attached-thread-reference-count-handling-.patch \
+           file://0030-Always-enable-pointer-guard-BZ-18928-CVE-2015-8777.patch \
+           file://0031-Fix-catopen-multiple-unbounded-stack-allocations-BZ-.patch \
 "
 
 SRC_URI += "\
