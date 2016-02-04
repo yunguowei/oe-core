@@ -15,6 +15,7 @@ SRC_URI = "git://git.infradead.org/mtd-utils.git \
            file://fix-armv7-neon-alignment.patch \
            file://0001-hashtable-Remove-duplicate-hashtable_iterator_value-.patch \
            file://mtd-utils-fix-corrupt-cleanmarker-with-flash_erase--j-command.patch \
+           file://libmtd-don-t-ignore-region-index-parameter-in-mtd_re.patch \
 "
 
 S = "${WORKDIR}/git/"
