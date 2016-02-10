@@ -51,6 +51,7 @@ CVEPATCHES = "\
         file://CVE-2014-8121-Do-not-close-NSS-files-database-during.patch \
         file://CVE-2015-1472-wscanf-allocates-too-little-memory.patch \
         file://CVE-2015-1781-resolv-nss_dns-dns-host.c-buffer-overf.patch \
+        file://CVE-2015-7547.patch \
     "
 LIC_FILES_CHKSUM = "file://LICENSES;md5=e9a558e243b36d3209f380deb394b213 \
       file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
