@@ -6,6 +6,7 @@ HOMEPAGE = "http://www.remotesensing.org/libtiff/"
 SRC_URI = "ftp://ftp.remotesensing.org/pub/libtiff/tiff-${PV}.tar.gz \
            file://libtool2.patch \
            file://tiff-CVE-2015-8781.patch \
+           file://tiff-CVE-2015-8683.patch \
           "
 
 SRC_URI[md5sum] = "9aee7107408a128c0c7b24286c0db900"
