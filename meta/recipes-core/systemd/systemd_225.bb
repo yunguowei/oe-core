@@ -48,6 +48,7 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://rules-whitelist-hd-devices.patch \
            file://0001-make-test-dir-configurable.patch \
            file://0001-tmpfiles.d-don-t-create-the-symbol-link-to-usr-lib-o.patch \
+           file://0001-login-fix-NULL-deref-on-wall_message.patch \
           "
 SRC_URI_append_qemuall = " file://qemuall_io_latency-core-device.c-Change-the-default-device-timeout-to-2.patch"
 
