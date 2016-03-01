@@ -20,7 +20,7 @@ GLIBC_GIT_URI ?= "git://sourceware.org/git/glibc.git"
 SRC_URI = "${GLIBC_GIT_URI};branch=${SRCBRANCH};name=glibc \
            git://github.com/kraj/localedef;branch=master;name=localedef;destsuffix=git/localedef \
            file://fix_for_centos_5.8.patch \
-	   file://strcoll-Remove-incorrect-STRDIFF-based-optimization-.patch \
+           file://strcoll-Remove-incorrect-STRDIFF-based-optimization-.patch \
            ${EGLIBCPATCHES} \
 "
 EGLIBCPATCHES = "\
@@ -35,7 +35,6 @@ EGLIBCPATCHES = "\
            file://0025-eglibc-Install-PIC-archives.patch \
            file://0026-eglibc-dl_debug_mask-is-controlled-by-__OPTION_EGLIB.patch \
            file://0027-eglibc-use-option-groups-Conditionally-exclude-c-tes.patch \
-           file://strcoll-Remove-incorrect-STRDIFF-based-optimization-.patch \
 "
 
 SRCREV_glibc ?= "a34d1c6afc86521d6ad17662a3b5362d8481514c"
