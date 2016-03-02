@@ -45,6 +45,9 @@ RDEPENDS_${PN} = "pkgconfig"
 
 RDEPENDS_${PN}_append_libc-glibc_class-target = " glibc-gconv-iso8859-1"
 
+# Workaround when DEBUG_BUILD = "1"
+CFLAGS_append_arm = " -O1"
+
 EXTRA_OECONF += "${@['--without-libltdl-prefix --without-libgmp-prefix --without-libreadline-prefix', ''][bb.data.inherits_class('native',d)]}"
 
 EXTRA_OECONF_append_class-target = " --with-libunistring-prefix=${STAGING_LIBDIR} \
