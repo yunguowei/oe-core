@@ -1,0 +1,33 @@
+From 9d3ab054a0a3289a4b39487000858331f5735bd1 Mon Sep 17 00:00:00 2001
+From: Andy Polyakov <appro@openssl.org>
+Date: Fri, 12 Sep 2014 00:06:00 +0200
+Subject: [PATCH] perlasm/x86_64-xlate.pl: handle inter-bank movd.
+
+commit c582e9d2139b9c9311718c20bbfeac37718e0b21 upstream
+git://git.openssl.org/openssl.git
+
+Upstream Status: Backport
+
+Reviewed-by: Rich Salz <rsalz@openssl.org>
+(cherry picked from commit 902b30df193afc3417a96ba72a81ed390bd50de3)
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
+---
+ crypto/perlasm/x86_64-xlate.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/perlasm/x86_64-xlate.pl b/crypto/perlasm/x86_64-xlate.pl
+index 56d9b64..b262b8d 100755
+--- a/crypto/perlasm/x86_64-xlate.pl
++++ b/crypto/perlasm/x86_64-xlate.pl
+@@ -121,7 +121,7 @@ my %globals;
+ 		$self->{sz} = "";
+ 	    } elsif ($self->{op} =~ /^v/) { # VEX
+ 		$self->{sz} = "";
+-	    } elsif ($self->{op} =~ /movq/ && $line =~ /%xmm/) {
++	    } elsif ($self->{op} =~ /mov[dq]/ && $line =~ /%xmm/) {
+ 		$self->{sz} = "";
+ 	    } elsif ($self->{op} =~ /([a-z]{3,})([qlwb])$/) {
+ 		$self->{op} = $1;
+-- 
+1.9.1
+

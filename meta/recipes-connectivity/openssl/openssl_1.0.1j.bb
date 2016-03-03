@@ -73,6 +73,14 @@ SRC_URI += "file://configure-targets.patch \
             file://0002-Fix-leak-with-ASN.1-combine.patch \
             file://0003-Add-PSS-parameter-check.patch \
             file://openssl-CVE-2015-3197.patch \
+            file://openssl-CVE-2016-0705.patch \
+            file://openssl-CVE-2016-0797.patch \
+            file://openssl-CVE-2016-0799.patch \
+            file://openssl-CVE-2016-0798.patch \
+            file://openssl-CVE-2016-0800.patch \
+            file://openssl-CVE-2016-0702-1.patch \
+            file://openssl-perlasm-x86_64-xlate.pl-handle-inter-bank-movd.patch \
+            file://openssl-CVE-2016-0702-2.patch \
            "
 
 SRC_URI[md5sum] = "f7175c9cd3c39bb1907ac8bba9df8ed3"
