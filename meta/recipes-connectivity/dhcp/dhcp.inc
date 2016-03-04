@@ -20,7 +20,11 @@ SRC_URI = "ftp://ftp.isc.org/isc/dhcp/${PV}/dhcp-${PV}.tar.gz \
            file://dhcpd.service file://dhcrelay.service \
            file://dhcpd6.service "
 
-inherit autotools systemd
+inherit autotools systemd useradd
+
+USERADD_PACKAGES = "${PN}-server"
+USERADD_PARAM_${PN}-server = "--system --no-create-home --home-dir /var/run/${PN} --shell /bin/false --user-group ${PN}"
+
 
 SYSTEMD_PACKAGES = "${PN}-server ${PN}-relay"
 SYSTEMD_SERVICE_${PN}-server = "dhcpd.service dhcpd6.service"
@@ -35,6 +39,7 @@ EXTRA_OECONF = "--with-srv-lease-file=${localstatedir}/lib/dhcp/dhcpd.leases \
                 --with-cli-lease-file=${localstatedir}/lib/dhcp/dhclient.leases \
                 --with-cli6-lease-file=${localstatedir}/lib/dhcp/dhclient6.leases \
                 --with-libbind=${STAGING_LIBDIR}/ \
+		--enable-paranoia \
                "
 
 do_install_append () {
