@@ -1,0 +1,38 @@
+From cc9b6111792384a954acb4d20bf1811b5b82fa3a Mon Sep 17 00:00:00 2001
+From: Zhenbo Gao <zhenbo.gao@windriver.com>
+Date: Mon, 7 Mar 2016 17:47:41 +0800
+Subject: [PATCH] tmpfiles: Don't create /var/tmp,log
+
+Signed-off-by: Zhenbo Gao <zhenbo.gao@windriver.com>
+---
+ tmpfiles.d/tmp.conf | 1 -
+ tmpfiles.d/var.conf | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/tmpfiles.d/tmp.conf b/tmpfiles.d/tmp.conf
+index ffdd82f..0704472 100644
+--- a/tmpfiles.d/tmp.conf
++++ b/tmpfiles.d/tmp.conf
+@@ -9,7 +9,6 @@
+
+ # Clear tmp directories separately, to make them easier to override
+ v /tmp 1777 root root 10d
+-v /var/tmp 1777 root root 30d
+
+ # Exclude namespace mountpoints created with PrivateTmp=yes
+ x /tmp/systemd-private-%b-*
+diff --git a/tmpfiles.d/var.conf b/tmpfiles.d/var.conf
+index 472680c..c6439e4 100644
+--- a/tmpfiles.d/var.conf
++++ b/tmpfiles.d/var.conf
+@@ -11,7 +11,6 @@ v /var 0755 - - -
+
+ L /var/run - - - - ../run
+
+-d /var/log 0755 - - -
+ f /var/log/wtmp 0664 root utmp -
+ f /var/log/btmp 0600 root utmp -
+
+--
+1.9.1
+
