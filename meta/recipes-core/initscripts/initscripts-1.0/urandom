@@ -3,7 +3,7 @@
 # Provides:          urandom
 # Required-Start:    $local_fs mountvirtfs
 # Required-Stop:     $local_fs
-# Default-Start:     S
+# Default-Start:     1 2 3 4 5
 # Default-Stop:      0 6
 # Short-Description: Save and restore the random seed
 # Description:       Save the random seed on shutdown and restore it on boot,
