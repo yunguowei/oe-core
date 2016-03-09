@@ -17,6 +17,12 @@ S = "${WORKDIR}/openssl-${PV}"
 
 PACKAGECONFIG[perl] = ",,,"
 
+# Both of these options should be disabled by default.  They are dangerous to
+# enable, and are provided for situations where someone requires one or both
+# options.
+PACKAGECONFIG[ssl2] = ",,,"
+PACKAGECONFIG[weak-ssl-ciphers] = ",,,"
+
 AR_append = " r"
 # Avoid binaries being marked as requiring an executable stack since it 
 # doesn't(which causes and this causes issues with SELinux
@@ -49,6 +55,9 @@ FILES_openssl-conf = "${libdir}/ssl/openssl.cnf"
 CONFFILES_openssl-conf = "${libdir}/ssl/openssl.cnf"
 RRECOMMENDS_libcrypto += "openssl-conf"
 RDEPENDS_${PN}-ptest += "${PN}-misc make perl perl-module-filehandle bc"
+
+EXTRA_OECONF += " ${@bb.utils.contains('PACKAGECONFIG', 'ssl2', 'enable-ssl2', '', d)}"
+EXTRA_OECONF += " ${@bb.utils.contains('PACKAGECONFIG', 'weak-ssl-ciphers', 'enable-weak-ssl-ciphers', '', d)}"
 
 do_configure_prepend_darwin () {
 	sed -i -e '/version-script=openssl\.ld/d' Configure

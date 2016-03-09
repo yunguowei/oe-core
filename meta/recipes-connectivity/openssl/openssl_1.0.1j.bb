@@ -77,7 +77,8 @@ SRC_URI += "file://configure-targets.patch \
             file://openssl-CVE-2016-0797.patch \
             file://openssl-CVE-2016-0799.patch \
             file://openssl-CVE-2016-0798.patch \
-            file://openssl-CVE-2016-0800.patch \
+            file://openssl-CVE-2016-0800-1.patch \
+            file://openssl-CVE-2016-0800-2.patch \
             file://openssl-CVE-2016-0702-1.patch \
             file://openssl-perlasm-x86_64-xlate.pl-handle-inter-bank-movd.patch \
             file://openssl-CVE-2016-0702-2.patch \
