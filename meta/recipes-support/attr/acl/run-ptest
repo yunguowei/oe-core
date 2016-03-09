@@ -1,7 +1,57 @@
 #!/bin/sh
+#
+#This script is used to run acl test suites
+
+#umask 077
+
+EXT3_IMAGE=ext3.img
+EXT3_MOUNT_PONIT=/mnt/ext3
+
+trap 'rm -f ${EXT3_IMAGE}' EXIT
+
+dd if=/dev/zero of=${EXT3_IMAGE} bs=1M count=1
+if [ "$?" -eq 0 ]; then
+	echo "PASS: dump ext3.img"
+else
+	echo "FAIL: dump ext3.img"
+	exit 1
+fi
+
+mkfs.ext3 -F ${EXT3_IMAGE}
+if [ "$?" -eq 0 ]; then
+	echo "PASS: mkfs.ext3 -F ext3.img"
+else
+	echo "FAIL: mkfs.ext3 -F ext3.img"
+	exit 1
+fi
+
+if [ -d $EXT3_MOUNT_PONIT ]; then
+	echo "mount ponit exist"
+else
+	mkdir -p $EXT3_MOUNT_PONIT
+fi
+
+
+mount -o loop,rw,acl  ${EXT3_IMAGE} $EXT3_MOUNT_PONIT
+if [ "$?" -eq 0 ]; then
+	echo "PASS: mount ext3.img"
+else
+	echo "FAIL: mount ext3.img"
+	exit 1
+fi
+
+cp -rf ./test/ $EXT3_MOUNT_PONIT
+
+cd $EXT3_MOUNT_PONIT/test/
 
 gpasswd -a daemon bin
-make -C test -k tests root-tests |sed \
- -e 's|^\[.*\] \(.*\) -- ok$|PASS: \1|' \
- -e 's|^\[.*\] \(.*\) -- failed|FAIL: \1|'
+make  -k tests root-tests |sed \
+	 -e 's|^\[.*\] \(.*\) -- ok$|PASS: \1|' \
+	  -e 's|^\[.*\] \(.*\) -- failed|FAIL: \1|'
 gpasswd -d daemon bin
+
+
+cd -
+umount $EXT3_MOUNT_PONIT
+rm -rf $EXT3_MOUNT_PONIT
+rm $EXT3_IMAGE
