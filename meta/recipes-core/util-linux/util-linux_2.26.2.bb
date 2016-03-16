@@ -13,6 +13,7 @@ SRC_URI += "file://util-linux-ng-replace-siginterrupt.patch \
             file://uclibc-__progname-conflict.patch \
             file://configure-sbindir.patch \
             file://fix-parallel-build.patch \
+            file://Fix-CVE-2015-5218.patch \
             file://runuser.pamd \
             file://runuser-l.pamd \
             ${OLDHOST} \
