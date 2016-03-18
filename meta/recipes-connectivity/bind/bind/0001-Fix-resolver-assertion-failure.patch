@@ -1,0 +1,82 @@
+Subject: [PATCH] Fix resolver assertion failure
+
+A race condition during shutdown can cause
+the assertion failure.
+
+This patch is partly backported from the
+following upstream commit:
+
+commit 289ff24e2d0b7e8dc6d6651e2214c416952902b6
+Author: Evan Hunt <each@isc.org>
+Date:   Wed Apr 8 14:34:10 2015 -0700
+
+    [v9_10] hold a reference on fetch context during query
+
+    4094.       [bug]           A race during shutdown or reconfiguration could
+                        cause an assertion in mem.c. [RT #38979]
+
+Upstream-Status: Backport
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+---
+ lib/dns/resolver.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/lib/dns/resolver.c b/lib/dns/resolver.c
+index bae3793..19eaf22 100644
+--- a/lib/dns/resolver.c
++++ b/lib/dns/resolver.c
+@@ -810,7 +810,10 @@ fctx_startidletimer(fetchctx_t *fctx, isc_interval_t *interval) {
+ 
+ static inline void
+ resquery_destroy(resquery_t **queryp) {
++	dns_resolver_t *res;
++	isc_boolean_t empty;
+ 	resquery_t *query;
++	fetchctx_t *fctx;
+ 
+ 	REQUIRE(queryp != NULL);
+ 	query = *queryp;
+@@ -818,15 +821,21 @@ resquery_destroy(resquery_t **queryp) {
+ 
+ 	INSIST(query->tcpsocket == NULL);
+ 
+-	query->fctx->nqueries--;
+-	if (SHUTTINGDOWN(query->fctx)) {
+-		dns_resolver_t *res = query->fctx->res;
+-		if (maybe_destroy(query->fctx, ISC_FALSE))
+-			empty_bucket(res);
+-	}
++	fctx = query->fctx;
++	res = fctx->res;
++
++	fctx->nqueries--;
++
++	LOCK(&res->buckets[fctx->bucketnum].lock);
++	empty = fctx_decreference(query->fctx);
++	UNLOCK(&res->buckets[fctx->bucketnum].lock);
++
+ 	query->magic = 0;
+ 	isc_mem_put(query->mctx, query, sizeof(*query));
+ 	*queryp = NULL;
++
++	if (empty)
++		empty_bucket(res);
+ }
+ 
+ static void
+@@ -8098,9 +8107,7 @@ resquery_response(isc_task_t *task, isc_event_t *event) {
+ 		if (result != ISC_R_SUCCESS)
+ 			fctx_done(fctx, result, __LINE__);
+ 		else {
+-			LOCK(&res->buckets[fctx->bucketnum].lock);
+-			fctx->references++;
+-			UNLOCK(&res->buckets[fctx->bucketnum].lock);
++			fctx_increference(fctx);
+ 			result = fctx_stopidletimer(fctx);
+ 			if (result != ISC_R_SUCCESS)
+ 				fctx_done(fctx, result, __LINE__);
+-- 
+1.9.1
+
