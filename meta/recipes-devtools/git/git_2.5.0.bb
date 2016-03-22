@@ -13,4 +13,5 @@ SRC_URI[manpages.sha256sum] = "745e4e797fe5061e781c880d370b1beb480199127da5acaf4
 SRC_URI += "\
     file://0011-CVE-2015-7545-4.patch \
     file://0012-CVE-2015-7545-5.patch \
+    file://git-CVE-2016-2315.patch \
     "
