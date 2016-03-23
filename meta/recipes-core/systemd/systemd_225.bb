@@ -50,6 +50,8 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://0001-make-test-dir-configurable.patch \
            file://0001-tmpfiles.d-don-t-create-the-symbol-link-to-usr-lib-o.patch \
            file://0001-login-fix-NULL-deref-on-wall_message.patch \
+           file://0001-logind-treat-an-empty-wall-message-like-a-NULL-one.patch \
+           file://0001-logind-when-parsing-a-boolean-via-sd-bus-the-type-mu.patch \
           "
 SRC_URI_append_qemuall = " file://qemuall_io_latency-core-device.c-Change-the-default-device-timeout-to-2.patch"
 

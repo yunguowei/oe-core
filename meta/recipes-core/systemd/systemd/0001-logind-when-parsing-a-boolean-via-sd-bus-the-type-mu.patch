@@ -1,0 +1,27 @@
+From 2cf088b56d72cb6a3243041524f1fbae7c1cb28e Mon Sep 17 00:00:00 2001
+From: Lennart Poettering <lennart@poettering.net>
+Date: Fri, 4 Sep 2015 10:35:46 +0200
+Subject: [PATCH] logind: when parsing a boolean via sd-bus the type must be
+ "int"
+
+And not bool.
+
+Upstream-Status: Backport
+---
+ src/login/logind-dbus.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/login/logind-dbus.c b/src/login/logind-dbus.c
+index 281314f..7cc68d4 100644
+--- a/src/login/logind-dbus.c
++++ b/src/login/logind-dbus.c
+@@ -2293,7 +2293,7 @@ static int method_set_wall_message(
+         int r;
+         Manager *m = userdata;
+         char *wall_message;
+-        bool enable_wall_messages;
++        int enable_wall_messages;
+ 
+         assert(message);
+         assert(m);
+-- 
