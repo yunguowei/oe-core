@@ -13,7 +13,6 @@ SRCNAME = "smart"
 
 SRC_URI = "\
           git://github.com/smartpm/smart.git \
-          file://smartpm-rpm5-nodig.patch \
           file://smart-recommends.patch \
           file://smart-improve-error-reporting.patch \
           file://smart-channelsdir.patch \
@@ -25,6 +24,7 @@ SRC_URI = "\
           file://smart-set-noprogress-for-pycurl.patch \
           file://smart-cache.py-getPackages-matches-name-version.patch \
           file://python-smartpm-Ensure-that-upgrades-pay-attention-to.patch \
+          file://smartpm-rpm5-support-check-signatures.patch \
          "
 
 # Disabled as this causes different behavior than the community version
