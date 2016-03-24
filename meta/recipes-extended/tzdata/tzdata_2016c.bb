@@ -8,8 +8,8 @@ DEPENDS = "tzcode-native"
 
 SRC_URI = "http://www.iana.org/time-zones/repository/releases/tzdata${PV}.tar.gz;name=tzdata"
 
-SRC_URI[tzdata.md5sum] = "f638ec0d4d7a17f001ce475860255c85"
-SRC_URI[tzdata.sha256sum] = "6392091d92556a32de488ea06a055c51bc46b7d8046c8a677f0ccfe286b3dbdc"
+SRC_URI[tzdata.md5sum] = "0330ccd16140d3b6438a18dae9b34b93"
+SRC_URI[tzdata.sha256sum] = "8700d981e6f2007ac037dabb5d2b12f390e8629bbc30e564bc21cf0c069a2d48"
 
 inherit allarch
 
@@ -21,6 +21,7 @@ RCONFLICTS_${PN} = "timezones timezone-africa timezone-america timezone-antarcti
 S = "${WORKDIR}"
 
 DEFAULT_TIMEZONE ?= "Universal"
+INSTALL_TIMEZONE_FILE ?= "1"
 
 TZONES= "africa antarctica asia australasia europe northamerica southamerica  \
          factory etcetera backward systemv \
@@ -48,7 +49,9 @@ do_install () {
         # Install default timezone
         if [ -e ${D}${datadir}/zoneinfo/${DEFAULT_TIMEZONE} ]; then
             install -d ${D}${sysconfdir}
-            echo ${DEFAULT_TIMEZONE} > ${D}${sysconfdir}/timezone
+            if [ "${INSTALL_TIMEZONE_FILE}" = "1" ]; then
+                echo ${DEFAULT_TIMEZONE} > ${D}${sysconfdir}/timezone
+            fi
             ln -s ${datadir}/zoneinfo/${DEFAULT_TIMEZONE} ${D}${sysconfdir}/localtime
         else
             bberror "DEFAULT_TIMEZONE is set to an invalid value."
@@ -205,4 +208,5 @@ FILES_${PN} += "${datadir}/zoneinfo/Pacific/Honolulu     \
                 ${datadir}/zoneinfo/iso3166.tab          \
                 ${datadir}/zoneinfo/Etc/*"
 
-CONFFILES_${PN} += "${sysconfdir}/timezone ${sysconfdir}/localtime"
+CONFFILES_${PN} += "${@ "${sysconfdir}/timezone" if bb.utils.to_boolean(d.getVar('INSTALL_TIMEZONE_FILE', True)) else "" }"
+CONFFILES_${PN} += "${sysconfdir}/localtime"
