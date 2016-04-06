@@ -1,0 +1,29 @@
+From dd2295715fabd823f01656cef0393cedc5a4bc34 Mon Sep 17 00:00:00 2001
+From: Alexandru Moise <alexandru.moise@windriver.com>
+Date: Wed, 6 Apr 2016 05:45:58 +0000
+Subject: [PATCH] STIG: set system default umask in /etc/login.defs to 077
+
+Conform to STIG standard:
+https://www.stigviewer.com/stig/red_hat_enterprise_linux_6/2015-05-26/finding/V-38645
+
+Signed-off-by: Alexandru Moise <alexandru.moise@windriver.com>
+---
+ etc/login.defs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/login.defs b/etc/login.defs
+index 8dd7c44..e2a8a65 100644
+--- a/etc/login.defs
++++ b/etc/login.defs
+@@ -190,7 +190,7 @@ KILLCHAR	025
+ # 022 is the default value, but 027, or even 077, could be considered
+ # for increased privacy. There is no One True Answer here: each sysadmin
+ # must make up his/her mind.
+-UMASK		022
++UMASK		077
+ 
+ #
+ # Password aging controls:
+-- 
+2.5.0
+
