@@ -1,0 +1,38 @@
+From 036c7b0579c783b2957143dd88ad7b0254fa9a11 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Wed, 16 Mar 2016 06:11:05 +0000
+Subject: [PATCH] Conditional compilation to DES related code in cms_kari.
+
+If configured with "no-des", the DES related code should be
+wrappered in macro block like "#ifndef OPENSSL_NO_DES".
+
+Upstream-status: Pending
+
+Signed-off-by: Haiqing Bai <Haiqing.Bai@windriver.com>
+---
+ crypto/cms/cms_kari.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/crypto/cms/cms_kari.c b/crypto/cms/cms_kari.c
+index 2cfcdb2..948630e 100644
+--- a/crypto/cms/cms_kari.c
++++ b/crypto/cms/cms_kari.c
+@@ -397,6 +397,7 @@ static int cms_wrap_init(CMS_KeyAgreeRecipientInfo *kari,
+             return 0;
+         return 1;
+     }
++# ifndef OPENSSL_NO_DES
+     /*
+      * Pick a cipher based on content encryption cipher. If it is DES3 use
+      * DES3 wrap otherwise use AES wrap similar to key size.
+@@ -409,6 +410,7 @@ static int cms_wrap_init(CMS_KeyAgreeRecipientInfo *kari,
+         kekcipher = EVP_aes_192_wrap();
+     else
+         kekcipher = EVP_aes_256_wrap();
++# endif
+     return EVP_EncryptInit_ex(ctx, kekcipher, NULL, NULL, NULL);
+ }
+
+--
+2.5.0
+
