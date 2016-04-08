@@ -23,8 +23,8 @@ DEPENDS = "gettext-native e2fsprogs"
 
 inherit autotools-brokensep gettext pkgconfig
 
-CFLAGS += "-I${STAGING_INCDIR}/tirpc"
-LDFLAGS += "-ltirpc"
+CFLAGS_append_libc-musl += "-I${STAGING_INCDIR}/tirpc"
+LDFLAGS_append_libc-musl += "-ltirpc"
 ASNEEDED = ""
 EXTRA_OEMAKE += 'STRIP=""'
 
