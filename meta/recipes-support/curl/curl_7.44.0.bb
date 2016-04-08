@@ -32,6 +32,11 @@ PACKAGECONFIG[zlib] = "--with-zlib=${STAGING_LIBDIR}/../,--without-zlib,zlib"
 PACKAGECONFIG[rtmpdump] = "--with-librtmp,--without-librtmp,rtmpdump"
 PACKAGECONFIG[libssh2] = "--with-libssh2,--without-libssh2,libssh2"
 PACKAGECONFIG[smb] = "--enable-smb,--disable-smb,"
+PACKAGECONFIG[krb5] = "--with-gssapi-libdir=${STAGING_LIBDIR}/ \
+                       --with-gssapi-includes=${STAGING_INCDIR}/gssapi/, \
+                       --without-gssapi,krb5"
+
+export KRB5CONFIG="${STAGING_BINDIR_CROSS}/krb5-config"
 
 EXTRA_OECONF = "--without-libidn \
                 --enable-crypto-auth \
