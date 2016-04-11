@@ -37,6 +37,7 @@ SRC_URI = "http://www.busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0002-Passthrough-r-to-linker.patch \
            file://0001-ash-fix-memleak.patch \
            file://0001-randconfig-fix.patch \
+           file://0001-zcip-fix-wrong-comparison-of-source-IP-with-our-IP.patch \
            file://mount-via-label.cfg \
            file://sha1sum.cfg \
            file://sha256sum.cfg \
