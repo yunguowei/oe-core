@@ -21,7 +21,6 @@ SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.t
         file://lighttpd \
         file://lighttpd.service \
         file://pkgconfig.patch \
-        file://0001-mod_cgi-buffers-data-without-bound.patch \
         "
 
 SRC_URI[md5sum] = "1843daffcb018aa528f6d15d43544654"
