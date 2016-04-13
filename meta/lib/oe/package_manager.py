@@ -55,6 +55,16 @@ class RpmIndexer(Indexer):
             target_os['default'] = self.d.getVar(os_var, True).strip()
         else:
             package_archs['default'] = self.d.getVar("PACKAGE_ARCHS", True).split()
+
+            #add the compatible arch extracted from TARGET_SYS.
+            #TARGET_SYS usually values as "arm-wrs-linux-gnueabi",
+            #so the arch is 'arm'
+            target_sys = self.d.getVar("TARGET_SYS", True)
+            if target_sys:
+                target_arch = target_sys.split('-')[0]
+            if target_arch not in package_archs['default']:
+                package_archs['default'].append(target_arch)
+
             # arch order is reversed.  This ensures the -best- match is
             # listed first!
             package_archs['default'].reverse()
