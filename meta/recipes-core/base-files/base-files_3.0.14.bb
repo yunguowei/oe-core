@@ -106,8 +106,8 @@ do_install () {
 		ln -sf volatile/$d ${D}${localstatedir}/$d
 	done
 
-	ln -snf ../run ${D}${localstatedir}/run
-	ln -snf ../run/lock ${D}${localstatedir}/lock
+	ln -snf /run ${D}${localstatedir}/run
+	ln -snf /run/lock ${D}${localstatedir}/lock
 
 	${BASEFILESISSUEINSTALL}
 
