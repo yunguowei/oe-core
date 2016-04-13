@@ -1964,6 +1964,9 @@ python package_redepchains() {
         d.setVar('RRECOMMENDS_%s' % pkg, bb.utils.join_deps(rreclist, commasep=False) or ' ')
 
     for pkg in packages.split():
+        if pkg == 'kernel-modules':
+            continue
+
         rdeplist = {}
         for (dep_pkg, dep) in bb.utils.explode_dep_versions2(d.getVar('RDEPENDS_' + pkg, True) or "").iteritems():
             if dep_pkg.startswith('kernel-'):
