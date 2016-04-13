@@ -27,6 +27,7 @@ SRC_URI = "\
     file://nss-CVE-2015-7575.patch \
     file://nss-CVE-2016-1950.patch \
     file://nss-CVE-2016-1978.patch \
+    file://nss-CVE-2016-1979.patch \
 "
 
 SRC_URI[md5sum] = "b02ffd1e8e8ef5f8512fa02d8ca9db3d"
