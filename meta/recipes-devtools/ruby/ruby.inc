@@ -20,6 +20,7 @@ DEPENDS_class-native = "openssl-native libyaml-native"
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://cache.ruby-lang.org/pub/ruby/${SHRT_VER}/ruby-${PV}.tar.gz \
            file://extmk.patch \
+           file://ruby-CVE-2015-7551.patch \
 "
 
 inherit autotools
