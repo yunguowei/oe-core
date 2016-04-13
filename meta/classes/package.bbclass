@@ -1941,9 +1941,8 @@ python package_redepchains() {
     """
     Since the kernel and kernel modules are not necessary for a container image,
     so it's necessary to exclude all of the kernel related files from installing
-    into the image. By now only finding the kernel related files are installed
-    into a image by image's IMAGE_INSTALL or packages RRECOMMENDS.
-    This function deal with the package's RRECOMMENDS of kernel module case.
+    into the image. This function deal with the package's RRECOMMENDS and RDEPENDS
+    of kernel related packages.
 
     TODO:
     Maybe in the future setup a container blacklist, and all of the packages in the list
@@ -1956,13 +1955,25 @@ python package_redepchains() {
     for pkg in packages.split():
         rreclist = {}
         for (dep_pkg, dep) in bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS_' + pkg, True) or "").iteritems():
-            if dep_pkg.startswith('kernel-module-'):
+            if dep_pkg.startswith('kernel-'):
                 pass
             else:
                 rreclist[dep_pkg] = dep
 
         bb.note("%s recommends: %s" % (pkg, ' '.join(rreclist)))
         d.setVar('RRECOMMENDS_%s' % pkg, bb.utils.join_deps(rreclist, commasep=False) or ' ')
+
+    for pkg in packages.split():
+        rdeplist = {}
+        for (dep_pkg, dep) in bb.utils.explode_dep_versions2(d.getVar('RDEPENDS_' + pkg, True) or "").iteritems():
+            if dep_pkg.startswith('kernel-'):
+                pass
+            else:
+                rdeplist[dep_pkg] = dep
+
+        bb.note("%s rdepends: %s" % (pkg, ' '.join(rdeplist)))
+        d.setVar('RDEPENDS_%s' % pkg, bb.utils.join_deps(rdeplist, commasep=False) or ' ')
+
 }
 
 # Since bitbake can't determine which variables are accessed during package
