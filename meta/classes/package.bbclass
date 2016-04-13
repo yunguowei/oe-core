@@ -35,7 +35,10 @@
 #
 # k) package_depchains - Adds automatic dependencies to -dbg and -dev packages
 #
-# l) emit_pkgdata - saves the packaging data into PKGDATA_DIR for use in later
+# l) package_redepchains - Rebuild the depchains of a package when building image for a container.
+#    Since some packages are not necessary for container image, such as kernel related packages.
+#
+# m) emit_pkgdata - saves the packaging data into PKGDATA_DIR for use in later
 #    packaging steps
 
 inherit packagedata
@@ -1934,6 +1937,34 @@ python package_depchains() {
                 pkg_addrrecs(pkg, base, suffix, func, rdeps, d)
 }
 
+python package_redepchains() {
+    """
+    Since the kernel and kernel modules are not necessary for a container image,
+    so it's necessary to exclude all of the kernel related files from installing
+    into the image. By now only finding the kernel related files are installed
+    into a image by image's IMAGE_INSTALL or packages RRECOMMENDS.
+    This function deal with the package's RRECOMMENDS of kernel module case.
+
+    TODO:
+    Maybe in the future setup a container blacklist, and all of the packages in the list
+    can be remove from the package's RRECOMMENDS. Even more, the packages in the list can
+    be excluded from a package group's RDEPENDS.
+    """
+
+    packages  = d.getVar('PACKAGES', True)
+
+    for pkg in packages.split():
+        rreclist = {}
+        for (dep_pkg, dep) in bb.utils.explode_dep_versions2(d.getVar('RRECOMMENDS_' + pkg, True) or "").iteritems():
+            if dep_pkg.startswith('kernel-module-'):
+                pass
+            else:
+                rreclist[dep_pkg] = dep
+
+        bb.note("%s recommends: %s" % (pkg, ' '.join(rreclist)))
+        d.setVar('RRECOMMENDS_%s' % pkg, bb.utils.join_deps(rreclist, commasep=False) or ' ')
+}
+
 # Since bitbake can't determine which variables are accessed during package
 # iteration, we need to list them here:
 PACKAGEVARS = "FILES RDEPENDS RRECOMMENDS SUMMARY DESCRIPTION RSUGGESTS RPROVIDES RCONFLICTS PKG ALLOW_EMPTY pkg_postinst pkg_postrm INITSCRIPT_NAME INITSCRIPT_PARAMS DEBIAN_NOAUTONAME ALTERNATIVE PKGE PKGV PKGR USERADD_PARAM GROUPADD_PARAM CONFFILES SYSTEMD_SERVICE LICENSE SECTION pkg_preinst pkg_prerm RREPLACES GROUPMEMS_PARAM SYSTEMD_AUTO_ENABLE"
@@ -1972,6 +2003,7 @@ PACKAGEFUNCS += " \
                 package_do_pkgconfig \
                 read_shlibdeps \
                 package_depchains \
+                ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'package_redepchains', '', d)} \
                 emit_pkgdata"
 
 python do_package () {
