@@ -71,7 +71,7 @@ PACKAGE_INSTALL_ATTEMPTONLY ?= "${FEATURE_INSTALL_OPTIONAL}"
 EXCLUDE_FROM_WORLD = "1"
 
 USE_DEVFS ?= "1"
-USE_DEPMOD ?= "1"
+USE_DEPMOD ?= "${@bb.utils.contains("IMAGE_ENABLE_CONTAINER", "1", "0", "1",d)}"
 
 PID = "${@os.getpid()}"
 
