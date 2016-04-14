@@ -12,7 +12,7 @@ python __anonymous () {
 	# (at least for now) into the fitImage .
         typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
         if 'fitImage' in typeformake.split():
-            typeformake.replace('fitImage', 'zImage')
+            typeformake = typeformake.replace('fitImage', 'zImage')
         d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake)
 
         image = d.getVar('INITRAMFS_IMAGE', True)
