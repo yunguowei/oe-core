@@ -64,6 +64,7 @@ SRC_URI += " \
         file://perl-PathTools-don-t-filter-out-blib-from-INC.patch \
         file://perl-errno-generation-gcc5.patch \
         file://fix-improper-use-of-reference-in-IO-Socket.patch \
+        file://perl-CVE-2016-2381.patch \
 "
 
 # Fix test case issues
