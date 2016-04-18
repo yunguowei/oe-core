@@ -14,7 +14,7 @@ python __anonymous () {
         if d.getVar("KEEPUIMAGE", True) != 'yes':
             typeformake = d.getVar("KERNEL_IMAGETYPE_FOR_MAKE", True) or ""
             if "uImage" in typeformake.split():
-                typeformake.replace('uImage', 'zImage')
+                typeformake = typeformake.replace('uImage', 'zImage')
             d.setVar('KERNEL_IMAGETYPE_FOR_MAKE', typeformake)
 }
 
