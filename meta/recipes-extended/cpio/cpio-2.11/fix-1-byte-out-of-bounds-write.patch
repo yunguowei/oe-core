@@ -1,0 +1,31 @@
+cpio:fix 1-byte out-of-bounds write
+
+Upstreamlink:https://lists.gnu.org/archive/html/bug-cpio/2016-01/
+msg00005.html
+
+diff -pNur cpio-2.11-ori/src/copyin.c cpio-2.11/src/copyin.c
+--- cpio-2.11-ori/src/copyin.c	2016-04-20 11:40:03.657861491 +0800
++++ cpio-2.11/src/copyin.c	2016-04-20 11:41:25.006861442 +0800
+@@ -1433,6 +1433,8 @@ process_copy_in ()
+ 	  break;
+ 	}
+ 
++      if (file_hdr.c_namesize <= 1)
++         file_hdr.c_name = xrealloc(file_hdr.c_name, 2);
+       cpio_safer_name_suffix (file_hdr.c_name, false, !no_abs_paths_flag,
+ 			      false);
+       
+diff -pNur cpio-2.11-ori/src/util.c cpio-2.11/src/util.c
+--- cpio-2.11-ori/src/util.c	2016-04-20 11:40:03.639861430 +0800
++++ cpio-2.11/src/util.c	2016-04-20 11:42:08.513861301 +0800
+@@ -1377,7 +1377,9 @@ set_file_times (int fd,
+ }
+ 
+ /* Do we have to ignore absolute paths, and if so, does the filename
+-   have an absolute path?  */
++   have an absolute path?
++   Before calling this function make sure that the allocated NAME buffer has
++   capacity at least 2 bytes to allow us to store the "." string inside.  */
+ void
+ cpio_safer_name_suffix (char *name, bool link_target, bool absolute_names,
+ 			bool strip_leading_dots)

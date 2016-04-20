@@ -12,6 +12,7 @@ SRC_URI += "file://remove-gets.patch \
         file://Fix-symlink-bad-length-test-for-64-bit-architectures.patch \
         file://fix-testcase-symlink-bad-lengths.patch \
         file://0001-fix-testcase-of-symlink-bad-length.patch \
+        file://fix-1-byte-out-of-bounds-write.patch \
         "
 
 SRC_URI[md5sum] = "1112bb6c45863468b5496ba128792f6c"
