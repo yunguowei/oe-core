@@ -1,0 +1,12 @@
+diff -pNur dosfstools-2.11-ori/mkdosfs/mkdosfs.c dosfstools-2.11/mkdosfs/mkdosfs.c
+--- dosfstools-2.11-ori/mkdosfs/mkdosfs.c	2016-04-21 19:51:50.538972030 -0700
++++ dosfstools-2.11/mkdosfs/mkdosfs.c	2016-04-21 19:52:52.654962886 -0700
+@@ -142,7 +142,7 @@
+ 
+ /* Compute ceil(a/b) */
+ 
+-inline int
++static inline int
+ cdiv (int a, int b)
+ {
+   return (a + b - 1) / b;
