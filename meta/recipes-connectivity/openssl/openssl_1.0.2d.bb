@@ -60,6 +60,7 @@ SRC_URI += "file://configure-targets.patch \
             file://openssl-CVE-2016-2106.patch \
             file://openssl-CVE-2016-2107.patch \
             file://openssl-CVE-2016-2108.patch \
+            file://openssl-CVE-2016-2109.patch \
            "
 
 SRC_URI[md5sum] = "38dd619b2e77cbac69b99f52a053d25a"
