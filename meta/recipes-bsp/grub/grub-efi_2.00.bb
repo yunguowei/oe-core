@@ -2,6 +2,7 @@ require grub2.inc
 
 DEPENDS_class-target = "grub-efi-native"
 RDEPENDS_${PN}_class-target = "diffutils freetype"
+DEPENDS += "autogen-native"
 PR = "r3"
 
 SRC_URI += " \
@@ -32,6 +33,11 @@ CACHED_CONFIGUREVARS += "ac_cv_path_HELP2MAN="
 EXTRA_OECONF = "--with-platform=efi --disable-grub-mkfont \
                 --enable-efiemu=no --program-prefix='' \
                 --enable-liblzma=no --enable-device-mapper=no --enable-libzfs=no"
+
+do_configure_prepend() {
+    ( cd ${S}
+    ${S}/autogen.sh )
+}
 
 do_install_class-native() {
 	install -d ${D}${bindir}
