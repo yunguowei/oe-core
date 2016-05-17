@@ -25,6 +25,7 @@ SRC_URI = "\
           file://smart-cache.py-getPackages-matches-name-version.patch \
           file://python-smartpm-Ensure-that-upgrades-pay-attention-to.patch \
           file://smartpm-rpm5-support-check-signatures.patch \
+          file://smart-channel-remove-all.patch \
          "
 
 # Disabled as this causes different behavior than the community version
