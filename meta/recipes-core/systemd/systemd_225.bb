@@ -53,6 +53,8 @@ SRC_URI = "git://github.com/systemd/systemd.git;protocol=git \
            file://0001-logind-treat-an-empty-wall-message-like-a-NULL-one.patch \
            file://0001-logind-when-parsing-a-boolean-via-sd-bus-the-type-mu.patch \
            file://systemd-CVE-2015-8842-befor-v229.patch \
+           file://0023-sd_pid_notify_with_fds-fix-computing-msg_controllen.patch \
+           file://0024-sd-daemon-simply-code-simplification.patch \
           "
 SRC_URI_append_qemuall = " file://qemuall_io_latency-core-device.c-Change-the-default-device-timeout-to-2.patch"
 
