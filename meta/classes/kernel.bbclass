@@ -282,7 +282,7 @@ do_compile_kernelmodules() {
 		# external kernel modules has a dependency on
 		# other kernel modules and will look at this
 		# file to do symbol lookups
-		cp Module.symvers ${STAGING_KERNEL_BUILDDIR}
+		cp ${B}/Module.symvers ${STAGING_KERNEL_BUILDDIR}
 	else
 		bbnote "no modules to compile"
 	fi
