@@ -30,6 +30,11 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://qemu-CVE-2016-4001.patch \
             file://qemu-CVE-2016-4002.patch \
             file://qemu-CVE-2016-3710.patch \
+            file://vga-add-vbe_enabled-helper.patch \
+            file://vga-factor-out-vga-register-setup.patch \
+            file://vga-update-vga-register-setup-on-vbe-changes.patch \
+            file://qemu-CVE-2016-3712.patch \
+            file://vga-add-sr_vbe-register-set.patch \
            "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "186ee8194140a484a455f8e3c74589f4"
