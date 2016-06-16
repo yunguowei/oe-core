@@ -1,0 +1,32 @@
+From 184718baabed00fecbc89fdd84b44014fcd6c444 Mon Sep 17 00:00:00 2001
+From: Alessandro Ghedini <alessandro@ghedini.me>
+Date: Fri, 2 Oct 2015 14:38:30 +0200
+Subject: [PATCH] Validate ClientHello extension field length
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+RT#4069
+
+Reviewed-by: Emilia Käsper <emilia@openssl.org>
+Reviewed-by: Matt Caswell <matt@openssl.org>
+---
+ ssl/t1_lib.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ssl/t1_lib.c b/ssl/t1_lib.c
+index 210a5e8..33af933 100644
+--- a/ssl/t1_lib.c
++++ b/ssl/t1_lib.c
+@@ -2024,7 +2024,7 @@ static int ssl_scan_clienthello_tlsext(SSL *s, unsigned char **p,
+ 
+     n2s(data, len);
+ 
+-    if (data > (d + n - len))
++    if (data + len != d + n)
+         goto err;
+ 
+     while (data <= (d + n - 4)) {
+-- 
+1.7.9.5
+
