@@ -208,6 +208,7 @@ do_install_ptest () {
 	mkdir -p ${D}${PTEST_PATH}/util
 	install util/opensslwrap.sh    ${D}${PTEST_PATH}/util
 	install util/shlib_wrap.sh     ${D}${PTEST_PATH}/util
+	sed -i -e 's#^PERL=.*#PERL= /usr/bin/perl#g' ${D}${PTEST_PATH}/Makefile
 }
 
 do_install_append_class-native() {
