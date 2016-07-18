@@ -103,6 +103,7 @@ SRC_URI = "http://www.rpm5.org/files/rpm/rpm-5.4/rpm-5.4.14-0.20131024.src.rpm;e
 	   file://0001-define-EM_AARCH64.patch \
 	   file://rpm-rpmfc.c-fix-for-N32-MIPS64.patch \
 	   file://rpm-lib-transaction.c-fix-file-conflicts-for-mips64-N32.patch \
+	   file://0001-system.h-query.c-support-nosignature.patch \
 	  "
 
 # Uncomment the following line to enable platform score debugging
