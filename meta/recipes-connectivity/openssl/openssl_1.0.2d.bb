@@ -67,6 +67,7 @@ SRC_URI += "file://configure-targets.patch \
             file://0001-Change-functions-to-pass-in-a-limit-rather-than-calc.patch \
             file://openssl-CVE-2016-2177.patch \
             file://Use-SHA256-not-MD5-as-default-digest.patch  \
+            file://openssl-CVE-2016-2180.patch \
            "
 
 SRC_URI[md5sum] = "38dd619b2e77cbac69b99f52a053d25a"
