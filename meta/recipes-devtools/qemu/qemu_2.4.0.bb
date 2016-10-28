@@ -57,6 +57,10 @@ SRC_URI += "file://configure-fix-Darwin-target-detection.patch \
             file://qemu-CVE-2016-5107.patch \
             file://CVE-2016-6351_p1.patch \
             file://CVE-2016-6351_p2.patch \
+            file://virtio-cache-used_idx-in-a-VirtQueue-field.patch \
+            file://virtio-recalculate-vq-inuse-after-migration.patch \
+            file://virtio-decrement-vq-inuse-in-virtqueue_discard.patch \
+            file://virtio-zero-vq-inuse-in-virtio_reset.patch \
            "
 SRC_URI_prepend = "http://wiki.qemu-project.org/download/${BP}.tar.bz2"
 SRC_URI[md5sum] = "186ee8194140a484a455f8e3c74589f4"
