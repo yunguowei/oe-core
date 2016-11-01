@@ -231,7 +231,7 @@ python write_specfile () {
                     continue
                 file = file.replace("%", "%%%%%%%%")
                 if conffiles.count(path + '/' + file):
-                    target.append('%config "' + path + '/' + file + '"')
+                    target.append('%config(noreplace) "' + path + '/' + file + '"')
                 else:
                     target.append('"' + path + '/' + file + '"')
 
