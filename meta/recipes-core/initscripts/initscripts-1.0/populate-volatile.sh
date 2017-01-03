@@ -69,7 +69,9 @@ mk_dir() {
 
 link_file() {
 	EXEC="
-	if [ -L \"$2\" ]; then
+	if [ -L \"$1\" -a -f \"\$(readlink -f \"$1\")\" ]; then
+		: ;
+	elif [ -L \"$2\" ]; then
 		[ \"\$(readlink -f \"$2\")\" != \"\$(readlink -f \"$1\")\" ] && { rm -f \"$2\"; ln -sf \"$1\" \"$2\"; };
 	elif [ -d \"$2\" ]; then
 		if awk '\$2 == \"$2\" {exit 1}' /proc/mounts; then
