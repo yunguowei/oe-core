@@ -1,0 +1,211 @@
+From 68701e51c1f794df59d9f70bcddbf714ee91b868 Mon Sep 17 00:00:00 2001
+From: Jay Satiro <raysatiro@yahoo.com>
+Date: Wed, 9 Mar 2016 02:59:05 -0500
+Subject: [PATCH] mprintf: Fix processing of width and prec args
+
+Prior to this change a width arg could be erroneously output, and also
+width and precision args could not be used together without crashing.
+
+"%0*d%s", 2, 9, "foo"
+
+Before: "092"
+After: "09foo"
+
+"%*.*s", 5, 2, "foo"
+
+Before: crash
+After: "   fo"
+
+Test 557 is updated to verify this and more
+---
+ lib/mprintf.c          |   60 ++++++++++++++++++++++++++++++++----------------
+ tests/data/test557     |    1 +
+ tests/libtest/lib557.c |   49 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+), 20 deletions(-)
+
+diff --git a/lib/mprintf.c b/lib/mprintf.c
+index 9069167..022012c 100644
+--- a/lib/mprintf.c
++++ b/lib/mprintf.c
+@@ -460,22 +460,24 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
+       if(flags & FLAGS_WIDTHPARAM) {
+         /* we have the width specified from a parameter, so we make that
+            parameter's info setup properly */
+-        vto[i].width = width - 1;
+-        i = width - 1;
+-        vto[i].type = FORMAT_WIDTH;
+-        vto[i].flags = FLAGS_NEW;
+-        vto[i].precision = vto[i].width = 0; /* can't use width or precision
+-                                                of width! */
++        long k = width - 1;
++        vto[i].width = k;
++        vto[k].type = FORMAT_WIDTH;
++        vto[k].flags = FLAGS_NEW;
++        /* can't use width or precision of width! */
++        vto[k].width = 0;
++        vto[k].precision = 0;
+       }
+       if(flags & FLAGS_PRECPARAM) {
+         /* we have the precision specified from a parameter, so we make that
+            parameter's info setup properly */
+-        vto[i].precision = precision - 1;
+-        i = precision - 1;
+-        vto[i].type = FORMAT_WIDTH;
+-        vto[i].flags = FLAGS_NEW;
+-        vto[i].precision = vto[i].width = 0; /* can't use width or precision
+-                                                of width! */
++        long k = precision - 1;
++        vto[i].precision = k;
++        vto[k].type = FORMAT_WIDTH;
++        vto[k].flags = FLAGS_NEW;
++        /* can't use width or precision of width! */
++        vto[k].width = 0;
++        vto[k].precision = 0;
+       }
+       *endpos++ = fmt + 1; /* end of this sequence */
+     }
+@@ -483,11 +485,15 @@ static long dprintf_Pass1(const char *format, va_stack_t *vto, char **endpos,
+ 
+   /* Read the arg list parameters into our data list */
+   for(i=0; i<max_param; i++) {
+-    if((i + 1 < max_param) && (vto[i + 1].type == FORMAT_WIDTH)) {
+-      /* Width/precision arguments must be read before the main argument
+-       * they are attached to
+-       */
+-      vto[i + 1].data.num.as_signed = (mp_intmax_t)va_arg(arglist, int);
++    /* Width/precision arguments must be read before the main argument
++       they are attached to */
++    if(vto[i].flags & FLAGS_WIDTHPARAM) {
++      vto[vto[i].width].data.num.as_signed =
++        (mp_intmax_t)va_arg(arglist, int);
++    }
++    if(vto[i].flags & FLAGS_PRECPARAM) {
++      vto[vto[i].precision].data.num.as_signed =
++        (mp_intmax_t)va_arg(arglist, int);
+     }
+ 
+     switch (vto[i].type) {
+@@ -640,16 +646,30 @@ static int dprintf_formatf(
+     p = &vto[param];
+ 
+     /* pick up the specified width */
+-    if(p->flags & FLAGS_WIDTHPARAM)
++    if(p->flags & FLAGS_WIDTHPARAM) {
+       width = (long)vto[p->width].data.num.as_signed;
++      param_num++; /* since the width is extracted from a parameter, we
++                      must skip that to get to the next one properly */
++      if(width < 0) {
++        /* "A negative field width is taken as a '-' flag followed by a
++           positive field width." */
++        width = -width;
++        p->flags |= FLAGS_LEFT;
++        p->flags &= ~FLAGS_PAD_NIL;
++      }
++    }
+     else
+       width = p->width;
+ 
+     /* pick up the specified precision */
+     if(p->flags & FLAGS_PRECPARAM) {
+       prec = (long)vto[p->precision].data.num.as_signed;
+-      param_num++; /* since the precision is extraced from a parameter, we
++      param_num++; /* since the precision is extracted from a parameter, we
+                       must skip that to get to the next one properly */
++      if(prec < 0)
++        /* "A negative precision is taken as if the precision were
++           omitted." */
++        prec = -1;
+     }
+     else if(p->flags & FLAGS_PREC)
+       prec = p->precision;
+@@ -804,7 +824,7 @@ static int dprintf_formatf(
+         else
+           len = strlen(str);
+ 
+-        width -= (long)len;
++        width -= (len > LONG_MAX) ? LONG_MAX : (long)len;
+ 
+         if(p->flags & FLAGS_ALT)
+           OUTCHAR('"');
+diff --git a/tests/data/test557 b/tests/data/test557
+index ee2793f..8d0944a 100644
+--- a/tests/data/test557
++++ b/tests/data/test557
+@@ -39,6 +39,7 @@ All curl_mprintf() signed int tests OK!
+ All curl_mprintf() unsigned long tests OK!
+ All curl_mprintf() signed long tests OK!
+ All curl_mprintf() curl_off_t tests OK!
++All curl_mprintf() strings tests OK!
+ </stdout>
+ </verify>
+ 
+diff --git a/tests/libtest/lib557.c b/tests/libtest/lib557.c
+index 2e72489..5bdb8ab 100644
+--- a/tests/libtest/lib557.c
++++ b/tests/libtest/lib557.c
+@@ -1374,6 +1374,53 @@ static int test_curl_off_t_formatting(void)
+   return failed;
+ }
+ 
++static int string_check(char *buf, const char *buf2)
++{
++  if(strcmp(buf, buf2)) {
++    /* they shouldn't differ */
++    printf("sprintf failed:\nwe '%s'\nsystem: '%s'\n",
++           buf, buf2);
++    return 1;
++  }
++  return 0;
++}
++
++/*
++ * The output strings in this test need to have been verified with a system
++ * sprintf() before used here.
++ */
++static int test_string_formatting(void)
++{
++  int errors = 0;
++  char buf[256];
++  curl_msnprintf(buf, sizeof(buf), "%0*d%s", 2, 9, "foo");
++  errors += string_check(buf, "09foo");
++
++  curl_msnprintf(buf, sizeof(buf), "%*.*s", 5, 2, "foo");
++  errors += string_check(buf, "   fo");
++
++  curl_msnprintf(buf, sizeof(buf), "%*.*s", 2, 5, "foo");
++  errors += string_check(buf, "foo");
++
++  curl_msnprintf(buf, sizeof(buf), "%*.*s", 0, 10, "foo");
++  errors += string_check(buf, "foo");
++
++  curl_msnprintf(buf, sizeof(buf), "%-10s", "foo");
++  errors += string_check(buf, "foo       ");
++
++  curl_msnprintf(buf, sizeof(buf), "%10s", "foo");
++  errors += string_check(buf, "       foo");
++
++  curl_msnprintf(buf, sizeof(buf), "%*.*s", -10, -10, "foo");
++  errors += string_check(buf, "foo       ");
++
++  if(!errors)
++    printf("All curl_mprintf() strings tests OK!\n");
++  else
++    printf("Some curl_mprintf() string tests Failed!\n");
++
++  return errors;
++}
+ 
+ int test(char *URL)
+ {
+@@ -1394,6 +1441,8 @@ int test(char *URL)
+ 
+   errors += test_curl_off_t_formatting();
+ 
++  errors += test_string_formatting();
++
+   if(errors)
+     return TEST_ERR_MAJOR_BAD;
+   else
+-- 
+1.7.9.5
+

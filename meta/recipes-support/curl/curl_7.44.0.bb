@@ -33,6 +33,8 @@ SRC_URI += " file://configure_ac.patch \
              file://curl-CVE-2016-8622.patch \
              file://curl-CVE-2016-8623.patch \
              file://curl-CVE-2016-8624.patch \
+             file://0001-mprintf-Fix-processing-of-width-and-prec-args.patch \
+             file://curl-CVE-2016-9586.patch \
 "
 
 SRC_URI[md5sum] = "6b952ca00e5473b16a11f05f06aa8dae"
