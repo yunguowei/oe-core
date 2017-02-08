@@ -217,6 +217,7 @@ do_assemble_fitimage() {
 }
 
 addtask assemble_fitimage before do_install after do_compile
+do_assemble_fitimage[dirs] = "${B}"
 
 kernel_do_deploy_append() {
 	# Update deploy directory
