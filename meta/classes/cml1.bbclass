@@ -41,6 +41,7 @@ python do_menuconfig() {
 }
 do_menuconfig[depends] += "ncurses-native:do_populate_sysroot"
 do_menuconfig[nostamp] = "1"
+do_menuconfig[dirs] = "${B}"
 addtask menuconfig after do_configure
 
 python do_diffconfig() {
