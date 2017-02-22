@@ -25,6 +25,8 @@ SRC_URI = "http://download.qt-project.org/official_releases/qt/4.8/${PV}/qt-ever
            file://0031-aarch64_arm64_mkspecs.patch \
            file://0032-aarch64_add_header.patch \
            file://0034-Fix-kmap2qmap-build-with-clang.patch \
+           file://0036-qt-everywhere-opensource-src-4.8.7-gcc6.patch \
+           file://gcc-6.patch \
            file://Fix-QWSLock-invalid-argument-logs.patch \
            file://add_check_for_aarch64_32.patch \
            file://g++.conf \
@@ -36,6 +38,9 @@ SRC_URI[md5sum] = "d990ee66bf7ab0c785589776f35ba6ad"
 SRC_URI[sha256sum] = "e2882295097e47fe089f8ac741a95fef47e0a73a3f3cdf21b56990638f626ea0"
 
 S = "${WORKDIR}/qt-everywhere-opensource-src-${PV}"
+
+# workaround for class std::auto_ptr' is deprecated with gcc-6
+CXXFLAGS += "-std=gnu++98 -Wno-deprecated"
 
 # disable webkit for mips64 n32 temporarily that fails to compile,
 # qt upstream defect:
