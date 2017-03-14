@@ -78,3 +78,4 @@ python sign_rpm () {
 }
 
 do_package_index[depends] += "signing-keys:do_export_public_keys"
+sign_rpm[depends] += "signing-keys:do_export_public_keys"
