@@ -17,10 +17,9 @@ RPM_SIGN_PACKAGES='1'
 
 
 python () {
-    # Check configuration
-    for var in ('RPM_GPG_NAME', 'RPM_GPG_PASSPHRASE_FILE'):
-        if not d.getVar(var, True):
-            raise_sanity_error("You need to define %s in the config" % var, d)
+    # Check RPM_GPG_NAME configuration
+    if not d.getVar('RPM_GPG_NAME', True):
+        raise_sanity_error("You need to define RPM_GPG_NAME in the config")
 
     # Set the expected location of the public key
     d.setVar('RPM_GPG_PUBKEY', os.path.join(d.getVar('STAGING_ETCDIR_NATIVE'),
@@ -59,8 +58,16 @@ def rpmsign_wrapper(d, files, passphrase, gpg_name=None):
 python sign_rpm () {
     import glob
 
-    with open(d.getVar("RPM_GPG_PASSPHRASE_FILE", True)) as fobj:
-        rpm_gpg_passphrase = fobj.readlines()[0].rstrip('\n')
+    # RPM_GPG_PASSPHRASE_FILE is optional.
+    # Set passphrase as empty if RPM_GPG_PASSPHRASE_FILE is not specified
+    if not d.getVar("RPM_GPG_PASSPHRASE_FILE", True):
+        rpm_gpg_passphrase = ''
+    else:
+        with open(d.getVar("RPM_GPG_PASSPHRASE_FILE", True)) as fobj:
+            if fobj.readlines():
+                rpm_gpg_passphrase = fobj.readlines()[0].rstrip('\n')
+            else:
+                rpm_gpg_passphrase = ''
 
     rpm_gpg_name = (d.getVar("RPM_GPG_NAME", True) or "")
 
@@ -71,3 +78,4 @@ python sign_rpm () {
 }
 
 do_package_index[depends] += "signing-keys:do_export_public_keys"
+sign_rpm[depends] += "signing-keys:do_export_public_keys"

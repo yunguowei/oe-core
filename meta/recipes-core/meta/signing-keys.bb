@@ -42,4 +42,4 @@ python do_export_public_keys () {
         export_gpg_pubkey(d, d.getVar("PACKAGE_FEED_GPG_NAME", True),
                           d.getVar('PACKAGE_FEED_GPG_PUBKEY', True))
 }
-addtask do_export_public_keys before do_build
+addtask do_export_public_keys before do_build after do_populate_sysroot
