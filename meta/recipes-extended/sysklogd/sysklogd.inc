@@ -54,6 +54,9 @@ ALTERNATIVE_PRIORITY = '100'
 
 ALTERNATIVE_${PN} = "syslogd klogd syslog-conf"
 
+ALTERNATIVE_${PN}-doc = "syslogd.8"
+ALTERNATIVE_LINK_NAME[syslogd.8] = "${mandir}/man8/syslogd.8"
+
 ALTERNATIVE_LINK_NAME[syslogd] = "${base_sbindir}/syslogd"
 ALTERNATIVE_LINK_NAME[klogd] = "${base_sbindir}/klogd"
 ALTERNATIVE_LINK_NAME[syslog-conf] = "${sysconfdir}/syslog.conf"
