@@ -28,4 +28,4 @@ python () {
                                    'PACKAGE-FEED-GPG-PUBKEY'))
 }
 
-do_package_index[depends] += "signing-keys:do_export_public_keys"
+do_package_index[depends] += "signing-keys-native:do_export_public_keys"
