@@ -34,9 +34,12 @@ FILES_${PN}-run-parts = "${base_bindir}/run-parts.debianutils"
 RDEPENDS_${PN} += "${PN}-run-parts"
 
 
-ALTERNATIVE_PRIORITY="100"
+ALTERNATIVE_PRIORITY="30"
 ALTERNATIVE_${PN} = "add-shell installkernel remove-shell savelog tempfile which"
 ALTERNATIVE_${PN}-run-parts = "run-parts"
+
+ALTERNATIVE_${PN}-doc = "which.1"
+ALTERNATIVE_LINK_NAME[which.1] = "${mandir}/man1/which.1"
 
 ALTERNATIVE_LINK_NAME[add-shell]="${sbindir}/add-shell"
 ALTERNATIVE_LINK_NAME[installkernel]="${sbindir}/installkernel"
