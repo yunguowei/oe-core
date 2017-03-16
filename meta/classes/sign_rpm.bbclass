@@ -34,7 +34,7 @@ def rpmsign_wrapper(d, files, passphrase, gpg_name=None):
     rpm_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/rpm'
     cmd = rpm_bin_path + " --addsign --define '_gpg_name %s' " % gpg_name
     if d.getVar('GPG_BIN', True):
-        cmd += "--define '%%__gpg %s' " % d.getVar('GPG_BIN', True)
+        cmd += "--define '__gpg %s' " % d.getVar('GPG_BIN', True)
     if d.getVar('GPG_PATH', True):
         cmd += "--define '_gpg_path %s' " % d.getVar('GPG_PATH', True)
     cmd += ' '.join(files)
