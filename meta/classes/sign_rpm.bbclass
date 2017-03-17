@@ -24,6 +24,10 @@ python () {
     # Set the expected location of the public key
     d.setVar('RPM_GPG_PUBKEY', os.path.join(d.getVar('STAGING_ETCDIR_NATIVE'),
                                             'RPM-GPG-PUBKEY'))
+
+    # Set default GPG_PATH if it is not configured
+    if not d.getVar('GPG_PATH', True):
+        d.setVar('GPG_PATH', d.getVar('DEPLOY_DIR_IMAGE', True) + '/.gnupg')
 }
 
 
