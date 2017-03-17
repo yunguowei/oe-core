@@ -23,6 +23,7 @@ EXCLUDE_FROM_WORLD = "1"
 def export_gpg_pubkey(d, keyid, path):
     import bb
     gpg_bin = d.getVar('GPG_BIN', True) or \
+              bb.utils.which(os.getenv('PATH'), "gpg2") or \
               bb.utils.which(os.getenv('PATH'), "gpg")
     cmd = '%s --batch --yes --export --armor -o %s %s' % \
           (gpg_bin, path, keyid)
