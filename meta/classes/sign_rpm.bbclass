@@ -77,5 +77,5 @@ python sign_rpm () {
         raise bb.build.FuncFailed("RPM signing failed")
 }
 
-do_package_index[depends] += "signing-keys:do_export_public_keys"
-sign_rpm[depends] += "signing-keys:do_export_public_keys"
+do_package_index[depends] += "signing-keys-native:do_export_public_keys"
+sign_rpm[depends] += "signing-keys-native:do_export_public_keys"
