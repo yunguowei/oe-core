@@ -24,11 +24,19 @@ python () {
     # Set the expected location of the public key
     d.setVar('RPM_GPG_PUBKEY', os.path.join(d.getVar('STAGING_ETCDIR_NATIVE'),
                                             'RPM-GPG-PUBKEY'))
+
+    # Set default GPG_PATH if it is not configured
+    if not d.getVar('GPG_PATH', True):
+        d.setVar('GPG_PATH', d.getVar('DEPLOY_DIR_IMAGE', True) + '/.gnupg')
 }
 
 
 def rpmsign_wrapper(d, files, passphrase, gpg_name=None):
-    import pexpect
+    try:
+        import pexpect
+    except:
+        raise bb.build.FuncFailed("RPM signing failed. No python-pexpect. " + \
+                "Please apt-get install python-pexpect or yum install python pexpect")
 
     # Find the correct rpm binary
     rpm_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/rpm'

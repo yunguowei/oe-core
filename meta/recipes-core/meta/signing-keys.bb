@@ -25,8 +25,8 @@ def export_gpg_pubkey(d, keyid, path):
     gpg_bin = d.getVar('GPG_BIN', True) or \
               bb.utils.which(os.getenv('PATH'), "gpg2") or \
               bb.utils.which(os.getenv('PATH'), "gpg")
-    cmd = '%s --batch --yes --export --armor -o %s %s' % \
-          (gpg_bin, path, keyid)
+    cmd = '%s --homedir %s --batch --yes --export --armor -o %s %s' % \
+          (gpg_bin, d.getVar('GPG_PATH', True), path, keyid)
     status, output = oe.utils.getstatusoutput(cmd)
     if status:
         raise bb.build.FuncFailed('Failed to export gpg public key (%s): %s' %
