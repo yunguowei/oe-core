@@ -32,7 +32,11 @@ python () {
 
 
 def rpmsign_wrapper(d, files, passphrase, gpg_name=None):
-    import pexpect
+    try:
+        import pexpect
+    except:
+        raise bb.build.FuncFailed("RPM signing failed. No python-pexpect. " + \
+                "Please apt-get install python-pexpect or yum install python pexpect")
 
     # Find the correct rpm binary
     rpm_bin_path = d.getVar('STAGING_BINDIR_NATIVE', True) + '/rpm'
