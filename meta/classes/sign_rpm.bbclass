@@ -19,7 +19,7 @@ RPM_SIGN_PACKAGES='1'
 python () {
     # Check RPM_GPG_NAME configuration
     if not d.getVar('RPM_GPG_NAME', True):
-        raise_sanity_error("You need to define RPM_GPG_NAME in the config")
+        raise_sanity_error("RPM_GPG_NAME is not defined.", d)
 
     # Set the expected location of the public key
     d.setVar('RPM_GPG_PUBKEY', os.path.join(d.getVar('STAGING_ETCDIR_NATIVE'),
