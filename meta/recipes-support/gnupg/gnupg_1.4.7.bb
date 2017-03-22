@@ -92,7 +92,7 @@ do_install () {
 }
 
 # split out gpgv from main package
-RDEPENDS_${PN} = "gpgv"
+RDEPENDS_${PN}-class_target = "gpgv"
 PACKAGES =+ "gpgv"
 FILES_gpgv = "${bindir}/gpgv"
 
@@ -103,3 +103,5 @@ FILES_${PN}-dbg += "${libexecdir}/${BPN}/.debug"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[curl] = "--with-libcurl=${STAGING_LIBDIR},--without-libcurl,curl"
 PACKAGECONFIG[libusb] = "--with-libusb=${STAGING_LIBDIR},--without-libusb,libusb-compat"
+
+BBCLASSEXTEND = "native"
