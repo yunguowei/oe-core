@@ -15,11 +15,12 @@ inherit sanity
 
 RPM_SIGN_PACKAGES='1'
 
+PREFERRED_VERSION_gnupg-native = "1.4.7"
 
 python () {
     # Check RPM_GPG_NAME configuration
     if not d.getVar('RPM_GPG_NAME', True):
-        raise_sanity_error("You need to define RPM_GPG_NAME in the config")
+        raise_sanity_error("RPM_GPG_NAME is not defined.", d)
 
     # Set the expected location of the public key
     d.setVar('RPM_GPG_PUBKEY', os.path.join(d.getVar('STAGING_ETCDIR_NATIVE'),
@@ -28,6 +29,10 @@ python () {
     # Set default GPG_PATH if it is not configured
     if not d.getVar('GPG_PATH', True):
         d.setVar('GPG_PATH', d.getVar('DEPLOY_DIR_IMAGE', True) + '/.gnupg')
+
+    # We prefer native gpg 1.4.7 if GPG_BIN is not specified
+    if not d.getVar('GPG_BIN', True):
+        d.setVar('GPG_BIN', d.getVar('STAGING_BINDIR_NATIVE', True) + '/gpg')
 }
 
 
