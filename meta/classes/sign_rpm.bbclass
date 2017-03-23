@@ -91,4 +91,4 @@ python sign_rpm () {
 }
 
 do_package_index[depends] += "signing-keys-native:do_export_public_keys"
-sign_rpm[depends] += "signing-keys-native:do_export_public_keys"
+do_package_write_rpm[depends] += "signing-keys-native:do_export_public_keys"
