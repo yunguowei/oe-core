@@ -2,6 +2,7 @@ SUMMARY = "GNU Privacy Guard - encryption and signing tools"
 HOMEPAGE = "http://www.gnupg.org/"
 DEPENDS = "zlib bzip2 readline"
 DEPENDS_class-native = "zlib-native bzip2-replacement-native readline-native"
+DEPENDS_class-nativesdk = "zlib-native bzip2-replacement-native readline-native"
 SECTION = "console/utils"
 
 LICENSE = "GPLv2"
@@ -106,4 +107,4 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[curl] = "--with-libcurl=${STAGING_LIBDIR},--without-libcurl,curl"
 PACKAGECONFIG[libusb] = "--with-libusb=${STAGING_LIBDIR},--without-libusb,libusb-compat"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
