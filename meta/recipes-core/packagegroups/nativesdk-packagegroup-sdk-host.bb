@@ -24,6 +24,9 @@ RDEPENDS_${PN} = "\
     nativesdk-makedevs \
     nativesdk-smartpm \
     nativesdk-postinst-intercept \
+    nativesdk-rpm-build \
+    nativesdk-createrepo \
+    nativesdk-gnupg \
     "
 
 RDEPENDS_${PN}_darwin = "\
